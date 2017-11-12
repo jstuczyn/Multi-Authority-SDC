@@ -1,0 +1,33 @@
+{
+  "name": "multi-authority-sdc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "babel-preset-env": "^1.6.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  },
+  "scripts": {
+    "test": "mocha dist/test",
+    "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jstuczyn/Multi-Authority-SDC.git"
+  },
+  "author": "Jedrzej Stuczynski",
+  "bugs": {
+    "url": "https://github.com/jstuczyn/Multi-Authority-SDC/issues"
+  },
+  "homepage": "https://github.com/jstuczyn/Multi-Authority-SDC#readme",
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  }
+}
