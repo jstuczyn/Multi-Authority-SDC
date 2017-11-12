@@ -34,7 +34,7 @@ export default class PSSig {
         // const y = new G.ctx.BIG(513);
 
         const sk = [x, y];
-        const pk = [g2, g2.mul(x), g2.mul(y)];
+        const pk = [g2, G.ctx.PAIR.G2mul(g2, x), G.ctx.PAIR.G2mul(g2, y)];
 
         return [sk, pk]
     }
@@ -56,7 +56,6 @@ export default class PSSig {
         let rand = G.ctx.BIG.randomnum(o, G.rngGen);
 
         // target:
-        // let h = g1.mul(rand);
         let h = G.ctx.PAIR.G1mul(g1, rand);
 
         // current broken alternatives:
@@ -68,7 +67,7 @@ export default class PSSig {
         let tmp2 = x.add(tmp1b);
         // tmp1db.add(x);
 
-        let sig = h.mul(tmp2);
+        let sig = G.ctx.PAIR.G1mul(h, tmp2);
         // let sig = h.mul(tmp1db)
 
         return [h, sig]
@@ -80,7 +79,7 @@ export default class PSSig {
         let [g, X, Y] = pk;
         let [sig1, sig2] = sig;
 
-        let G2_tmp1 = Y.mul(m);
+        let G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
         G2_tmp1.add(X);
         G2_tmp1.affine();
 

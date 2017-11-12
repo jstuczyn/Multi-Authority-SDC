@@ -30,8 +30,8 @@ describe("Bilinear Pairing", () => {
         const big6 = new G.ctx.BIG(6);
         const big7 = new G.ctx.BIG(7);
 
-        const g1test = g1Elem.mul(big2);
-        const g2test = g2Elem.mul(big3);
+        const g1test = G.ctx.PAIR.G1mul(g1Elem, big2);
+        const g2test = G.ctx.PAIR.G2mul(g2Elem, big3);
 
         const gt6_1 = e(g1test, g2test);
         const gt6_2 = G.ctx.PAIR.GTpow(gt, big6);
@@ -46,8 +46,8 @@ describe("Bilinear Pairing", () => {
         });
 
         it("e(3*g1, 4*g2) != e(g1, g2)^6", () => {
-            const g1test_2 = g1Elem.mul(big3);
-            const g2test_2 = g2Elem.mul(big4);
+            const g1test_2 = G.ctx.PAIR.G1mul(g1Elem, big3);
+            const g2test_2 = G.ctx.PAIR.G2mul(g2Elem, big4);
             const gt6_3 = e(g1test_2, g2test_2);
 
             chai.assert.isNotTrue(gt6_3.equals(gt6_2));
@@ -56,7 +56,7 @@ describe("Bilinear Pairing", () => {
 
         it("e(a*g1, g2) == e(g1,g2)^a for random a", () => {
             const a = G.ctx.BIG.randomnum(o, G.rngGen);
-            const g1_test2 = g1Elem.mul(a);
+            const g1_test2 = G.ctx.PAIR.G1mul(g1Elem, a);
             const gt_1 = e(g1_test2, g2Elem);
             const gt_2 = G.ctx.PAIR.GTpow(e(g1Elem, g2Elem), a);
 
@@ -65,7 +65,7 @@ describe("Bilinear Pairing", () => {
 
         it("e(g1, a*g2) == e(g1,g2)^a for random a", () => {
             const a = G.ctx.BIG.randomnum(o, G.rngGen);
-            const g2_test2 = g2Elem.mul(a);
+            const g2_test2 = G.ctx.PAIR.G2mul(g2Elem, a);
             const gt_1 = e(g1Elem, g2_test2);
             const gt_2 = G.ctx.PAIR.GTpow(e(g1Elem, g2Elem), a);
 
