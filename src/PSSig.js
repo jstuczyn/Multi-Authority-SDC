@@ -1,12 +1,5 @@
 import BpGroup from "./BpGroup"
 
-/*
-    TODO:
-    - fix incorrect signature when given x,y = sk, y > 513
-
- */
-
-
 export default class PSSig {
 
     static setup() {
@@ -21,17 +14,11 @@ export default class PSSig {
     }
 
     static keygen(params) {
-        let [G, o, g1, g2, e] = params;
+        const [G, o, g1, g2, e] = params;
 
         // Target values:
         const x = G.ctx.BIG.randomnum(G.order, G.rngGen);
         const y = G.ctx.BIG.randomnum(G.order, G.rngGen);
-
-        // Test values: (to compare intermediate products with values of working library)
-        // X can be random as long as Y <= 513...
-
-        // const x = new G.ctx.BIG(42);
-        // const y = new G.ctx.BIG(513);
 
         const sk = [x, y];
         const pk = [g2, G.ctx.PAIR.G2mul(g2, x), G.ctx.PAIR.G2mul(g2, y)];
@@ -41,58 +28,57 @@ export default class PSSig {
 
     // sig = (x+y*m) * h
     static sign(params, sk, m) {
-        let [G, o, g1, g2, e] = params;
-        let [a, b] = sk;
+        const [G, o, g1, g2, e] = params;
+        const [x, y] = sk;
 
-        // makes a copy of them so that would not be overwritten during addition
-        let x = new G.ctx.BIG(a);
-        let y = new G.ctx.BIG(b);
+        const rand = G.ctx.BIG.randomnum(o, G.rngGen);
+        const h = G.ctx.PAIR.G1mul(g1, rand);
 
-        // Test value for testing and comparing intermediate products with working library
-        // let rand = new G.ctx.BIG(32);
+        // mcpy = m mod p
+        const mcpy = new G.ctx.BIG(m);
+        mcpy.mod(o);
 
-        // let h = G.ctx.PAIR.G1mul(g1, G.ctx.BIG.randomnum(o, G.rngGen));
+        // t1 = y * (m mod p)
+        const t1 = G.ctx.BIG.mul(y,mcpy);
 
-        let rand = G.ctx.BIG.randomnum(o, G.rngGen);
+        // DBIG constructor does not allow to pass it a BIG value hence we copy all word values manually
+        const xDBIG =  new G.ctx.DBIG(0);
+        for (let i = 0; i < G.ctx.BIG.NLEN; i++) {
+            xDBIG.w[i] = x.w[i];
+        }
 
-        // target:
-        let h = G.ctx.PAIR.G1mul(g1, rand);
+        // t1 = x + y * (m mod p)
+        t1.add(xDBIG);
 
-        // current broken alternatives:
-        // smul returns instanceof BIG but loses carry of multiplication;
-        // mul returns DBIG, which has correct value, but can't be used to multiply G1Elem
-        let tmp1b = G.ctx.BIG.smul(y,m);
-        let tmp1db = G.ctx.BIG.mul(y,m);
+        // K = (x + y * (m mod p)) mod p
+        const K = t1.mod(o);
 
-        let tmp2 = x.add(tmp1b);
-        // tmp1db.add(x);
-
-        let sig = G.ctx.PAIR.G1mul(h, tmp2);
-        // let sig = h.mul(tmp1db)
+        // sig = K * h
+        const sig = G.ctx.PAIR.G1mul(h, K);
 
         return [h, sig]
     }
 
     //  e(sig1, X + m * Y) == e(sig2, g)
     static verify(params, pk, m, sig) {
-        let [G, o, g1, g2, e] = params;
-        let [g, X, Y] = pk;
-        let [sig1, sig2] = sig;
+        const [G, o, g1, g2, e] = params;
+        const [g, X, Y] = pk;
+        const [sig1, sig2] = sig;
 
-        let G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
+        const G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
         G2_tmp1.add(X);
         G2_tmp1.affine();
 
-        let Gt_1 = e(sig1, G2_tmp1);
-        let Gt_2 = e(sig2, g);
+        const Gt_1 = e(sig1, G2_tmp1);
+        const Gt_2 = e(sig2, g);
 
         return !sig.INF && Gt_1.equals(Gt_2);
     }
 
     static randomize(params, sig) {
-        let [G, o, g1, g2, e] = params;
-        let [sig1, sig2] = sig;
-        let t = G.ctx.BIG.randomnum(G.order, G.rngGen);
+        const [G, o, g1, g2, e] = params;
+        const [sig1, sig2] = sig;
+        const t = G.ctx.BIG.randomnum(G.order, G.rngGen);
 
         return [G.ctx.PAIR.G1mul(sig1, t), G.ctx.PAIR.G1mul(sig2, t)]
     }

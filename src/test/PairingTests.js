@@ -73,20 +73,17 @@ describe("Bilinear Pairing", () => {
         });
 
 
-        it("e(a*g1, b*g2) == e(g1, g2)^(a*b) for big (originally random) (a,b)", () => {
-            // const a = G.ctx.BIG.randomnum(o, G.rngGen);
-            // const b = G.ctx.BIG.randomnum(o, G.rngGen);
-
-            const a = new G.ctx.BIG(514000051400005140000);
-            const b = new G.ctx.BIG(514000051400005140000);
+        it("e(a*g1, b*g2) == e(g1, g2)^(a*b) for random (a,b)", () => {
+            const a = G.ctx.BIG.randomnum(o, G.rngGen);
+            const b = G.ctx.BIG.randomnum(o, G.rngGen);
 
             const g1_test2 = G.ctx.PAIR.G1mul(g1, a);
             const g2_test2 = G.ctx.PAIR.G2mul(g2, b);
 
             const gt_1 = e(g1_test2, g2_test2);
 
-            // same issue as in SchemeTests; smul returns only part of result, mul returns instance of "DBIG" that can't be used in GTPow
             const c = G.ctx.BIG.mul(a,b);
+            c.mod(G.order);
 
             const gt_2 = G.ctx.PAIR.GTpow(e(g1, g2), c);
 

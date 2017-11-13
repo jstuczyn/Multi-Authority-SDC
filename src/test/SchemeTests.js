@@ -93,25 +93,33 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
 
 
         // only works for y <= 513...
-        it("For signature(sig1, sig2), sig2 = (x+y*m) * sig1", () => {
-            // BIG TODO: smul vs mul... both have disadvantages, neither is working (will be shown in verify)
-            const t1 = G.ctx.BIG.smul(y,m);
-            const x_cp = new G.ctx.BIG(x);
-            const t2 = x_cp.add(t1);
+        it("For signature(sig1, sig2), sig2 = ((x+y*(m mod p)) mod p) * sig1", () => {
 
-            let sig_test = sig1.mul(t2);
+            const mcpy = new G.ctx.BIG(m);
+            mcpy.mod(o);
+
+            const t1 = G.ctx.BIG.mul(y,mcpy);
+
+            const xDBIG =  new G.ctx.DBIG(0);
+            for (let i = 0; i < G.ctx.BIG.NLEN; i++) {
+                xDBIG.w[i] = x.w[i];
+            }
+            t1.add(xDBIG);
+            const K = t1.mod(o);
+
+            const sig_test = G.ctx.PAIR.G1mul(sig1, K);
             chai.assert.isTrue(sig2.equals(sig_test))
         });
     });
 
 
     describe("Verify", () => {
-        describe("With Y <= 513", () => {
+        describe("With sk = (42, 513)", () => {
             const params = PSSig.setup();
             const [G, o, g1, g2, e] = params;
 
             // keygen needs to be done "manually"
-            const x = G.ctx.BIG.randomnum(G.order, G.rngGen);
+            const x = new G.ctx.BIG(42);
             const y = new G.ctx.BIG(513);
 
             const sk = [x, y];
