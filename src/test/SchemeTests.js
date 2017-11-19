@@ -66,19 +66,20 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
     });
 
     // h, sig = (x+y*m) * h
-    describe("Sign", () => {
+     describe("Sign", () => {
         const params = PSSig.setup();
         const [G, o, g1, g2, e] = params;
         const [sk, pk] = PSSig.keygen(params);
         const [x, y] = sk;
 
-        const m = PSSig.hashMessage(G, "Hello World!");
+        let m = "Hello World!";
 
-        const signature = PSSig.sign(params, sk, m, true);
+        const signature = PSSig.sign(params, sk, m);
         const [sig1, sig2] = signature;
 
 
         it("For signature(sig1, sig2), sig2 = ((x+y*(m mod p)) mod p) * sig1", () => {
+            m = G.hashToBIG(m);
             const mcpy = new G.ctx.BIG(m);
             mcpy.mod(o);
 

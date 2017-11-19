@@ -31,12 +31,16 @@ export default class PSSig {
         const [G, o, g1, g2, e] = params;
         const [x, y] = sk;
 
-        if(!isMessageHashed) {
-            m = PSSig.hashMessage(G, m);
-        }
+        // RANDOM h:
+        // const rand = G.ctx.BIG.randomnum(o, G.rngGen);
+        // const h = G.ctx.PAIR.G1mul(g1, rand);
 
-        const rand = G.ctx.BIG.randomnum(o, G.rngGen);
-        const h = G.ctx.PAIR.G1mul(g1, rand);
+        // h being hash of message to point on the curve
+        const h = G.hashToPointOnCurve(m);
+
+        if(!isMessageHashed) {
+            m = G.hashToBIG(m);
+        }
 
         // mcpy = m mod p
         const mcpy = new G.ctx.BIG(m);
@@ -70,7 +74,7 @@ export default class PSSig {
         const [sig1, sig2] = sig;
 
         if(!isMessageHashed) {
-            m = PSSig.hashMessage(G, m);
+            m = G.hashToBIG(m);
         }
 
         const G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
@@ -89,21 +93,5 @@ export default class PSSig {
         const t = G.ctx.BIG.randomnum(G.order, G.rngGen);
 
         return [G.ctx.PAIR.G1mul(sig1, t), G.ctx.PAIR.G1mul(sig2, t)]
-    }
-
-    static hashMessage(G, m) {
-        const messageBytes = PSSig.stringToBytes(m);
-        const H = new G.ctx.HASH256(); // proof of concept only because it will be replaced by hashing to point on curve; make hash context attribute of class
-        H.process_array(messageBytes);
-        const R = H.hash();
-        const hashedMessage = G.ctx.BIG.fromBytes(R);
-        return hashedMessage;
-    }
-    
-    static stringToBytes(s) {
-        let b = [];
-        for (let i = 0; i < s.length; i++)
-            b.push(s.charCodeAt(i));
-        return b;
     }
 }
