@@ -5,13 +5,6 @@ import BpGroup from "../BpGroup";
 import * as mocha from "mocha";
 import * as chai from 'chai';
 
-function stringToBytes(s) {
-    let b = [];
-    for (let i = 0; i < s.length; i++)
-        b.push(s.charCodeAt(i));
-    return b;
-}
-
 describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
     describe("Setup", () => {
         const params = PSSig.setup();
@@ -56,8 +49,6 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             chai.assert.isTrue(y instanceof(G.ctx.BIG));
         });
 
-        //        const pk = [g2, g2.mul(x), g2.mul(y)];
-
         describe("Returns Valid Private Key (g,X,Y)", () => {
             it("g = g2", () => {
                 chai.assert.isTrue(g2.equals(g));
@@ -81,20 +72,13 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
         const [sk, pk] = PSSig.keygen(params);
         const [x, y] = sk;
 
-        const testMessage = "Hello World!";
-        const messageBytes = stringToBytes(testMessage);
-        const H = new G.ctx.HASH256();
-        H.process_array(messageBytes);
-        const R = H.hash();
-        const m = G.ctx.BIG.fromBytes(R);
+        const m = PSSig.hashMessage(G, "Hello World!");
 
-        const signature = PSSig.sign(params, sk, m);
+        const signature = PSSig.sign(params, sk, m, true);
         const [sig1, sig2] = signature;
 
 
-        // only works for y <= 513...
         it("For signature(sig1, sig2), sig2 = ((x+y*(m mod p)) mod p) * sig1", () => {
-
             const mcpy = new G.ctx.BIG(m);
             mcpy.mod(o);
 
@@ -125,13 +109,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             const sk = [x, y];
             const pk = [g2, g2.mul(x), g2.mul(y)];
 
-            const testMessage = "Hello World!";
-            const messageBytes = stringToBytes(testMessage);
-            const H = new G.ctx.HASH256();
-            H.process_array(messageBytes);
-            const R = H.hash();
-            const m = G.ctx.BIG.fromBytes(R);
-
+            const m = "Hello World!";
             const sig = PSSig.sign(params, sk, m);
 
             it("Successful verification for original message", () => {
@@ -139,12 +117,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             });
 
             it("Failed verification for another message", () => {
-                let messageBytes2 = stringToBytes("Other Hello World!");
-                let H2 = new G.ctx.HASH256();
-                H2.process_array(messageBytes2);
-                let R2 = H2.hash();
-                let m2 = G.ctx.BIG.fromBytes(R2);
-
+                let m2 = "Other Hello World!";
                 chai.assert.isNotTrue(PSSig.verify(params, pk, m2, sig));
             });
 
@@ -156,13 +129,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             const [sk, pk] = PSSig.keygen(params);
             const [x, y] = sk;
 
-            const testMessage = "Hello World!";
-            const messageBytes = stringToBytes(testMessage);
-            const H = new G.ctx.HASH256();
-            H.process_array(messageBytes);
-            const R = H.hash();
-            const m = G.ctx.BIG.fromBytes(R);
-
+            const m = "Hello World!";
             const sig = PSSig.sign(params, sk, m);
 
             it("Successful verification for original message", () => {
@@ -170,12 +137,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             });
 
             it("Failed verification for another message", () => {
-                let messageBytes2 = stringToBytes("Other Hello World!");
-                let H2 = new G.ctx.HASH256();
-                H2.process_array(messageBytes2);
-                let R2 = H2.hash();
-                let m2 = G.ctx.BIG.fromBytes(R2);
-
+                let m2 = "Other Hello World!";
                 chai.assert.isNotTrue(PSSig.verify(params, pk, m2, sig));
             });
         });
@@ -188,13 +150,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
         const [sk, pk] = PSSig.keygen(params);
         const [x, y] = sk;
 
-        const testMessage = "Hello World!";
-        const messageBytes = stringToBytes(testMessage);
-        const H = new G.ctx.HASH256();
-        H.process_array(messageBytes);
-        const R = H.hash();
-        const m = G.ctx.BIG.fromBytes(R);
-
+        const m = "Hello World!";
         let sig = PSSig.sign(params, sk, m);
         sig = PSSig.randomize(params, sig);
 
@@ -203,12 +159,7 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
         });
 
         it("Failed verification for another message with randomized signature", () => {
-            let messageBytes2 = stringToBytes("Other Hello World!");
-            let H2 = new G.ctx.HASH256();
-            H2.process_array(messageBytes2);
-            let R2 = H2.hash();
-            let m2 = G.ctx.BIG.fromBytes(R2);
-
+            let m2 = "Other Hello World!";
             chai.assert.isNotTrue(PSSig.verify(params, pk, m2, sig));
         });
     });
