@@ -5,6 +5,7 @@
 
 import CTX from "./lib/Milagro-Crypto-Library/ctx"
 import {stringToBytes} from "./auxiliary"
+import * as crypto from "crypto"
 
 export default class BpGroup {
     constructor() {
@@ -51,8 +52,11 @@ export default class BpGroup {
         let RAW = [];
         let rng = new this.ctx.RAND();
         rng.clean();
-        for (let i = 0; i < 100; i++) RAW[i] = i;
-        rng.seed(100, RAW);
+        RAW = crypto.randomBytes(128);
+        rng.seed(RAW.length, RAW);
+        // old "seed"
+        // for (let i = 0; i < 100; i++) RAW[i] = i;
+        // rng.seed(100, RAW);
         this.rng = rng;
 
         this.pair = this.pair.bind(this)

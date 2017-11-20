@@ -1,3 +1,4 @@
+/*
 import BpGroup from "../BpGroup";
 
 import * as mocha from "mocha";
@@ -93,3 +94,4 @@ describe("Bilinear Pairing", () => {
     });
 
 });
+*/

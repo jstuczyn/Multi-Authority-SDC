@@ -6,6 +6,7 @@ import * as mocha from "mocha";
 import * as chai from 'chai';
 
 describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
+    /*
     describe("Setup", () => {
         const params = PSSig.setup();
         const [G, o, g1, g2, e] = params;
@@ -163,5 +164,106 @@ describe("Pointcheval-Sanders Short Randomizable Signatures scheme", () => {
             let m2 = "Other Hello World!";
             chai.assert.isNotTrue(PSSig.verify(params, pk, m2, sig));
         });
+    });*/
+
+    // todo: better test for whether aggregation is correct
+
+    describe("Aggregate", () => {
+        it("Aggregation(s1) = s1", () => {
+            const params = PSSig.setup();
+            const [G, o, g1, g2, e] = params;
+            const [sk, pk] = PSSig.keygen(params);
+            const [x, y] = sk;
+
+            const m = "Hello World!";
+            let [sig1, sig2] = PSSig.sign(params, sk, m);
+            let aggregateSig = PSSig.aggregateSignatures(params, [sig2]);
+
+            chai.assert.isTrue(sig2.equals(aggregateSig));
+        });
     });
+
+    describe("Aggregate Verification", () => {
+        // returns error when duplicates
+
+       it("using PSSIG", () => {
+           const params = PSSig.setup();
+           const [G, o, g1, g2, e] = params;
+
+           const messagesToSign = 3;
+           let pks = [];
+           let ms = [];
+           let sigs = [];
+
+           for(let i = 0; i < messagesToSign; i++) {
+               let messageToSign = `Test Message ${i}`;
+               ms.push(messageToSign);
+               let [sk, pk] = PSSig.keygen(params);
+               pks.push(pk);
+               let [sig1, sig2] = PSSig.sign(params, sk, messageToSign);
+               sigs.push(sig2);
+           }
+
+           let aggregateSignature = PSSig.aggregateSignatures(params, sigs);
+
+           chai.assert.isTrue(PSSig.verifyAggregation(params, pks, ms, aggregateSignature));
+
+       });
+
+       it("using modified paper scheme", () => {
+           const params = PSSig.setup();
+           const [G, o, g1, g2, e] = params;
+
+           let x1 = G.ctx.BIG.randomnum(G.order, G.rngGen);
+           let x2 = G.ctx.BIG.randomnum(G.order, G.rngGen);
+
+           let v1 = G.ctx.PAIR.G2mul(g2, x1);
+           let v2 = G.ctx.PAIR.G2mul(g2, x2);
+
+           let m1 = "Test1";
+           let m2 = "Test2";
+
+           let h1 = G.hashToPointOnCurve(m1);
+           let h2 = G.hashToPointOnCurve(m2);
+
+           let sig1 = G.ctx.PAIR.G1mul(h1, x1);
+           let sig2 = G.ctx.PAIR.G1mul(h2, x2);
+
+           console.log("ver1: ", (e(sig1, g2)).equals(e(h1, v1)) );
+           console.log("ver2: ", (e(sig2, g2)).equals(e(h2, v2)) );
+
+           let aggregateSignature = new G.ctx.ECP();
+           aggregateSignature.copy(sig1);
+
+           aggregateSignature.add(sig2); // aggregate signature
+
+           let gt_1 = e(aggregateSignature, g2);
+
+
+           let pair1 = e(h1, v1);
+
+           let aggregatePairing = new G.ctx.FP12(pair1);
+
+
+           let pair2 = e(h2, v2);
+
+           aggregatePairing.a.add(pair2.a);
+           aggregatePairing.b.add(pair2.b);
+           aggregatePairing.c.add(pair2.c);
+
+
+
+
+           chai.assert.isTrue(gt_1.equals(aggregatePairing));
+
+
+
+
+
+
+
+
+       });
+    });
+
 });

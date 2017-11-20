@@ -68,14 +68,12 @@ export default class PSSig {
     }
 
     //  e(sig1, X + m * Y) == e(sig2, g)
-    static verify(params, pk, m, sig, isMessageHashed = false) {
+    static verify(params, pk, m, sig) {
         const [G, o, g1, g2, e] = params;
         const [g, X, Y] = pk;
         const [sig1, sig2] = sig;
 
-        if(!isMessageHashed) {
-            m = G.hashToBIG(m);
-        }
+        m = G.hashToBIG(m);
 
         const G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
         G2_tmp1.add(X);
@@ -93,5 +91,62 @@ export default class PSSig {
         const t = G.ctx.BIG.randomnum(G.order, G.rngGen);
 
         return [G.ctx.PAIR.G1mul(sig1, t), G.ctx.PAIR.G1mul(sig2, t)]
+    }
+
+
+    // todo ensure all messages are distinct
+    static aggregateSignatures(params, signatures) {
+        const [G, o, g1, g2, e] = params;
+
+        let aggregateSignature = new G.ctx.ECP();
+        aggregateSignature.copy(signatures[0]);
+
+        for(let i = 1; i < signatures.length; i++) {
+            aggregateSignature.add(signatures[1]);
+        }
+        return aggregateSignature;
+    }
+
+   static verifyAggregation(params, pks, ms, aggregateSignature) {
+        const [G, o, g1, g2, e] = params;
+
+        if ((new Set(ms)).size !== ms.length) {
+            return false; // messages are not distinct
+        }
+
+        const Gt_1 = e(aggregateSignature, g2);
+
+        let pairings = [];
+        for(let i = 0; i < ms.length; i++) {
+            let h = G.hashToPointOnCurve(ms[i]);
+            let [g, X, Y] = pks[i];
+
+            let m = G.hashToBIG(ms[i]); // replace with the other hash?
+
+            const G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
+            G2_tmp1.add(X);
+            G2_tmp1.affine();
+
+            const Gt_2 = e(h, G2_tmp1);
+
+            pairings.push(Gt_2);
+        }
+
+        let aggregatePairing = new G.ctx.FP12(pairings[0]);
+
+        for(let i = 1; i < pairings.length; i++) {
+            // pairings[0].mul(pairings[i]);
+            // operation was not explicitly defined but I assume it follows same pattern as FP4, FP2 and FP addition
+            aggregatePairing.a.add(pairings[i].a);
+            aggregatePairing.b.add(pairings[i].b);
+            aggregatePairing.c.add(pairings[i].c);
+
+        }
+
+        return Gt_1.equals(aggregatePairing);
+
+
+
+
     }
 }
