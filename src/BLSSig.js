@@ -48,10 +48,10 @@ export default class BLSSig {
         aggregateSignature.copy(signatures[0]);
 
         for(let i = 1; i < signatures.length; i++) {
-            aggregateSignature.add(signatures[1]);
+            aggregateSignature.add(signatures[i]);
         }
-
         aggregateSignature.affine();
+
         return aggregateSignature;
 
     }
@@ -59,7 +59,7 @@ export default class BLSSig {
     static verifyAggregation(params, pks, m, aggregateSignature) {
         const [G, o, g1, g2, e] = params;
 
-        let Gt_1 = e(aggregateSignature, g2);
+        const Gt_1 = e(aggregateSignature, g2);
 
         let aggregatePK = new G.ctx.ECP2();
         aggregatePK.copy(pks[0]);
@@ -67,12 +67,11 @@ export default class BLSSig {
         for(let i = 1; i < pks.length; i++) {
             aggregatePK.add(pks[i]);
         }
-
         aggregatePK.affine();
 
-        const h = G.hashToPointOnCurve(m);
-        let Gt_2 = e(h, aggregatePK);
 
+        const h = G.hashToPointOnCurve(m);
+        const Gt_2 = e(h, aggregatePK);
 
         return Gt_1.equals(Gt_2);
     }

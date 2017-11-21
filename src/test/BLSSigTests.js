@@ -1,10 +1,10 @@
 import BLSSig from "../BLSSig";
 import BpGroup from "../BpGroup";
 
-import * as mocha from "mocha";
+import {describe, it, xit} from "mocha";
 import * as chai from 'chai';
 
-describe("Boneh–Lynn–Shacham Signatures scheme", () => {
+describe("Boneh–Lynn–Shacham-based Signature scheme", () => {
     describe("Setup", () => {
         const params = BLSSig.setup();
         const [G, o, g1, g2, e] = params;
@@ -50,7 +50,7 @@ describe("Boneh–Lynn–Shacham Signatures scheme", () => {
         });
     });
 
-// h, sig = (x+y*m) * h
+    // sig = sk * H(m)
     describe("Sign", () => {
         const params = BLSSig.setup();
         const [G, o, g1, g2, e] = params;
@@ -68,7 +68,7 @@ describe("Boneh–Lynn–Shacham Signatures scheme", () => {
         });
     });
 
-
+    // e(sig, g2) = e(h, pk)
     describe("Verify", () => {
         const params = BLSSig.setup();
         const [G, o, g1, g2, e] = params;
@@ -82,32 +82,44 @@ describe("Boneh–Lynn–Shacham Signatures scheme", () => {
         });
 
         it("Failed verification for another message", () => {
-            let m2 = "Other Hello World!";
+            const m2 = "Other Hello World!";
             chai.assert.isNotTrue(BLSSig.verify(params, pk, m2, sig));
         });
     });
 
     describe("Aggregate", () => {
-        xit("Aggregation(s1) = s1", () => {
-            // const params = PSSig.setup();
-            // const [G, o, g1, g2, e] = params;
-            // const [sk, pk] = PSSig.keygen(params);
-            // const [x, y] = sk;
-            //
-            // const m = "Hello World!";
-            // let [sig1, sig2] = PSSig.sign(params, sk, m);
-            // let aggregateSig = PSSig.aggregateSignatures(params, [sig2]);
-            //
-            // chai.assert.isTrue(sig2.equals(aggregateSig));
+        it("Aggregation(sig1) = sig1", () => {
+            const params = BLSSig.setup();
+            const [G, o, g1, g2, e] = params;
+            const [sk, pk] = BLSSig.keygen(params);
+
+            const m = "Hello World!";
+            const sig = BLSSig.sign(params, sk, m);
+            const aggregateSignature = BLSSig.aggregateSignatures(params, [sig]);
+
+            chai.assert.isTrue(sig.equals(aggregateSignature));
         });
     });
 
     describe("Aggregate Verification", () => {
-        it("using BLSSig", () => {
+        it("Works for single signature", () => {
+            const params = BLSSig.setup();
+            const [G, o, g1, g2, e] = params;
+            const [sk, pk] = BLSSig.keygen(params);
+
+            const m = "Hello World!";
+            const sig = BLSSig.sign(params, sk, m);
+            const aggregateSignature = BLSSig.aggregateSignatures(params, [sig]);
+
+            chai.assert.isTrue(BLSSig.verifyAggregation(params, [pk], m, aggregateSignature));
+
+        });
+
+        it("Works for three distinct signatures", () => {
             const params = BLSSig.setup();
             const [G, o, g1, g2, e] = params;
 
-            const messagesToSign = 2;
+            const messagesToSign = 3;
             let pks = [];
             let signatures = [];
 
@@ -120,13 +132,37 @@ describe("Boneh–Lynn–Shacham Signatures scheme", () => {
                 signatures.push(signature);
             }
 
-            let aggregateSignature = BLSSig.aggregateSignatures(params, signatures);
+            const aggregateSignature = BLSSig.aggregateSignatures(params, signatures);
 
             chai.assert.isTrue(BLSSig.verifyAggregation(params, pks, m, aggregateSignature));
-
         });
 
+        it("Doesn't work when one of three signatures is on different message", () => {
+            const params = BLSSig.setup();
+            const [G, o, g1, g2, e] = params;
+
+            const messagesToSign = 2;
+            let pks = [];
+            let signatures = [];
+
+            const m = "Hello World!";
+
+            for (let i = 0; i < messagesToSign; i++) {
+                const [sk, pk] = BLSSig.keygen(params);
+                pks.push(pk);
+                const signature = BLSSig.sign(params, sk, m);
+                signatures.push(signature);
+            }
+
+            const m2 = "Malicious Hello World";
+            const [skm, pkm] = BLSSig.keygen(params);
+            pks.push(pkm);
+            const maliciousSignature = BLSSig.sign(params, skm, m2);
+            signatures.push(maliciousSignature);
+
+            const aggregateSignature = BLSSig.aggregateSignatures(params, signatures);
+
+            chai.assert.isNotTrue(BLSSig.verifyAggregation(params, pks, m, aggregateSignature));
+        });
     });
-
-
 });

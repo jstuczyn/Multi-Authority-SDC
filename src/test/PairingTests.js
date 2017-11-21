@@ -1,7 +1,6 @@
-/*
 import BpGroup from "../BpGroup";
 
-import * as mocha from "mocha";
+import {describe, it, xit} from "mocha";
 import * as chai from 'chai';
 
 
@@ -94,4 +93,3 @@ describe("Bilinear Pairing", () => {
     });
 
 });
-*/

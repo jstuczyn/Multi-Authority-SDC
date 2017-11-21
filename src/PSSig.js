@@ -38,7 +38,7 @@ export default class PSSig {
         // h being hash of message to point on the curve
         const h = G.hashToPointOnCurve(m);
 
-        if(!isMessageHashed) {
+        if (!isMessageHashed) {
             m = G.hashToBIG(m);
         }
 
@@ -47,10 +47,10 @@ export default class PSSig {
         mcpy.mod(o);
 
         // t1 = y * (m mod p)
-        const t1 = G.ctx.BIG.mul(y,mcpy);
+        const t1 = G.ctx.BIG.mul(y, mcpy);
 
         // DBIG constructor does not allow to pass it a BIG value hence we copy all word values manually
-        const xDBIG =  new G.ctx.DBIG(0);
+        const xDBIG = new G.ctx.DBIG(0);
         for (let i = 0; i < G.ctx.BIG.NLEN; i++) {
             xDBIG.w[i] = x.w[i];
         }
@@ -82,8 +82,7 @@ export default class PSSig {
         const Gt_1 = e(sig1, G2_tmp1);
         const Gt_2 = e(sig2, g);
 
-        // TODO: sig is an array; check whether to check for INF for sig1 or sig2
-        return !sig.INF && Gt_1.equals(Gt_2);
+        return !sig2.INF && Gt_1.equals(Gt_2);
     }
 
     static randomize(params, sig) {
@@ -99,82 +98,41 @@ export default class PSSig {
         const [G, o, g1, g2, e] = params;
 
         let aggregateSignature = new G.ctx.ECP();
-        aggregateSignature.copy(signatures[0]);
+        aggregateSignature.copy(signatures[0][1]);
 
-        for(let i = 1; i < signatures.length; i++) {
-            aggregateSignature.add(signatures[1]);
+        for (let i = 1; i < signatures.length; i++) {
+            aggregateSignature.add(signatures[i][1]);
         }
 
         aggregateSignature.affine();
-        return aggregateSignature;
+        return [signatures[0][0], aggregateSignature]; // so returns H(m), Sa
     }
 
-   static verifyAggregation(params, pks, m, aggregateSignature) {
+    static verifyAggregation(params, pks, m, aggregateSignature) {
+        const [G, o, g1, g2, e] = params;
+        const [h, aggregateSign] = aggregateSignature;
 
-        // BLSSIG
-       /*
+        const Gt_1 = e(aggregateSign, g2);
 
-               const [G, o, g1, g2, e] = params;
+        m = G.hashToBIG(m);
+        let aggregate = new G.ctx.ECP2();
 
-        let Gt_1 = e(aggregateSignature, g2);
+        for (let i = 0; i < pks.length; i++) {
+            let [g, X, Y] = pks[i];
+            let G2_tmp = G.ctx.PAIR.G2mul(Y, m);
+            G2_tmp.add(X);
+            G2_tmp.affine();
+            if(i == 0) {
+                aggregate.copy(G2_tmp)
+            }
+            else {
+                aggregate.add(G2_tmp)
+            }
 
-        let aggregatePK = new G.ctx.ECP2();
-        aggregatePK.copy(pks[0]);
-
-        for(let i = 1; i < pks.length; i++) {
-            aggregatePK.add(pks[i]);
         }
-
-        aggregatePK.affine();
-
-        const h = G.hashToPointOnCurve(m);
-        let Gt_2 = e(h, aggregatePK);
-
+        aggregate.affine();
+        const Gt_2 = e(h, aggregate);
 
         return Gt_1.equals(Gt_2);
-        
-        */
-
-
-
-        const [G, o, g1, g2, e] = params;
-
-        const Gt_1 = e(aggregateSignature, g2);
-
-
-
-
-        let pairings = [];
-        for(let i = 0; i < ms.length; i++) {
-            let h = G.hashToPointOnCurve(ms[i]);
-            let [g, X, Y] = pks[i];
-
-            let m = G.hashToBIG(ms[i]); // replace with the other hash?
-
-            const G2_tmp1 = G.ctx.PAIR.G2mul(Y, m);
-            G2_tmp1.add(X);
-            G2_tmp1.affine();
-
-            const Gt_2 = e(h, G2_tmp1);
-
-            pairings.push(Gt_2);
-        }
-
-        let aggregatePairing = new G.ctx.FP12(pairings[0]);
-
-        for(let i = 1; i < pairings.length; i++) {
-            // pairings[0].mul(pairings[i]);
-            // operation was not explicitly defined but I assume it follows same pattern as FP4, FP2 and FP addition
-            aggregatePairing.a.add(pairings[i].a);
-            aggregatePairing.b.add(pairings[i].b);
-            aggregatePairing.c.add(pairings[i].c);
-
-        }
-
-        return Gt_1.equals(aggregatePairing);
-
-
-
-
     }
 }
