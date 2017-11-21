@@ -82,6 +82,7 @@ export default class PSSig {
         const Gt_1 = e(sig1, G2_tmp1);
         const Gt_2 = e(sig2, g);
 
+        // TODO: sig is an array; check whether to check for INF for sig1 or sig2
         return !sig.INF && Gt_1.equals(Gt_2);
     }
 
@@ -94,7 +95,6 @@ export default class PSSig {
     }
 
 
-    // todo ensure all messages are distinct
     static aggregateSignatures(params, signatures) {
         const [G, o, g1, g2, e] = params;
 
@@ -104,17 +104,45 @@ export default class PSSig {
         for(let i = 1; i < signatures.length; i++) {
             aggregateSignature.add(signatures[1]);
         }
+
+        aggregateSignature.affine();
         return aggregateSignature;
     }
 
-   static verifyAggregation(params, pks, ms, aggregateSignature) {
-        const [G, o, g1, g2, e] = params;
+   static verifyAggregation(params, pks, m, aggregateSignature) {
 
-        if ((new Set(ms)).size !== ms.length) {
-            return false; // messages are not distinct
+        // BLSSIG
+       /*
+
+               const [G, o, g1, g2, e] = params;
+
+        let Gt_1 = e(aggregateSignature, g2);
+
+        let aggregatePK = new G.ctx.ECP2();
+        aggregatePK.copy(pks[0]);
+
+        for(let i = 1; i < pks.length; i++) {
+            aggregatePK.add(pks[i]);
         }
 
+        aggregatePK.affine();
+
+        const h = G.hashToPointOnCurve(m);
+        let Gt_2 = e(h, aggregatePK);
+
+
+        return Gt_1.equals(Gt_2);
+        
+        */
+
+
+
+        const [G, o, g1, g2, e] = params;
+
         const Gt_1 = e(aggregateSignature, g2);
+
+
+
 
         let pairings = [];
         for(let i = 0; i < ms.length; i++) {
