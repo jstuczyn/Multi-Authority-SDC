@@ -4,7 +4,9 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -15,7 +17,8 @@
   },
   "scripts": {
     "test": "nyc mocha dist/test --timeout=3000",
-    "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files"
+    "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files",
+    "start": "node dist/app.js"
   },
   "repository": {
     "type": "git",
@@ -32,7 +35,7 @@
     ]
   },
   "nyc": {
-    "include" : [
+    "include": [
       "dist/*.js"
     ]
   }
