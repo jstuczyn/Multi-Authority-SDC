@@ -1,6 +1,4 @@
-import BpGroup from "./BpGroup"
-
-export default class BLSSig {
+class BLSSig {
 
     static setup() {
         const G = new BpGroup();

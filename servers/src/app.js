@@ -3,13 +3,22 @@ const bodyParser = require('body-parser');
 import PSSig from "./PSSig";
 
 const hostname = '127.0.0.1';
-const port = 3000;
+let port;
+
+if (process.argv.length < 3) {
+    throw("No port number provided");
+}
+
+port = parseInt(process.argv[2]);
+
 const app = express();
 const router = express.Router();
 let params;
 let pk;
 let sk;
 let pk_bytes;
+
+
 
 
 
@@ -40,10 +49,12 @@ router.route('/sign')
 
         const [h, sig] = PSSig.sign(params, sk, message);
         let sig_t = [];
+        let h_t = [];
         sig.toBytes(sig_t);
+        h.toBytes(h_t);
 
         console.log("sig:", sig.toString());
-        res.json({ signature: sig_t});
+        res.json({ signature: [h_t, sig_t]});
     });
 
 router.route('/pk')

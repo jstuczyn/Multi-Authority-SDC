@@ -1,6 +1,4 @@
-import BpGroup from "./BpGroup"
-
-export default class PSSig {
+class PSSig {
 
     static setup() {
         const G = new BpGroup();

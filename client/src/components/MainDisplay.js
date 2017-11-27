@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 
 import MessageInput from './MessageInput'
 import ServerStatus from './ServerStatus'
+import AggregateDisplay from './AggregateDisplay'
+
 import {checkIfAlive} from '../utils/api'
 import {Segment, Grid, Table} from 'semantic-ui-react'
 
@@ -27,10 +29,13 @@ export default class MainDisplay extends React.Component {
     constructor(props) {
         super(props);
 
+
+        // TODO: put array of public keys here to be able to verify aggregate
         this.state = {
             message: "",
             serversDone: [],
             allServersDone: false,
+            signatures: [],
         }
     }
 
@@ -50,17 +55,20 @@ export default class MainDisplay extends React.Component {
         });
     };
 
-    testAgg = () => {
-        console.log("hai")
-    };
-
     handleSubmit = (message) => {
         this.setState({message})
     };
 
-    handleSignatureDone = (serverDone) => {
+    handleSignatureDone = (serverDone, signature) => {
         console.log(serverDone, "is done");
+        if (signature) {
+            this.setState((prevState) => ({
+                signatures: prevState.signatures.concat([signature])
+            }));
+        }
 
+
+        // todo: user prevState instead to simplify below
         let newServersDoneState = [];
         let i;
         let overallStatus = true;
@@ -118,7 +126,10 @@ export default class MainDisplay extends React.Component {
                     }
                 </div>
                 {this.state.allServersDone &&
-                <p>All Servers are done: get aggregate</p>
+                <AggregateDisplay
+                    ctx={this.props.ctx}
+                    signatures={this.state.signatures}
+                />
                 }
             </div>
         )

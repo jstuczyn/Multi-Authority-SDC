@@ -33,7 +33,7 @@ export default class ServerStatus extends React.Component {
             // message: this.props.message, moved to props
             status: "Checking if server is Alive...", // todo fancy . => .. => ... => .
             publicKey: ["", "", ""],
-            signature: "",
+            signature: ["", ""],
             isDone: false,
         };
     }
@@ -41,20 +41,22 @@ export default class ServerStatus extends React.Component {
     async getMessageSignature() {
         await signMessage(this.props.address, this.props.message).then((response) => {
             if(response.status) {
-                let signature = this.props.ctx.ECP.fromBytes(response.signature);
+                let [h_b, sig_b] = response.signature;
+                let h = this.props.ctx.ECP.fromBytes(h_b);
+                let sig = this.props.ctx.ECP.fromBytes(sig_b);
                 this.setState({
                     status: "Complete",
-                    signature: signature,
+                    signature: [h, sig],
                 })
             }
             else {
                 this.setState({
                     status: errorMessage,
-                    signature: errorMessage,
+                    signature: [errorMessage, errorMessage],
                 })
             }
         });
-        this.props.onDone(this.props.address);
+        this.props.onDone(this.props.address, this.state.signature);
     }
 
     async getPublicKey() {
@@ -73,9 +75,10 @@ export default class ServerStatus extends React.Component {
             else {
                 this.setState({
                     status: errorMessage,
-                    signature: errorMessage,
+                    publicKey: [errorMessage, errorMessage, errorMessage],
+                    signature: [errorMessage, errorMessage],
                 });
-                this.props.onDone(this.props.address);
+                this.props.onDone(this.props.address, null);
             }
         });
 
@@ -101,15 +104,15 @@ export default class ServerStatus extends React.Component {
                 >
                     <div style={serverNameContainerStyle}>
                         {/*todo: move to separate component*/}
-                        {this.state.signature.length === 0 &&
+                        {this.state.signature[1].length === 0 &&
                         <Icon name='circle notched' loading size="large"/>
                         }
 
-                        {this.state.signature === errorMessage &&
+                        {this.state.signature[1] === errorMessage &&
                         <Icon name='remove' color="red" size="large"/>
                         }
 
-                        {this.state.signature !== errorMessage && this.state.signature instanceof this.props.ctx.ECP &&
+                        {this.state.signature[1] !== errorMessage && this.state.signature[1] instanceof this.props.ctx.ECP &&
                         <Icon name='checkmark' color="green" size="large"/>
                         }
                         <p style={nameStyle}> {this.props.address} </p>
@@ -140,7 +143,7 @@ export default class ServerStatus extends React.Component {
                     // rowSpan='2'
                     textAlign="left"
                 >
-                    <p style={signatureFont}>{this.state.signature.toString()}</p>
+                    <p style={signatureFont}>{this.state.signature[1].toString()}</p>
                 </Table.Cell>
 
 
