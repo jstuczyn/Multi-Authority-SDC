@@ -3,11 +3,13 @@
     - "proper" investigate RNG
  */
 
-import CTX from "./lib/Milagro-Crypto-Library/ctx"
-import {stringToBytes} from "./auxiliary"
-import * as crypto from "crypto"
+// import {stringToBytes} from "../../servers/src/auxiliary"
 
-export default class BpGroup {
+// replaced in browser
+// import * as crypto from "crypto"
+
+// export default class BpGroup {
+class BpGroup {
     constructor() {
         this.ctx = new CTX("BN254");
 
@@ -49,10 +51,11 @@ export default class BpGroup {
             TODO: Investigate "proper" entropy sources
             TODO: Even though examples used |s| = 100, consider longer seeds?
          */
-        let RAW = [];
+        let RAW = new Uint8Array(128);
+        crypto.getRandomValues(RAW);
+
         let rng = new this.ctx.RAND();
         rng.clean();
-        RAW = crypto.randomBytes(128);
         rng.seed(RAW.length, RAW);
         // old "seed"
         // for (let i = 0; i < 100; i++) RAW[i] = i;
@@ -112,4 +115,4 @@ export default class BpGroup {
         }
         return this.ctx.ECP.mapit(W);
     }
-};
+}

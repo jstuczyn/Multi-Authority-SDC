@@ -5,8 +5,13 @@ import {Icon, Segment, Grid, Table} from "semantic-ui-react";
 
 const nameStyle = {
     "fontWeight": "bold",
-    "display": "inline"
+    "display": "inline",
 
+};
+
+const signatureFont = {
+    "fontSize": "40%",
+    "display": "inline",
 };
 
 // const outerContainerStyle = {
@@ -27,15 +32,29 @@ export default class ServerStatus extends React.Component {
             // address: this.props.address,
             // message: this.props.message, moved to props
             status: "Checking if server is Alive...", // todo fancy . => .. => ... => .
-            publicKey: [],
-            signature: ""
+            publicKey: ["", "", ""],
+            signature: "",
+            isDone: false,
         };
     }
 
     async getMessageSignature() {
         await signMessage(this.props.address, this.props.message).then((response) => {
-            console.log("stuff?");
+            if(response.status) {
+                let signature = this.props.ctx.ECP.fromBytes(response.signature);
+                this.setState({
+                    status: "Complete",
+                    signature: signature,
+                })
+            }
+            else {
+                this.setState({
+                    status: errorMessage,
+                    signature: errorMessage,
+                })
+            }
         });
+        this.props.onDone(this.props.address);
     }
 
     async getPublicKey() {
@@ -56,6 +75,7 @@ export default class ServerStatus extends React.Component {
                     status: errorMessage,
                     signature: errorMessage,
                 });
+                this.props.onDone(this.props.address);
             }
         });
 
@@ -66,7 +86,6 @@ export default class ServerStatus extends React.Component {
         if (this.state.status !== errorMessage) {
             await this.getMessageSignature();
         }
-
     }
 
     render() {
@@ -77,6 +96,7 @@ export default class ServerStatus extends React.Component {
 
                 <Table.Cell
                     width={2}
+                    // rowSpan='2'
                     textAlign="left"
                 >
                     <div style={serverNameContainerStyle}>
@@ -89,7 +109,7 @@ export default class ServerStatus extends React.Component {
                         <Icon name='remove' color="red" size="large"/>
                         }
 
-                        {this.state.signature !== errorMessage && this.state.signature.length > 0 &&
+                        {this.state.signature !== errorMessage && this.state.signature instanceof this.props.ctx.ECP &&
                         <Icon name='checkmark' color="green" size="large"/>
                         }
                         <p style={nameStyle}> {this.props.address} </p>
@@ -98,6 +118,7 @@ export default class ServerStatus extends React.Component {
 
                 <Table.Cell
                     width={3}
+                    // rowSpan='2'
                     textAlign="left"
                 >
                     {this.state.status}
@@ -105,17 +126,21 @@ export default class ServerStatus extends React.Component {
 
                 <Table.Cell
                     width={4}
+                    // rowSpan='2'
                     textAlign="left"
                 >
-                    {this.state.publicKey}
+                    <p style={nameStyle}>g: </p><p style={signatureFont}>{this.state.publicKey[0].toString()}</p><br/>
+                    <p style={nameStyle}>X: </p><p style={signatureFont}>{this.state.publicKey[1].toString()}</p><br/>
+                    <p style={nameStyle}>Y: </p><p style={signatureFont}>{this.state.publicKey[2].toString()}</p><br/>
                 </Table.Cell>
 
 
                 <Table.Cell
                     width={4}
+                    // rowSpan='2'
                     textAlign="left"
                 >
-                    {this.state.signature}
+                    <p style={signatureFont}>{this.state.signature.toString()}</p>
                 </Table.Cell>
 
 

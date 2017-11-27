@@ -5,36 +5,85 @@ import ServerStatus from './ServerStatus'
 import {checkIfAlive} from '../utils/api'
 import {Segment, Grid, Table} from 'semantic-ui-react'
 
+
+// var libs = require('lib');
+// const CTX = require('script-loader!../../lib/Milagro-Crypto-Library/ctx.js');
+
+// import BpGroup from 'script-loader!../../lib/BpGroup.exec'
+
+// import BpGroup from '../../lib/BpGroup.exec'
+//
+// const G = new BpGroup();
+// G.gen1
+
+
 const divStyle = {
     "width": "1000px",
     "margin": "auto",
     "marginTop": "50px",
 };
 
-const servers = [
-    "127.0.0.1:3000",
-    "127.0.0.1:3001",
-];
-
-
 export default class MainDisplay extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            message: ""
+            message: "",
+            serversDone: [],
+            allServersDone: false,
         }
     }
 
+
+    componentWillMount() {
+        let newServersDoneState = [];
+        this.props.servers.forEach((server) => {
+            newServersDoneState.push({
+                    "server": server,
+                    "isDone": false,
+                }
+            );
+        });
+
+        this.setState({
+            serversDone: newServersDoneState,
+        });
+    };
+
+    testAgg = () => {
+        console.log("hai")
+    };
+
     handleSubmit = (message) => {
-        console.log("clicked");
-        console.log(message);
         this.setState({message})
-        // this.setState({loading: true});
-        // checkIfAlive("test").then((response) => {
-        //     console.log("we got: ", response);
-        //     this.setState({loading: false});
-        // });
+    };
+
+    handleSignatureDone = (serverDone) => {
+        console.log(serverDone, "is done");
+
+        let newServersDoneState = [];
+        let i;
+        let overallStatus = true;
+        for (i = 0; i < this.state.serversDone.length; i++) {
+            let server = this.state.serversDone[i].server;
+
+            if (server === serverDone) {
+                newServersDoneState.push({
+                    "server": server,
+                    "isDone": true,
+                });
+            }
+            else {
+                newServersDoneState.push(this.state.serversDone[i]);
+            }
+
+            overallStatus = overallStatus && newServersDoneState[i].isDone;
+        }
+
+        this.setState({
+            serversDone: newServersDoneState,
+            allServersDone: overallStatus,
+        });
     };
 
     render() {
@@ -55,18 +104,22 @@ export default class MainDisplay extends React.Component {
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {servers.map((server) => (
+                            {this.props.servers.map((server) => (
                                 <ServerStatus
                                     key={server}
                                     address={server}
                                     message={this.state.message}
                                     ctx={this.props.ctx}
+                                    onDone={this.handleSignatureDone}
                                 />
                             ))}
                         </Table.Body>
                     </Table>
                     }
                 </div>
+                {this.state.allServersDone &&
+                <p>All Servers are done: get aggregate</p>
+                }
             </div>
         )
     }

@@ -34,7 +34,7 @@ build/Release
 
 # Dependency directories
 servers/node_modules/
-client/dist/js/*
+client/dist/js/app.js
 client/node_modules
 
 jspm_packages/

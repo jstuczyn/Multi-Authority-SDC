@@ -3,7 +3,7 @@
     - "proper" investigate RNG
  */
 
-import CTX from "./lib/Milagro-Crypto-Library/ctx"
+import CTX from "../../servers/src/lib/Milagro-Crypto-Library/ctx"
 import {stringToBytes} from "./auxiliary"
 import * as crypto from "crypto"
 

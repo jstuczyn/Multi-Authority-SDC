@@ -41,9 +41,13 @@ export async function getPublicKey(server) {
 }
 
 export async function signMessage(server, message) {
-    let response = null;
+    let clientResponse = {
+        status: null,
+        signature: null
+    };
+
     try {
-        response = await
+        let response = await
             fetch(`http://${server}/testapi/sign`, {
                 method: 'POST',
                 mode: "cors",
@@ -54,8 +58,14 @@ export async function signMessage(server, message) {
                     message: message,
                 })
             });
+        response = await response.json();
+        clientResponse.signature = response.signature;
+        clientResponse.status = true;
     }
     catch(err) {
-        throw err
+        clientResponse.signature = "Error";
+        clientResponse.status = false;
     }
+
+    return clientResponse;
 }

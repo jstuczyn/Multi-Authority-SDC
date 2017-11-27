@@ -24,7 +24,14 @@ const webpackConfig = {
             test: /\.(js|jsx)$/,
             exclude: /node_modules/,
             loader: 'babel-loader',
-        }],
+        },
+            {
+                test: /\.exec\.js$/,
+                include: path.resolve('lib'),
+                loader: 'script-loader'
+            },
+
+        ],
     },
 
     plugins: [

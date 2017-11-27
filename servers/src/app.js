@@ -39,7 +39,11 @@ router.route('/sign')
         console.log("Got message: ", message);
 
         const [h, sig] = PSSig.sign(params, sk, message);
-        res.json({ signature: sig});
+        let sig_t = [];
+        sig.toBytes(sig_t);
+
+        console.log("sig:", sig.toString());
+        res.json({ signature: sig_t});
     });
 
 router.route('/pk')
@@ -80,6 +84,10 @@ app.listen(port, hostname, () => {
 
 
     pk_bytes = [g2_t, X_t, Y_t];
+
+    console.log("g:", g.toString());
+    console.log("X", X.toString());
+    console.log("Y", Y.toString());
 });
 
 

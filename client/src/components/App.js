@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import {Button, Header} from 'semantic-ui-react'
-
-import CTX from "../lib/Milagro-Crypto-Library/ctx"
-
-
 import MainDisplay from './MainDisplay'
+
 
 const divStyle = {
     "marginTop": "50px",
@@ -12,7 +9,8 @@ const divStyle = {
 };
 
 const servers = [
-  "127.0.0.1:3000",
+    "127.0.0.1:3000",
+    "127.0.0.1:3001",
 ];
 
 const ctx = new CTX("BN254");
@@ -27,6 +25,7 @@ const App = () => (
         />
 
         <MainDisplay
+            servers={servers}
             ctx={ctx}
         />
     </div>
