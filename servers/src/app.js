@@ -53,7 +53,7 @@ router.route('/sign')
         sig.toBytes(sig_t);
         h.toBytes(h_t);
 
-        console.log("sig:", sig.toString());
+        console.log("sig:", h.toString(), sig.toString());
         res.json({ signature: [h_t, sig_t]});
     });
 

@@ -129,6 +129,16 @@ class PSSig {
 
         }
         aggregate.affine();
+
+        // for some reason h.x and h.y return false to being instances of FP, hence temporary, ugly hack:
+        // I blame javascript pseudo-broken typesystem
+        let tempX = new G.ctx.FP(0);
+        let tempY = new G.ctx.FP(0);
+        tempX.copy(h.getx());
+        tempY.copy(h.gety());
+        h.x = tempX;
+        h.y = tempY;
+
         const Gt_2 = e(h, aggregate);
 
         return Gt_1.equals(Gt_2);

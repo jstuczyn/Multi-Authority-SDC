@@ -56,7 +56,7 @@ export default class ServerStatus extends React.Component {
                 })
             }
         });
-        this.props.onDone(this.props.address, this.state.signature);
+        this.props.onDone(this.props.address, this.state.signature, this.state.publicKey);
     }
 
     async getPublicKey() {
@@ -78,7 +78,7 @@ export default class ServerStatus extends React.Component {
                     publicKey: [errorMessage, errorMessage, errorMessage],
                     signature: [errorMessage, errorMessage],
                 });
-                this.props.onDone(this.props.address, null);
+                this.props.onDone(this.props.address, null, null); // no point of sending PK if there is no signature to use for verification
             }
         });
 

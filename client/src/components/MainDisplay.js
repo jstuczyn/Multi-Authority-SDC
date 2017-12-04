@@ -36,6 +36,7 @@ export default class MainDisplay extends React.Component {
             serversDone: [],
             allServersDone: false,
             signatures: [],
+            pks: [], // signatures and pks are guaranteed to be in the same order
         }
     }
 
@@ -59,11 +60,12 @@ export default class MainDisplay extends React.Component {
         this.setState({message})
     };
 
-    handleSignatureDone = (serverDone, signature) => {
+    handleSignatureDone = (serverDone, signature, pk) => {
         console.log(serverDone, "is done");
-        if (signature) {
+        if (signature) { // if signature isn't null, pk CAN'T be null
             this.setState((prevState) => ({
-                signatures: prevState.signatures.concat([signature])
+                signatures: prevState.signatures.concat([signature]),
+                pks: prevState.pks.concat([pk])
             }));
         }
 
@@ -129,6 +131,8 @@ export default class MainDisplay extends React.Component {
                 <AggregateDisplay
                     ctx={this.props.ctx}
                     signatures={this.state.signatures}
+                    message={this.state.message}
+                    pks={this.state.pks}
                 />
                 }
             </div>

@@ -7,7 +7,7 @@ function wait(t) {
 
 export async function checkIfAlive(server) {
     // only for test to see transitions
-    await wait(1000);
+    // await wait(1000);
 
     // might as well get pk now
     let response = {
@@ -63,7 +63,7 @@ export async function signMessage(server, message) {
         clientResponse.status = true;
     }
     catch(err) {
-        clientResponse.signature = "Error";
+        clientResponse.signature = ["Error", "Error"];
         clientResponse.status = false;
     }
 
