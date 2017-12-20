@@ -1,34 +1,17 @@
-import React, { Component } from 'react';
-import {Button, Header} from 'semantic-ui-react'
-import MainDisplay from './MainDisplay'
-
-
-const divStyle = {
-    "marginTop": "50px",
-    "textAlign": "center"
-};
-
-const servers = [
-    "127.0.0.1:3000",
-    "127.0.0.1:3001",
-    "127.0.0.1:3002",
-];
-
-const ctx = new CTX("BN254");
-
+import React from 'react';
+import {Header} from 'semantic-ui-react'
+import MainView from './MainView'
+import style from './App.style'
 
 const App = () => (
-    <div style={divStyle}>
+    <div style={style.divStyle}>
         <Header
             as='h1'
             textAlign="center"
-            content="Test Query"
+            content="Client Generating Coins"
         />
 
-        <MainDisplay
-            servers={servers}
-            ctx={ctx}
-        />
+        <MainView/>
     </div>
 );
 
