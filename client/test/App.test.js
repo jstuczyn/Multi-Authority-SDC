@@ -1,15 +1,10 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow, mount, render } from 'enzyme';
-import App from '../src/components/App'
-import {Header} from 'semantic-ui-react'
-import MainView from '../src/components/MainView'
+import App from '../src/components/App';
+import {Header} from 'semantic-ui-react';
+import MainView from '../src/components/MainView';
 
-describe('the environment', () => {
-    it('works, hopefully', () => {
-        expect(true).to.be.true;
-    });
-});
 
 describe('App Component', () => {
     it('Should have two children', () => {

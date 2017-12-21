@@ -1,26 +1,16 @@
 # Multi-Authority-SDC
 
-#### Current "test" UI:
+### Step I: Client Generating coins himself
 
-##### Home:
+![Diagram](https://imgur.com/a/qc8g8)
 
-![Home](https://i.imgur.com/YvbiO6X.png)
+###
 
-##### Query in Progress:
-
-![Query in Progress](https://i.imgur.com/KBNM1bV.png)
-
-##### Finished Query:
-
-![Finished Query](https://i.imgur.com/c3xwK6g.png)
-
-
+### Questions:
+- Does it matter if id is g1^id or g2^id?
 
 ### Client-side TODOs:
-- indication on correctness of aggregate
 
 ### Server-side TODOs:
 
 ### Project-wide TODOs:
-- consider porting JS to TypeScript/Flow
-- tests for newly added API
