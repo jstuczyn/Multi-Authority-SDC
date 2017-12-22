@@ -6,9 +6,8 @@
 // import {stringToBytes} from "../../servers/src/auxiliary"
 
 // replaced in browser
-// import * as crypto from "crypto"
-
-import CTX from './Milagro-Crypto-Library/ctx'
+import * as crypto from 'crypto';
+import CTX from './Milagro-Crypto-Library/ctx';
 
 export default class BpGroup {
 // class BpGroup {
@@ -53,8 +52,10 @@ export default class BpGroup {
             TODO: Investigate "proper" entropy sources
             TODO: Even though examples used |s| = 100, consider longer seeds?
          */
-        let RAW = new Uint8Array(128);
-        crypto.getRandomValues(RAW);
+        // let RAW = new Uint8Array(128);
+        // crypto.getRandomValues(RAW);
+
+        let RAW = crypto.randomBytes(128);
 
         let rng = new this.ctx.RAND();
         rng.clean();

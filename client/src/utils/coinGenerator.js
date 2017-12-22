@@ -1,5 +1,6 @@
 import {ctx} from '../config';
 import Coin from '../../lib/Coin';
+import * as crypto from 'crypto';
 
 export function getCoin(pk, value) {
     return new Coin(pk, getRandomCoinId(), value);
@@ -7,8 +8,7 @@ export function getCoin(pk, value) {
 
 // uses same RNG generator as the one used for key generation
 function getRandomCoinId() {
-    let RAW = new Uint8Array(128);
-    crypto.getRandomValues(RAW);
+    let RAW = crypto.randomBytes(128);
 
     let rng = new ctx.RAND();
     rng.clean();
