@@ -1,38 +1,39 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
-HASH512 = function(ctx) {
+var HASH384 = function(ctx) {
+    "use strict";
 
-    var HASH512 = function() {
+    var HASH384 = function() {
         this.length = [];
         this.h = [];
         this.w = [];
         this.init();
     };
 
-    HASH512.prototype = {
-
+    HASH384.prototype = {
         transform: function() { /* basic transformation step */
-            var a, b, c, d, e, ee, zz, f, g, hh, t1, t2;
-            var j, r;
-            for (j = 16; j < 80; j++)
-                this.w[j] = HASH512.theta1(this.w[j - 2]).add(this.w[j - 7]).add(HASH512.theta0(this.w[j - 15])).add(this.w[j - 16]);
+            var a, b, c, d, e, f, g, hh, t1, t2, j;
+
+            for (j = 16; j < 80; j++) {
+                this.w[j] = HASH384.theta1(this.w[j - 2]).add(this.w[j - 7]).add(HASH384.theta0(this.w[j - 15])).add(this.w[j - 16]);
+            }
 
             a = this.h[0].copy();
             b = this.h[1].copy();
@@ -45,10 +46,10 @@ HASH512 = function(ctx) {
 
             for (j = 0; j < 80; j++) { /* 80 times - mush it up */
                 t1 = hh.copy();
-                t1.add(HASH512.Sig1(e)).add(HASH512.Ch(e, f, g)).add(HASH512.HK[j]).add(this.w[j]);
+                t1.add(HASH384.Sig1(e)).add(HASH384.Ch(e, f, g)).add(HASH384.HK[j]).add(this.w[j]);
 
-                t2 = HASH512.Sig0(a);
-                t2.add(HASH512.Maj(a, b, c));
+                t2 = HASH384.Sig0(a);
+                t2.add(HASH384.Maj(a, b, c));
                 hh = g;
                 g = f;
                 f = e;
@@ -75,38 +76,48 @@ HASH512 = function(ctx) {
         /* Initialise Hash function */
         init: function() { /* initialise */
             var i;
-            for (i = 0; i < 80; i++) this.w[i] = new ctx.UInt64(0, 0);
+
+            for (i = 0; i < 80; i++) {
+                this.w[i] = new ctx.UInt64(0, 0);
+            }
             this.length[0] = new ctx.UInt64(0, 0);
             this.length[1] = new ctx.UInt64(0, 0);
-            this.h[0] = HASH512.H[0].copy();
-            this.h[1] = HASH512.H[1].copy();
-            this.h[2] = HASH512.H[2].copy();
-            this.h[3] = HASH512.H[3].copy();
-            this.h[4] = HASH512.H[4].copy();
-            this.h[5] = HASH512.H[5].copy();
-            this.h[6] = HASH512.H[6].copy();
-            this.h[7] = HASH512.H[7].copy();
+            this.h[0] = HASH384.H[0].copy();
+            this.h[1] = HASH384.H[1].copy();
+            this.h[2] = HASH384.H[2].copy();
+            this.h[3] = HASH384.H[3].copy();
+            this.h[4] = HASH384.H[4].copy();
+            this.h[5] = HASH384.H[5].copy();
+            this.h[6] = HASH384.H[6].copy();
+            this.h[7] = HASH384.H[7].copy();
         },
 
         /* process a single byte */
         process: function(byt) { /* process the next message byte */
-            var cnt;
+            var cnt, e;
+
             cnt = (this.length[0].bot >>> 6) % 16;
             this.w[cnt].shlb();
             this.w[cnt].bot |= (byt & 0xFF);
 
-            var e = new ctx.UInt64(0, 8);
+            e = new ctx.UInt64(0, 8);
             this.length[0].add(e);
+
             if (this.length[0].top === 0 && this.length[0].bot == 0) {
                 e = new ctx.UInt64(0, 1);
                 this.length[1].add(e);
             }
-            if ((this.length[0].bot % 1024) === 0) this.transform();
+
+            if ((this.length[0].bot % 1024) === 0) {
+                this.transform();
+            }
         },
 
         /* process an array of bytes */
         process_array: function(b) {
-            for (var i = 0; i < b.length; i++) this.process(b[i]);
+            for (var i = 0; i < b.length; i++) {
+                this.process(b[i]);
+            }
         },
 
         /* process a 32-bit integer */
@@ -118,91 +129,107 @@ HASH512 = function(ctx) {
         },
 
         hash: function() { /* pad message and finish - supply digest */
-            var i;
-            var digest = [];
-            var len0, len1;
+            var digest = [],
+                len0, len1,
+                i;
+
             len0 = this.length[0].copy();
             len1 = this.length[1].copy();
             this.process(0x80);
-            while ((this.length[0].bot % 1024) != 896) this.process(0);
+            while ((this.length[0].bot % 1024) != 896) {
+                this.process(0);
+            }
 
             this.w[14] = len1;
             this.w[15] = len0;
             this.transform();
 
-            for (i = 0; i < HASH512.len; i++) { /* convert to bytes */
-                digest[i] = HASH512.R(8 * (7 - i % 8), this.h[i >>> 3]).bot & 0xff;
+            for (i = 0; i < HASH384.len; i++) { /* convert to bytes */
+                digest[i] = HASH384.R(8 * (7 - i % 8), this.h[i >>> 3]).bot & 0xff;
             }
 
             this.init();
+
             return digest;
         }
     };
 
-    /* static functions */
-    HASH512.S = function(n, x) {
-        if (n == 0) return x;
-        if (n < 32)
+
+    /* static  functions */
+    HASH384.S = function(n, x) {
+        if (n == 0) {
+            return x;
+        }
+
+        if (n < 32) {
             return new ctx.UInt64((x.top >>> n) | (x.bot << (32 - n)), (x.bot >>> n) | (x.top << (32 - n)));
-        else
+        } else {
             return new ctx.UInt64((x.bot >>> (n - 32)) | (x.top << (64 - n)), (x.top >>> (n - 32)) | (x.bot << (64 - n)));
+        }
 
     };
 
-    HASH512.R = function(n, x) {
-        if (n == 0) return x;
-        if (n < 32)
+    HASH384.R = function(n, x) {
+        if (n == 0) {
+            return x;
+        }
+
+        if (n < 32) {
             return new ctx.UInt64((x.top >>> n), (x.bot >>> n | (x.top << (32 - n))));
-        else
+        } else {
             return new ctx.UInt64(0, x.top >>> (n - 32));
+        }
     };
 
-    HASH512.Ch = function(x, y, z) {
+    HASH384.Ch = function(x, y, z) {
         return new ctx.UInt64((x.top & y.top) ^ (~(x.top) & z.top), (x.bot & y.bot) ^ (~(x.bot) & z.bot));
     };
 
-    HASH512.Maj = function(x, y, z) {
+    HASH384.Maj = function(x, y, z) {
         return new ctx.UInt64((x.top & y.top) ^ (x.top & z.top) ^ (y.top & z.top), (x.bot & y.bot) ^ (x.bot & z.bot) ^ (y.bot & z.bot));
     };
 
-    HASH512.Sig0 = function(x) {
-        var r1 = HASH512.S(28, x);
-        var r2 = HASH512.S(34, x);
-        var r3 = HASH512.S(39, x);
+    HASH384.Sig0 = function(x) {
+        var r1 = HASH384.S(28, x),
+            r2 = HASH384.S(34, x),
+            r3 = HASH384.S(39, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
-    HASH512.Sig1 = function(x) {
-        var r1 = HASH512.S(14, x);
-        var r2 = HASH512.S(18, x);
-        var r3 = HASH512.S(41, x);
+    HASH384.Sig1 = function(x) {
+        var r1 = HASH384.S(14, x),
+            r2 = HASH384.S(18, x),
+            r3 = HASH384.S(41, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
-    HASH512.theta0 = function(x) {
-        var r1 = HASH512.S(1, x);
-        var r2 = HASH512.S(8, x);
-        var r3 = HASH512.R(7, x);
+    HASH384.theta0 = function(x) {
+        var r1 = HASH384.S(1, x),
+            r2 = HASH384.S(8, x),
+            r3 = HASH384.R(7, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
-    HASH512.theta1 = function(x) {
-        var r1 = HASH512.S(19, x);
-        var r2 = HASH512.S(61, x);
-        var r3 = HASH512.R(6, x);
+    HASH384.theta1 = function(x) {
+        var r1 = HASH384.S(19, x),
+            r2 = HASH384.S(61, x),
+            r3 = HASH384.R(6, x);
+
         return new ctx.UInt64(r1.top ^ r2.top ^ r3.top, r1.bot ^ r2.bot ^ r3.bot);
     };
 
-    /* constants */
-    HASH512.len = 64;
+    HASH384.len = 48;
 
-    HASH512.H = [new ctx.UInt64(0x6a09e667, 0xf3bcc908), new ctx.UInt64(0xbb67ae85, 0x84caa73b),
-        new ctx.UInt64(0x3c6ef372, 0xfe94f82b), new ctx.UInt64(0xa54ff53a, 0x5f1d36f1),
-        new ctx.UInt64(0x510e527f, 0xade682d1), new ctx.UInt64(0x9b05688c, 0x2b3e6c1f),
-        new ctx.UInt64(0x1f83d9ab, 0xfb41bd6b), new ctx.UInt64(0x5be0cd19, 0x137e2179)
+    HASH384.H = [new ctx.UInt64(0xcbbb9d5d, 0xc1059ed8), new ctx.UInt64(0x629a292a, 0x367cd507),
+        new ctx.UInt64(0x9159015a, 0x3070dd17), new ctx.UInt64(0x152fecd8, 0xf70e5939),
+        new ctx.UInt64(0x67332667, 0xffc00b31), new ctx.UInt64(0x8eb44a87, 0x68581511),
+        new ctx.UInt64(0xdb0c2e0d, 0x64f98fa7), new ctx.UInt64(0x47b5481d, 0xbefa4fa4)
     ];
 
-    HASH512.HK = [new ctx.UInt64(0x428a2f98, 0xd728ae22), new ctx.UInt64(0x71374491, 0x23ef65cd),
+    HASH384.HK = [new ctx.UInt64(0x428a2f98, 0xd728ae22), new ctx.UInt64(0x71374491, 0x23ef65cd),
         new ctx.UInt64(0xb5c0fbcf, 0xec4d3b2f), new ctx.UInt64(0xe9b5dba5, 0x8189dbbc),
         new ctx.UInt64(0x3956c25b, 0xf348b538), new ctx.UInt64(0x59f111f1, 0xb605d019),
         new ctx.UInt64(0x923f82a4, 0xaf194f9b), new ctx.UInt64(0xab1c5ed5, 0xda6d8118),
@@ -243,5 +270,10 @@ HASH512 = function(ctx) {
         new ctx.UInt64(0x4cc5d4be, 0xcb3e42b6), new ctx.UInt64(0x597f299c, 0xfc657e2a),
         new ctx.UInt64(0x5fcb6fab, 0x3ad6faec), new ctx.UInt64(0x6c44198c, 0x4a475817)
     ];
-    return HASH512;
+
+    return HASH384;
 };
+
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+    module.exports.HASH384 = HASH384;
+}

@@ -1,6 +1,8 @@
+import CTX from './Milagro-Crypto-Library/ctx';
+
 const MIN_TTL_H = 12;
 
-class Coin {
+export default class Coin {
     constructor(v, ide, value) {
         this.ctx = new CTX("BN254");
 

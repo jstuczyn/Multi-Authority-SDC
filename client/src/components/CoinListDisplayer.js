@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CoinDisplayer from './CoinDisplayer'
+import CoinDisplayer from './CoinDisplayer';
 
 export default class CoinListDisplayer extends React.Component {
     constructor(props) {
@@ -8,7 +8,6 @@ export default class CoinListDisplayer extends React.Component {
     }
 
     render() {
-        console.log(this.props.coins);
         // {sk: sk, coin: coin}
         return (
             <div>

@@ -1,11 +1,11 @@
 import React from 'react';
-import {Grid} from 'semantic-ui-react'
-import CoinRequester from './CoinRequester'
-import CoinListDisplayer from './CoinListDisplayer'
-import {getCoin} from "../utils/coinGenerator";
+import {Grid} from 'semantic-ui-react';
+import CoinRequester from './CoinRequester';
+import CoinListDisplayer from './CoinListDisplayer';
+import {getCoin} from '../utils/coinGenerator';
+import BLSSig from '../../lib/BLSSig';
 
-
-export default class MainDisplay extends React.Component {
+export default class MainView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

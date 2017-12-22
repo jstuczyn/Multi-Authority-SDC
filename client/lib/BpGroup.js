@@ -8,8 +8,10 @@
 // replaced in browser
 // import * as crypto from "crypto"
 
-// export default class BpGroup {
-class BpGroup {
+import CTX from './Milagro-Crypto-Library/ctx'
+
+export default class BpGroup {
+// class BpGroup {
     constructor() {
         this.ctx = new CTX("BN254");
 

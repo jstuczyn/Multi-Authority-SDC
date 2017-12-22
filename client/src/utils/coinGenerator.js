@@ -1,5 +1,5 @@
 import {ctx} from '../config';
-
+import Coin from '../../lib/Coin';
 
 export function getCoin(pk, value) {
     return new Coin(pk, getRandomCoinId(), value);
@@ -10,7 +10,6 @@ function getRandomCoinId() {
     let RAW = new Uint8Array(128);
     crypto.getRandomValues(RAW);
 
-    console.log(ctx);
     let rng = new ctx.RAND();
     rng.clean();
     rng.seed(RAW.length, RAW);
