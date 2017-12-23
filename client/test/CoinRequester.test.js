@@ -37,7 +37,7 @@ describe('CoinRequester Component', () => {
     it('On input change, the value state is set to that value', () => {
         const wrapper = mount(<CoinRequester/>);
         const input = wrapper.find('input');
-        
+
         input.simulate('change', {target: {value: 2}});
         expect(wrapper.state('value')).to.equal(2);
         input.simulate('change', {target: {value: 3}});

@@ -10,17 +10,20 @@ export default class ValueInput extends React.Component {
         }
     }
 
+    // only allows integer values
     handleInputChange = (event) => {
         const stringValue = event.target.value;
-        const numValue = parseInt(stringValue / 1); // ensures that it won't try to extract num from garbage (ex. parseInt("42.jgp") would have returned 42)
+
+        const numValue = parseFloat(stringValue / 1); // ensures that it won't try to extract num from garbage (ex. parseFloat("42.jgp") would have returned 42, if divided by 1, it will return NaN)
+
         let isInputValid = true;
-        if (numValue && numValue > 0) {
+        if(Number.isInteger(numValue)) { // checks if the value parsed is an integer or a float
             this.props.onInputChange(numValue);
         } else {
-            this.props.onInputChange(0);
             isInputValid = false;
+            this.props.onInputChange(0);
         }
-        this.setState({isInputValid})
+        this.setState({isInputValid});
     };
 
     render() {
@@ -37,5 +40,5 @@ export default class ValueInput extends React.Component {
 }
 
 ValueInput.propTypes = {
-  onInputChange: PropTypes.func.isRequired,
+    onInputChange: PropTypes.func.isRequired,
 };
