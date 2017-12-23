@@ -34,7 +34,7 @@ describe('ValueInput Component', () => {
         expect(wrapper.state('isInputValid')).to.equal(true);
     });
 
-    
+
     it('Should have received "onInputChange" function as a prop', () => {
         const mainWrapper = mount(<CoinRequester/>);
         const wrapper = mainWrapper.find(ValueInput);

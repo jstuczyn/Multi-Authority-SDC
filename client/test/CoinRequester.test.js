@@ -5,7 +5,6 @@ import ValueInput from '../src/components/ValueInput';
 import SubmitButton from '../src/components/SubmitButton';
 import CoinRequester from '../src/components/CoinRequester';
 import MainView from '../src/components/MainView';
-import sinon from 'sinon';
 
 describe('CoinRequester Component', () => {
     it('Contains a ValueInput component', () => {
