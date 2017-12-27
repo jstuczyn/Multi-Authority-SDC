@@ -1,25 +1,41 @@
 /*
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* Fixed Data in ROM - Field and Curve parameters */
 
-module.exports.ROM_FIELD_25519 = function() {
+var ROM_FIELD_25519,
+    ROM_FIELD_256PM,
+    ROM_FIELD_384PM,
+    ROM_FIELD_512PM,
+    ROM_FIELD_ANSSI,
+    ROM_FIELD_BLS383,
+    ROM_FIELD_BN254,
+    ROM_FIELD_BN254CX,
+    ROM_FIELD_BRAINPOOL,
+    ROM_FIELD_C41417,
+    ROM_FIELD_GOLDILOCKS,
+    ROM_FIELD_HIFIVE,
+    ROM_FIELD_NIST256,
+    ROM_FIELD_NIST384,
+    ROM_FIELD_NIST521;
+
+ROM_FIELD_25519 = function() {
 
     var ROM_FIELD_25519 = {
 
@@ -33,27 +49,7 @@ module.exports.ROM_FIELD_25519 = function() {
     return ROM_FIELD_25519;
 };
 
-module.exports.ROM_FIELD_256PM = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_256PM = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_256PM = {
@@ -68,27 +64,7 @@ module.exports.ROM_FIELD_256PM = function() {
     return ROM_FIELD_256PM;
 };
 
-module.exports.ROM_FIELD_384PM = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_384PM = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_384PM = {
@@ -103,27 +79,7 @@ module.exports.ROM_FIELD_384PM = function() {
     return ROM_FIELD_384PM;
 };
 
-module.exports.ROM_FIELD_512PM = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_512PM = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_512PM = {
@@ -138,27 +94,7 @@ module.exports.ROM_FIELD_512PM = function() {
     return ROM_FIELD_512PM;
 };
 
-module.exports.ROM_FIELD_ANSSI = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_ANSSI = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_ANSSI = {
@@ -173,32 +109,12 @@ module.exports.ROM_FIELD_ANSSI = function() {
     return ROM_FIELD_ANSSI;
 };
 
-module.exports.ROM_FIELD_BLS383 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_BLS383 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_BLS383 = {
 
-        // BLS383 Modulus 
+        // BLS383 Modulus
         // Base Bits= 23
         Modulus: [0x2D556B, 0x556A55, 0x75EAB2, 0x23AFBA, 0x1BB01, 0x2BAEA4, 0x5CC20F, 0x758B67, 0x20F99, 0x640A63, 0x69A3A8, 0x6009AA, 0x2A7852, 0x20B8AA, 0x7DD718, 0x104054, 0x7AC5],
         R2modp: [0x3353B, 0x66C8A7, 0x51A94C, 0x31E097, 0x340361, 0x5EBDB7, 0x3B6484, 0x3C1977, 0x73CD0B, 0x3C91A6, 0x269561, 0x1EC635, 0x182E9D, 0x5C56A2, 0x778340, 0x321B03, 0x5892],
@@ -211,32 +127,12 @@ module.exports.ROM_FIELD_BLS383 = function() {
     return ROM_FIELD_BLS383;
 };
 
-module.exports.ROM_FIELD_BN254 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_BN254 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_BN254 = {
 
-        // BN254 Modulus 
+        // BN254 Modulus
 
         // Base Bits= 24
         Modulus: [0x13, 0x0, 0x13A700, 0x0, 0x210000, 0x861, 0x800000, 0xBA344D, 0x1, 0x648240, 0x2523],
@@ -250,32 +146,12 @@ module.exports.ROM_FIELD_BN254 = function() {
     return ROM_FIELD_BN254;
 };
 
-module.exports.ROM_FIELD_BN254CX = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_BN254CX = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_BN254CX = {
 
-        // BN254CX Modulus 
+        // BN254CX Modulus
         // Base Bits= 24
         Modulus: [0x1B55B3, 0x23EF5C, 0xE1BE66, 0x18093E, 0x3FD6EE, 0x66D324, 0x647A63, 0xB0BDDF, 0x702A0D, 0x8, 0x2400],
         R2modp: [0x8EE63D, 0x721FDE, 0xCC0891, 0x10C28B, 0xD4F5A, 0x4C18FB, 0x9036FA, 0x3F845F, 0xA507E4, 0x78EB29, 0x1587],
@@ -287,27 +163,7 @@ module.exports.ROM_FIELD_BN254CX = function() {
     return ROM_FIELD_BN254CX;
 };
 
-module.exports.ROM_FIELD_BRAINPOOL = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_BRAINPOOL = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_BRAINPOOL = {
@@ -322,27 +178,7 @@ module.exports.ROM_FIELD_BRAINPOOL = function() {
     return ROM_FIELD_BRAINPOOL;
 };
 
-module.exports.ROM_FIELD_C41417 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_C41417 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
 
@@ -357,27 +193,7 @@ module.exports.ROM_FIELD_C41417 = function() {
     return ROM_FIELD_C41417;
 };
 
-module.exports.ROM_FIELD_GOLDILOCKS = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_GOLDILOCKS = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_GOLDILOCKS = {
@@ -391,27 +207,7 @@ module.exports.ROM_FIELD_GOLDILOCKS = function() {
     return ROM_FIELD_GOLDILOCKS;
 };
 
-module.exports.ROM_FIELD_HIFIVE = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_HIFIVE = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_HIFIVE = {
@@ -425,32 +221,12 @@ module.exports.ROM_FIELD_HIFIVE = function() {
     return ROM_FIELD_HIFIVE;
 };
 
-module.exports.ROM_FIELD_NIST256 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_NIST256 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_NIST256 = {
 
-        // NIST256 Modulus 
+        // NIST256 Modulus
         // Base Bits= 24
         Modulus: [0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0x0, 0x0, 0x0, 0x0, 0x1, 0xFFFF00, 0xFFFF],
         R2modp: [0x30000, 0x0, 0x0, 0xFFFF00, 0xFBFFFF, 0xFFFFFF, 0xFFFFFE, 0xFFFFFF, 0xFDFFFF, 0xFFFFFF, 0x4],
@@ -460,27 +236,7 @@ module.exports.ROM_FIELD_NIST256 = function() {
     return ROM_FIELD_NIST256;
 };
 
-module.exports.ROM_FIELD_NIST384 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_NIST384 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_NIST384 = {
@@ -495,27 +251,7 @@ module.exports.ROM_FIELD_NIST384 = function() {
     return ROM_FIELD_NIST384;
 };
 
-module.exports.ROM_FIELD_NIST521 = function() {
-
-    /*
-    	Licensed to the Apache Software Foundation (ASF) under one
-    	or more contributor license agreements.  See the NOTICE file
-    	distributed with this work for additional information
-    	regarding copyright ownership.  The ASF licenses this file
-    	to you under the Apache License, Version 2.0 (the
-    	"License"); you may not use this file except in compliance
-    	with the License.  You may obtain a copy of the License at
-    	
-    	http://www.apache.org/licenses/LICENSE-2.0
-
-    	Unless required by applicable law or agreed to in writing,
-    	software distributed under the License is distributed on an
-    	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    	KIND, either express or implied.  See the License for the
-    	specific language governing permissions and limitations
-    	under the License.
-    */
-
+ROM_FIELD_NIST521 = function() {
     /* Fixed Data in ROM - Field and Curve parameters */
 
     var ROM_FIELD_NIST521 = {
@@ -528,3 +264,23 @@ module.exports.ROM_FIELD_NIST521 = function() {
     };
     return ROM_FIELD_NIST521;
 };
+
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+    module.exports = {
+        ROM_FIELD_25519: ROM_FIELD_25519,
+        ROM_FIELD_256PM: ROM_FIELD_256PM,
+        ROM_FIELD_384PM: ROM_FIELD_384PM,
+        ROM_FIELD_512PM: ROM_FIELD_512PM,
+        ROM_FIELD_ANSSI: ROM_FIELD_ANSSI,
+        ROM_FIELD_BLS383: ROM_FIELD_BLS383,
+        ROM_FIELD_BN254: ROM_FIELD_BN254,
+        ROM_FIELD_BN254CX: ROM_FIELD_BN254CX,
+        ROM_FIELD_BRAINPOOL: ROM_FIELD_BRAINPOOL,
+        ROM_FIELD_C41417: ROM_FIELD_C41417,
+        ROM_FIELD_GOLDILOCKS: ROM_FIELD_GOLDILOCKS,
+        ROM_FIELD_HIFIVE: ROM_FIELD_HIFIVE,
+        ROM_FIELD_NIST256: ROM_FIELD_NIST256,
+        ROM_FIELD_NIST384: ROM_FIELD_NIST384,
+        ROM_FIELD_NIST521: ROM_FIELD_NIST521,
+    };
+}
