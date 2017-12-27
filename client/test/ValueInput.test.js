@@ -41,4 +41,3 @@ describe('ValueInput Component', () => {
         expect(wrapper.props().onInputChange).to.be.a("Function");
     });
 });
-

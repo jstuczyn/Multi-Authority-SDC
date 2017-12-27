@@ -1,50 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Segment } from 'semantic-ui-react';
+import {Segment} from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
-import style from './CoinDisplayer.style';
+import styles from './CoinDisplayer.style';
 import {COIN_STATUS} from '../config';
 
-import {wait} from '../utils/api'
+import {wait} from '../utils/api';
 
-export default class CoinDisplayer extends React.Component {
+class CoinDisplayer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            'coinState' : COIN_STATUS.created,
+            coinState: COIN_STATUS.created,
         };
-
-        this.handleCoinSign = this.handleCoinSign.bind(this);
-        this.handleCoinSpend = this.handleCoinSpend.bind(this);
-
     }
 
-    async handleCoinSign() {
-        this.setState({'coinState': COIN_STATUS.signing});
-        console.log('Coin sign request was sent (TODO)');
+    handleCoinSign = async() => {
+        this.setState({coinState: COIN_STATUS.signing});
+        console.log("Coin sign request was sent (TODO)");
 
         const waiting = await wait(1000); // simulates async call to signing authorities
 
-        console.log('Coin was signed (TODO)');
-        this.setState({'coinState': COIN_STATUS.signed});
-    }
+        console.log("Coin was signed (TODO)");
+        this.setState({coinState: COIN_STATUS.signed});
+    };
 
-    async handleCoinSpend() {
-        this.setState({'coinState': COIN_STATUS.spending});
-        console.log('Coin spend request was sent (TODO)');
+    handleCoinSpend = async() => {
+        this.setState({coinState: COIN_STATUS.spending});
+        console.log("Coin spend request was sent (TODO)");
 
         const waiting = await wait(1000); // simulates async call to the verifier
 
-        console.log('Coin was spent (TODO)');
-        this.setState({'coinState': COIN_STATUS.spent});
-    }
+        console.log("Coin was spent (TODO)");
+        this.setState({coinState: COIN_STATUS.spent});
+    };
 
     render() {
         return (
             <Segment.Group horizontal>
-                <Segment style={style.segmentStyle}> Time to live: {this.props.coin.ttl} </Segment>
-                <Segment style={style.segmentStyle}> Value: {this.props.coin.value}</Segment>
-                <Segment style={style.segmentStyle}>
+                <Segment style={styles.segmentStyle}>Time to live: {this.props.coin.ttl}</Segment>
+                <Segment style={styles.segmentStyle}>Value: {this.props.coin.value}</Segment>
+                <Segment style={styles.segmentStyle}>
                     <CoinActionButton
                         onSign={this.handleCoinSign}
                         onSpend={this.handleCoinSpend}
@@ -52,10 +48,12 @@ export default class CoinDisplayer extends React.Component {
                     />
                 </Segment>
             </Segment.Group>
-        )
+        );
     }
-};
+}
 
-CoinDisplayer.PropTypes = {
+CoinDisplayer.propTypes = {
     coin: PropTypes.object.isRequired,
 };
+
+export default CoinDisplayer;

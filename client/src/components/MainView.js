@@ -5,19 +5,19 @@ import CoinListDisplayer from './CoinListDisplayer';
 import {getCoin} from '../utils/coinGenerator';
 import BLSSig from '../../lib/BLSSig';
 
-export default class MainView extends React.Component {
+class MainView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             coins: []
-        }
+        };
     }
 
-    handleCoinSubmit = (value) => {
+    handleCoinSubmit = value => {
         const params = BLSSig.setup();
         const [sk, pk] = BLSSig.keygen(params);
         const coin = getCoin(pk, value);
-        this.setState((prevState) => ({
+        this.setState(prevState => ({
             coins: prevState.coins.concat([{sk, coin}]),
         }));
     };
@@ -32,10 +32,9 @@ export default class MainView extends React.Component {
                 <Grid.Row centered={true}>
                     <CoinListDisplayer coins={this.state.coins}/>
                 </Grid.Row>
-
             </Grid>
-        )
+        );
     }
-
-
 }
+
+export default MainView;

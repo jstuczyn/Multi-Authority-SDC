@@ -1,10 +1,10 @@
-export const divStyle = {
-    'marginTop': '50px',
-    'textAlign': 'center',
+const divStyle = {
+    marginTop: 50,
+    textAlign: 'center',
 };
 
-const style = {
+const styles = {
     divStyle,
 };
 
-export default style;
+export default styles;

@@ -43,6 +43,7 @@ describe('CoinDisplayer Component', () => {
 
             expect(coinDisplayerNode.find(CoinActionButton)).to.have.length(1);
         });
+
         it('If CoinDisplayer has coinState "Generated", CoinActionButton will call "handleCoinSign" on click', () => {
             const wrapper = mount(<CoinDisplayer coin={dummyCoin}/>);
             wrapper.setState({'coinState': COIN_STATUS.created});
@@ -69,3 +70,4 @@ describe('CoinDisplayer Component', () => {
     // more to come as Component is developed
 
 });
+

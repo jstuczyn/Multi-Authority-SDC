@@ -6,7 +6,6 @@ import CoinRequester from '../src/components/CoinRequester';
 import sinon from 'sinon';
 import {Button} from 'semantic-ui-react';
 
-
 describe('SubmitButton Component', () => {
     it('Should have received "onSubmit" function as a prop', () => {
         const mainWrapper = mount(<CoinRequester/>);
@@ -39,5 +38,4 @@ describe('SubmitButton Component', () => {
 
         expect(callback.calledOnce).to.equal(true);
     });
-
 });

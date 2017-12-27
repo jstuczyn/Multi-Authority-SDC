@@ -45,7 +45,7 @@ describe('Coin object', () => {
 
         it('Time to live generation', () => {
             // TODO: FIGURE OUT HOW TO PROPERLY TEST IT
-        })
+        });
 
     });
 
@@ -56,5 +56,4 @@ describe('Coin object', () => {
     it('The alias for getting time to live works correctly', () => {
         expect(coin.timeToLive).to.equal(coin.ttl);
     });
-
 });

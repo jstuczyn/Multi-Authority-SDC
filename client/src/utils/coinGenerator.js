@@ -2,12 +2,10 @@ import {ctx} from '../config';
 import Coin from '../../lib/Coin';
 import * as crypto from 'crypto';
 
-export function getCoin(pk, value) {
-    return new Coin(pk, getRandomCoinId(), value);
-}
+export const getCoin = (pk, value) => new Coin(pk, getRandomCoinId(), value);
 
 // uses same RNG generator as the one used for key generation
-function getRandomCoinId() {
+const getRandomCoinId = () => {
     let RAW = crypto.randomBytes(128);
 
     let rng = new ctx.RAND();
@@ -17,4 +15,4 @@ function getRandomCoinId() {
     groupOrder.rcopy(ctx.ROM_CURVE.CURVE_Order);
 
     return ctx.BIG.randomnum(groupOrder, rng)
-}
+};

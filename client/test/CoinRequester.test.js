@@ -18,23 +18,23 @@ describe('CoinRequester Component', () => {
     });
 
     it('Should have initial value state of 0', () => {
-        const wrapper = mount(<CoinRequester/>);
+        const wrapper = mount(<CoinRequester />);
         expect(wrapper.state().value).to.equal(0);
     });
 
     it('Should have initial isProcessing state of false', () => {
-        const wrapper = mount(<CoinRequester/>);
+        const wrapper = mount(<CoinRequester />);
         expect(wrapper.state().isProcessing).to.equal(false);
     });
 
     it('Should have received "handleCoinSubmit" function as a prop', () => {
-        const mainWrapper = mount(<MainView/>);
+        const mainWrapper = mount(<MainView />);
         const wrapper = mainWrapper.find(CoinRequester);
         expect(wrapper.props().handleCoinSubmit).to.be.a("Function");
     });
 
     it('On input change, the value state is set to that value', () => {
-        const wrapper = mount(<CoinRequester/>);
+        const wrapper = mount(<CoinRequester />);
         const input = wrapper.find('input');
 
         input.simulate('change', {target: {value: 2}});
@@ -45,7 +45,7 @@ describe('CoinRequester Component', () => {
 
     it('On submitting input, the value state is still correctly set to that value', () => {
         const value = 42;
-        const wrapper = mount(<CoinRequester handleCoinSubmit = {(value) => {}}/>); // the behaviour of passed function is irrelevant for this component's state
+        const wrapper = mount(<CoinRequester handleCoinSubmit = {(value) => {}} />); // the behaviour of passed function is irrelevant for this component's state
         const input = wrapper.find('input');
 
         //input value

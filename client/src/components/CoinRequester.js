@@ -3,20 +3,20 @@ import ValueInput from './ValueInput';
 import SubmitButton from './SubmitButton';
 import PropTypes from 'prop-types';
 
-export default class CoinRequester extends React.Component {
+class CoinRequester extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             value: 0,
             isProcessing: false,
-        }
+        };
     }
 
-    handleInputChange = (value) => {
+    handleInputChange = value => {
         this.setState({value});
     };
 
-    handleSubmit = (event) => {
+    handleSubmit = event => {
         this.props.handleCoinSubmit(this.state.value);
     };
 
@@ -25,12 +25,15 @@ export default class CoinRequester extends React.Component {
             <ValueInput onInputChange={this.handleInputChange}>
                 <SubmitButton
                     onSubmit={this.handleSubmit}
-                    isDisabled={this.state.value <= 0}/>
+                    isDisabled={this.state.value <= 0}
+                />
             </ValueInput>
-        )
+        );
     }
 }
 
-CoinRequester.PropTypes = {
+CoinRequester.propTypes = {
     handleCoinSubmit: PropTypes.func.isRequired,
 };
+
+export default CoinRequester;

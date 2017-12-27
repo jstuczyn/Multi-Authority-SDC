@@ -9,6 +9,7 @@ describe('Coin Generator', () => {
         v = {'Dummy' : 'object'};
         coin = getCoin(v, coinValue);
     });
+
     it('Generated Coin has the same value as it was passed', () => {
        expect(coin.value).to.equal(coinValue);
     });

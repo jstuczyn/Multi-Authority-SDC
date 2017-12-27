@@ -8,11 +8,11 @@ export const servers = [
 
 export const ctx = new CTX('BN254');
 
-export const COIN_STATUS_CREATED = 'Generated';
-export const COIN_STATUS_SIGNING = 'Signing';
-export const COIN_STATUS_SIGNED = 'Signed';
-export const COIN_STATUS_SPENT = 'Spent';
-export const COIN_STATUS_SPENDING = 'Spending';
+const COIN_STATUS_CREATED = "Generated";
+const COIN_STATUS_SIGNING = "Signing";
+const COIN_STATUS_SIGNED = "Signed";
+const COIN_STATUS_SPENT = "Spent";
+const COIN_STATUS_SPENDING = "Spending";
 
 export const COIN_STATUS = {
     created: COIN_STATUS_CREATED,
@@ -22,16 +22,16 @@ export const COIN_STATUS = {
     spending: COIN_STATUS_SPENDING,
 };
 
-export const BUTTON_COIN_STATUS_SIGN = 'Sign Coin';
-export const BUTTON_COIN_STATUS_SIGN_INPROGRESS = 'Signing...';
-export const BUTTON_COIN_STATUS_SPEND = 'Spend Coin';
-export const BUTTON_COIN_STATUS_SPENT = 'Coin was Spent';
-export const BUTTON_COIN_STATUS_SPENDING_INPROGRESS = 'Spending...';
+const BUTTON_COIN_STATUS_SIGN = "Sign Coin";
+const BUTTON_COIN_STATUS_SIGN_IN_PROGRESS = "Signing...";
+const BUTTON_COIN_STATUS_SPEND = "Spend Coin";
+const BUTTON_COIN_STATUS_SPENT = "Coin was Spent";
+const BUTTON_COIN_STATUS_SPENDING_IN_PROGRESS = "Spending...";
 
 export const BUTTON_COIN_STATUS = {
     sign: BUTTON_COIN_STATUS_SIGN,
-    signing: BUTTON_COIN_STATUS_SIGN_INPROGRESS,
+    signing: BUTTON_COIN_STATUS_SIGN_IN_PROGRESS,
     spend: BUTTON_COIN_STATUS_SPEND,
     spent: BUTTON_COIN_STATUS_SPENT,
-    spending: BUTTON_COIN_STATUS_SPENDING_INPROGRESS,
+    spending: BUTTON_COIN_STATUS_SPENDING_IN_PROGRESS,
 };

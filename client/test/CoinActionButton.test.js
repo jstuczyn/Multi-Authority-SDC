@@ -50,7 +50,7 @@ describe('CoinActionButton Component', () => {
         const buttonNode2 = wrapper2.find(Button);
         const buttonNode3 = wrapper3.find(Button);
         const buttonNode4 = wrapper4.find(Button);
-        const buttonNode5 = wrapper4.find(Button);
+        const buttonNode5 = wrapper5.find(Button);
 
         expect(buttonNode1.props().disabled).to.be.a("boolean").to.equal(false);
         expect(buttonNode2.props().disabled).to.be.a("boolean").to.equal(true);
