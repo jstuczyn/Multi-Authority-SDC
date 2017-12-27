@@ -4,6 +4,8 @@ import { shallow, mount, render } from 'enzyme';
 import SubmitButton from '../src/components/SubmitButton';
 import CoinRequester from '../src/components/CoinRequester';
 import sinon from 'sinon';
+import {Button} from 'semantic-ui-react';
+
 
 describe('SubmitButton Component', () => {
     it('Should have received "onSubmit" function as a prop', () => {
@@ -20,12 +22,12 @@ describe('SubmitButton Component', () => {
 
     it('The "disabled" attribute of the button should be the same one as received in props', () => {
         let wrapper = mount(<SubmitButton isDisabled={true}/>);
-        let buttonNode = wrapper.find('button');
+        let buttonNode = wrapper.find(Button);
         expect(buttonNode.props().disabled).to.be.a("boolean").to.equal(true);
 
         let wrapper2 = mount(<SubmitButton isDisabled={false}/>);
-        let buttonNode2 = wrapper2.find('button');
-        expect(buttonNode2.props().disabled).to.equal(false || undefined)
+        let buttonNode2 = wrapper2.find(Button);
+        expect(buttonNode2.props().disabled).to.equal(false)
     });
 
     it('Should call "handleCoinSubmit" sent from CoinRequester Component when there is a valid value in input field', () => {

@@ -4,6 +4,7 @@ import {shallow, mount, render} from 'enzyme';
 import CoinDisplayer from '../src/components/CoinDisplayer';
 import MainView from '../src/components/MainView';
 import CoinListDisplayer from '../src/components/CoinListDisplayer';
+import CoinRequester from '../src/components/CoinRequester';
 
 let coinListDisplayerNode;
 
@@ -12,10 +13,10 @@ describe('CoinListDisplayer Component', () => {
     before(() => {
         wrapper = mount(<MainView/>);
         wrapper.find('input').simulate('change', {target: {value: 42}});
-        wrapper.find('button').simulate('click');
+        wrapper.find(CoinRequester).find('button').simulate('click');
 
         wrapper.find('input').simulate('change', {target: {value: 43}});
-        wrapper.find('button').simulate('click');
+        wrapper.find(CoinRequester).find('button').simulate('click');
 
         coinListDisplayerNode = wrapper.find(CoinListDisplayer);
     });

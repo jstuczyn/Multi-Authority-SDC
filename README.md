@@ -7,7 +7,7 @@
 ![Diagram](https://i.imgur.com/ycQoCbf.png)
 
 ### Current Client Interface:
-![Interface](https://i.imgur.com/qIUGqIc.png)
+![Interface](https://i.imgur.com/ylcVhHo.png)
 
 
 
@@ -15,4 +15,6 @@
 - Does it matter if id is g1^id or g2^id?
 
 #### TODOs:
-- Add more tests
+- Re-integrate coin signing
+- Re-integrate client aggregate
+- Client Merchant entity

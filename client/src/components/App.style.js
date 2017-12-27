@@ -1,6 +1,6 @@
 export const divStyle = {
-    "marginTop": "50px",
-    "textAlign": "center"
+    'marginTop': '50px',
+    'textAlign': 'center',
 };
 
 const style = {
