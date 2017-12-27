@@ -2,31 +2,42 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
-import style from './CoinDisplayer.style'
+import style from './CoinDisplayer.style';
 import {COIN_STATUS} from '../config';
+
+import {wait} from '../utils/api'
 
 export default class CoinDisplayer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             'coinState' : COIN_STATUS.created,
-        }
+        };
+
+        this.handleCoinSign = this.handleCoinSign.bind(this);
+        this.handleCoinSpend = this.handleCoinSpend.bind(this);
+
     }
 
-    handleCoinSign = () => {
-        // firstly it will set state to 'signing' and then make async calls to all authorities
-        // upon completion and aggregating signatures, it will properly set state to 'signed'
+    async handleCoinSign() {
+        this.setState({'coinState': COIN_STATUS.signing});
+        console.log('Coin sign request was sent (TODO)');
 
-        // this.setState({'coinState': COIN_STATUS.signing});
-        // async call to signers
+        const waiting = await wait(1000); // simulates async call to signing authorities
+
         console.log('Coin was signed (TODO)');
         this.setState({'coinState': COIN_STATUS.signed});
-    };
+    }
 
-    handleCoinSpend = () => {
-        this.setState({'coinState': COIN_STATUS.spent});
+    async handleCoinSpend() {
+        this.setState({'coinState': COIN_STATUS.spending});
+        console.log('Coin spend request was sent (TODO)');
+
+        const waiting = await wait(1000); // simulates async call to the verifier
+
         console.log('Coin was spent (TODO)');
-    };
+        this.setState({'coinState': COIN_STATUS.spent});
+    }
 
     render() {
         return (

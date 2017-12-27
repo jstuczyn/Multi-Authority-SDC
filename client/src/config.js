@@ -12,22 +12,26 @@ export const COIN_STATUS_CREATED = 'Generated';
 export const COIN_STATUS_SIGNING = 'Signing';
 export const COIN_STATUS_SIGNED = 'Signed';
 export const COIN_STATUS_SPENT = 'Spent';
+export const COIN_STATUS_SPENDING = 'Spending';
 
 export const COIN_STATUS = {
     created: COIN_STATUS_CREATED,
     signing: COIN_STATUS_SIGNING,
     signed: COIN_STATUS_SIGNED,
     spent: COIN_STATUS_SPENT,
+    spending: COIN_STATUS_SPENDING,
 };
 
 export const BUTTON_COIN_STATUS_SIGN = 'Sign Coin';
 export const BUTTON_COIN_STATUS_SIGN_INPROGRESS = 'Signing...';
 export const BUTTON_COIN_STATUS_SPEND = 'Spend Coin';
 export const BUTTON_COIN_STATUS_SPENT = 'Coin was Spent';
+export const BUTTON_COIN_STATUS_SPENDING_INPROGRESS = 'Spending...';
 
 export const BUTTON_COIN_STATUS = {
     sign: BUTTON_COIN_STATUS_SIGN,
     signing: BUTTON_COIN_STATUS_SIGN_INPROGRESS,
     spend: BUTTON_COIN_STATUS_SPEND,
     spent: BUTTON_COIN_STATUS_SPENT,
+    spending: BUTTON_COIN_STATUS_SPENDING_INPROGRESS,
 };

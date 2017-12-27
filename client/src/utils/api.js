@@ -1,11 +1,23 @@
-// todo put parsing pk here
 
-
-function wait(t) {
+// auxiliary, mostly for testing purposes to simulate delays
+export function wait(t) {
     return new Promise((r) => setTimeout(r, t));
 }
 
-export async function checkIfAlive(server) {
+
+
+
+
+// BELOW IS AN OLD API,
+// TODO: REFACTOR AND CLEAN UP BEFORE REUSING
+
+
+
+
+
+
+
+export async function checkIfAlive(server, getPublicKey = false) {
     // only for test to see transitions
     // await wait(1000);
 

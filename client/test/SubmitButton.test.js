@@ -27,7 +27,7 @@ describe('SubmitButton Component', () => {
 
         let wrapper2 = mount(<SubmitButton isDisabled={false}/>);
         let buttonNode2 = wrapper2.find(Button);
-        expect(buttonNode2.props().disabled).to.equal(false)
+        expect(buttonNode2.props().disabled).to.be.a("boolean").to.equal(false)
     });
 
     it('Should call "handleCoinSubmit" sent from CoinRequester Component when there is a valid value in input field', () => {

@@ -6,7 +6,7 @@ describe('Coin Generator', () => {
     let coinValue, v, coin;
     before(() => {
         coinValue = 42;
-        v = {"Dummy" : "object"};
+        v = {'Dummy' : 'object'};
         coin = getCoin(v, coinValue);
     });
     it('Generated Coin has the same value as it was passed', () => {

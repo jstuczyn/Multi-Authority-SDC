@@ -27,6 +27,11 @@ const CoinActionButton = (props) => {
             isDisabled = true;
             buttonContent = BUTTON_COIN_STATUS.spent;
             break;
+
+        case COIN_STATUS.spending:
+            isDisabled = true;
+            buttonContent = BUTTON_COIN_STATUS.spending;
+            break;
     }
 
     return (
@@ -37,8 +42,6 @@ const CoinActionButton = (props) => {
             onClick={buttonOnClick}
         />
     )
-
-
 };
 
 CoinActionButton.PropTypes = {

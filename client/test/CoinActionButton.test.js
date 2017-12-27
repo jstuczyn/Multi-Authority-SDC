@@ -39,20 +39,23 @@ describe('CoinActionButton Component', () => {
             coinState === COIN_STATUS.spent)
     });
 
-    it('Should be disabled if "coinState" is either "signing" or "spent"', () => {
+    it('Should be disabled if "coinState" is either "signing", "spending" or "spent"', () => {
         const wrapper1 = shallow(<CoinActionButton onSign={()=>{}} onSpend={()=>{}} coinState={COIN_STATUS.created}/>)
         const wrapper2 = shallow(<CoinActionButton onSign={()=>{}} onSpend={()=>{}} coinState={COIN_STATUS.signing}/>)
         const wrapper3 = shallow(<CoinActionButton onSign={()=>{}} onSpend={()=>{}} coinState={COIN_STATUS.signed}/>)
         const wrapper4 = shallow(<CoinActionButton onSign={()=>{}} onSpend={()=>{}} coinState={COIN_STATUS.spent}/>)
+        const wrapper5 = shallow(<CoinActionButton onSign={()=>{}} onSpend={()=>{}} coinState={COIN_STATUS.spending}/>)
 
         const buttonNode1 = wrapper1.find(Button);
         const buttonNode2 = wrapper2.find(Button);
         const buttonNode3 = wrapper3.find(Button);
         const buttonNode4 = wrapper4.find(Button);
+        const buttonNode5 = wrapper4.find(Button);
 
-        expect(buttonNode1.props().disabled).to.equal(false);
+        expect(buttonNode1.props().disabled).to.be.a("boolean").to.equal(false);
         expect(buttonNode2.props().disabled).to.be.a("boolean").to.equal(true);
-        expect(buttonNode3.props().disabled).to.equal(false);
+        expect(buttonNode3.props().disabled).to.be.a("boolean").to.equal(false);
         expect(buttonNode4.props().disabled).to.be.a("boolean").to.equal(true);
+        expect(buttonNode5.props().disabled).to.be.a("boolean").to.equal(true);
     });
 });
