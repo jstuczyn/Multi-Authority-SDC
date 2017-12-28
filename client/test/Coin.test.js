@@ -3,6 +3,8 @@ import { before } from 'mocha';
 import * as crypto from 'crypto';
 import Coin from '../lib/Coin';
 import { ctx } from '../src/config';
+import BLSSig from '../lib/BLSSig';
+import { getCoin } from '../src/utils/coinGenerator';
 
 describe('Coin object', () => {
   let coinValue;
@@ -60,5 +62,44 @@ describe('Coin object', () => {
 
   it('The alias for getting time to live works correctly', () => {
     expect(coin.timeToLive).to.equal(coin.ttl);
+  });
+
+  // assumes previous tests would have detected errors so normal key generation could be used
+  describe('Coin Object Simplification', () => {
+    let properCoin;
+    before(() => {
+      const properCoinValue = 42;
+      const params = BLSSig.setup();
+      const [sk, pk] = BLSSig.keygen(params);
+      properCoin = getCoin(pk, properCoinValue);
+    });
+
+    it('Can simplify a coin', () => {
+      const simplifiedCoin = properCoin.getSimplifiedCoin();
+      expect(simplifiedCoin).to.have.property('bytesV').that.is.an('array');
+      expect(simplifiedCoin).to.have.property('value').that.is.an('number');
+      expect(simplifiedCoin).to.have.property('ttl').that.is.an('number');
+      expect(simplifiedCoin).to.have.property('bytesId').that.is.an('array');
+    });
+
+    it('Can re-create Coin', () => {
+      const v_old = properCoin.v;
+      const value_old = properCoin.value;
+      const ttl_old = properCoin.ttl;
+      const id_old = properCoin.id;
+
+      const simplifiedCoin = properCoin.getSimplifiedCoin();
+      const recreatedCoin = Coin.fromSimplifiedCoin(simplifiedCoin);
+
+      const v_new = recreatedCoin.v;
+      const value_new = recreatedCoin.value;
+      const ttl_new = recreatedCoin.ttl;
+      const id_new = recreatedCoin.id;
+
+      assert.isTrue(v_old.equals(v_new));
+      assert.isTrue(value_old === value_new);
+      assert.isTrue(ttl_old === ttl_new);
+      assert.isTrue(id_old.equals(id_new));
+    });
   });
 });

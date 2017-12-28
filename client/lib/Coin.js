@@ -1,11 +1,12 @@
 import CTX from './Milagro-Crypto-Library/ctx';
+import { ctx } from '../src/config';
 
 const MIN_TTL_H = 12;
 
 export default class Coin {
-  constructor(v, ide, value) {
-    this.ctx = new CTX('BN254');
-
+  constructor(v, ide, value, ttl = -1, id = null) {
+    // this.ctx = new CTX('BN254');
+    this.ctx = ctx;
     // does it matter if id is g1^id or g2^id ?
 
     const x = new this.ctx.BIG(0);
@@ -29,8 +30,18 @@ export default class Coin {
 
     this.v = v;
     this.value = value;
-    this.id = this.ctx.PAIR.G2mul(this.g2, ide);
-    this.ttl = Coin.getTimeToLive();
+
+    if (id === null) {
+      this.id = this.ctx.PAIR.G2mul(this.g2, ide);
+    } else {
+      this.id = id;
+    }
+
+    if (ttl > 0) {
+      this.ttl = ttl;
+    } else {
+      this.ttl = Coin.getTimeToLive();
+    }
   }
 
   // alias for v
@@ -41,6 +52,29 @@ export default class Coin {
   // alias for ttl
   get timeToLive() {
     return this.ttl;
+  }
+
+  getSimplifiedCoin() {
+    const bytesId = [];
+    const bytesV = [];
+    this.id.toBytes(bytesId);
+    this.v.toBytes(bytesV);
+    return {
+      bytesV: bytesV,
+      value: this.value,
+      ttl: this.ttl,
+      bytesId: bytesId,
+    };
+  }
+
+  static fromSimplifiedCoin(simplifiedCoin) {
+    const {
+      bytesV, value, ttl, bytesId,
+    } = simplifiedCoin;
+
+    const v = ctx.ECP2.fromBytes(bytesV); // ECP2?
+    const id = ctx.ECP2.fromBytes(bytesId);
+    return new Coin(v, null, value, ttl, id);
   }
 
   static getHourTimeDifference(date1, date2) {
