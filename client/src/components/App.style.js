@@ -1,10 +1,10 @@
 const divStyle = {
-    marginTop: 50,
-    textAlign: 'center',
+  marginTop: 50,
+  textAlign: 'center',
 };
 
 const styles = {
-    divStyle,
+  divStyle,
 };
 
 export default styles;

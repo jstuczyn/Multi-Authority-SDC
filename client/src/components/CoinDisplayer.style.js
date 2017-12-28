@@ -1,9 +1,9 @@
 const segmentStyle = {
-    margin : 'auto',
+  margin: 'auto',
 };
 
 const styles = {
-    segmentStyle,
+  segmentStyle,
 };
 
 export default styles;

@@ -3,24 +3,24 @@ import PropTypes from 'prop-types';
 import CoinDisplayer from './CoinDisplayer';
 
 class CoinListDisplayer extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+  constructor(props) {
+    super(props);
+  }
 
-    render() {
-        // {sk: sk, coin: coin}
-        return (
-            <div>
-                {this.props.coins.map(coin => (
-                    <CoinDisplayer key={coin.coin.id} coin={coin.coin}/>
-                ))}
-            </div>
-        );
-    }
+  render() {
+    // {sk: sk, coin: coin}
+    return (
+      <div>
+        {this.props.coins.map(coin => (
+          <CoinDisplayer key={coin.coin.id} coin={coin.coin} />
+        ))}
+      </div>
+    );
+  }
 }
 
 CoinListDisplayer.propTypes = {
-    coins: PropTypes.array.isRequired,
+  coins: PropTypes.array.isRequired,
 };
 
 export default CoinListDisplayer;
