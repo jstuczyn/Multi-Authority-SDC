@@ -47,19 +47,16 @@ describe('Pointcheval-Sanders Short Randomizable Signatures scheme', () => {
       assert.isTrue(y instanceof (G.ctx.BIG));
     });
 
-    // todo: replace g2.mul with PAIR.G2mul
     describe('Returns Valid Private Key (g,X,Y)', () => {
       it('g = g2', () => {
         assert.isTrue(g2.equals(g));
       });
 
       it('X = g2*x', () => {
-        assert.isTrue(X.equals(g2.mul(x)));
         assert.isTrue(X.equals(G.ctx.PAIR.G2mul(g2, x)));
       });
 
       it('Y = g2*y', () => {
-        assert.isTrue(Y.equals(g2.mul(y)));
         assert.isTrue(Y.equals(G.ctx.PAIR.G2mul(g2, y)));
       });
     });
