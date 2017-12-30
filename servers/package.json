@@ -1,19 +1,28 @@
 {
   "name": "multi-authority-sdc",
   "version": "1.0.0",
+  "engines": {
+    "node": ">= 8.5.0"
+  },
   "description": "",
   "main": "app.js",
   "dependencies": {
     "babel-preset-env": "^1.6.1",
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "babel-preset-es2017": "^6.24.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-eslint": "^8.1.2",
     "chai": "^4.1.2",
-    "mocha": "^4.0.1",
-    "nyc": "^11.3.0"
+    "eslint": "^4.14.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-node": "^5.2.1",
+    "mocha": "^4.1.0",
+    "nyc": "^11.4.1"
   },
   "scripts": {
     "test": "nyc mocha dist/test --timeout=3000",

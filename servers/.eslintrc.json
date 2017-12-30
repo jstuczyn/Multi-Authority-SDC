@@ -1,0 +1,29 @@
+{
+  "parser": "babel-eslint",
+  "plugins": ["node"],
+  "extends": ["eslint:recommended", "plugin:node/recommended", "airbnb/base"],
+  "env": {"es6": true},
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "allowImportExportEverywhere": true,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": 0,
+    "camelcase": "warn",
+    "no-param-reassign": "off",
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "prefer-destructuring": "off",
+    "import/prefer-default-export": "warn",
+    "import/no-extraneous-dependencies": ["error", {
+      "peerDependencies": true}
+    ],
+    "node/no-unsupported-features" : ["error", {
+      "version": 8,
+      "ignores": [
+        "modules"
+      ]
+    }]
+  }
+}

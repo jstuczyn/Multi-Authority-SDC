@@ -1,15 +1,16 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 exports.stringToBytes = stringToBytes;
 // set of auxiliary functions that don't belong to any existing class/module
 
 function stringToBytes(s) {
-    var b = [];
-    for (var i = 0; i < s.length; i++) {
-        b.push(s.charCodeAt(i));
-    }return b;
+  var b = [];
+  for (var i = 0; i < s.length; i++) {
+    b.push(s.charCodeAt(i));
+  }
+  return b;
 }
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9hdXhpbGlhcnkuanMiXSwibmFtZXMiOlsic3RyaW5nVG9CeXRlcyIsInMiLCJiIiwiaSIsImxlbmd0aCIsInB1c2giLCJjaGFyQ29kZUF0Il0sIm1hcHBpbmdzIjoiOzs7OztRQUVnQkEsYSxHQUFBQSxhO0FBRmhCOztBQUVPLFNBQVNBLGFBQVQsQ0FBdUJDLENBQXZCLEVBQTBCO0FBQzdCLFFBQUlDLElBQUksRUFBUjtBQUNBLFNBQUssSUFBSUMsSUFBSSxDQUFiLEVBQWdCQSxJQUFJRixFQUFFRyxNQUF0QixFQUE4QkQsR0FBOUI7QUFDSUQsVUFBRUcsSUFBRixDQUFPSixFQUFFSyxVQUFGLENBQWFILENBQWIsQ0FBUDtBQURKLEtBRUEsT0FBT0QsQ0FBUDtBQUNIIiwiZmlsZSI6ImF1eGlsaWFyeS5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8vIHNldCBvZiBhdXhpbGlhcnkgZnVuY3Rpb25zIHRoYXQgZG9uJ3QgYmVsb25nIHRvIGFueSBleGlzdGluZyBjbGFzcy9tb2R1bGVcclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBzdHJpbmdUb0J5dGVzKHMpIHtcclxuICAgIGxldCBiID0gW107XHJcbiAgICBmb3IgKGxldCBpID0gMDsgaSA8IHMubGVuZ3RoOyBpKyspXHJcbiAgICAgICAgYi5wdXNoKHMuY2hhckNvZGVBdChpKSk7XHJcbiAgICByZXR1cm4gYjtcclxufSJdfQ==
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9hdXhpbGlhcnkuanMiXSwibmFtZXMiOlsic3RyaW5nVG9CeXRlcyIsInMiLCJiIiwiaSIsImxlbmd0aCIsInB1c2giLCJjaGFyQ29kZUF0Il0sIm1hcHBpbmdzIjoiOzs7OztRQUVnQkEsYSxHQUFBQSxhO0FBRmhCOztBQUVPLFNBQVNBLGFBQVQsQ0FBdUJDLENBQXZCLEVBQTBCO0FBQy9CLE1BQU1DLElBQUksRUFBVjtBQUNBLE9BQUssSUFBSUMsSUFBSSxDQUFiLEVBQWdCQSxJQUFJRixFQUFFRyxNQUF0QixFQUE4QkQsR0FBOUIsRUFBbUM7QUFDakNELE1BQUVHLElBQUYsQ0FBT0osRUFBRUssVUFBRixDQUFhSCxDQUFiLENBQVA7QUFDRDtBQUNELFNBQU9ELENBQVA7QUFDRCIsImZpbGUiOiJhdXhpbGlhcnkuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBzZXQgb2YgYXV4aWxpYXJ5IGZ1bmN0aW9ucyB0aGF0IGRvbid0IGJlbG9uZyB0byBhbnkgZXhpc3RpbmcgY2xhc3MvbW9kdWxlXG5cbmV4cG9ydCBmdW5jdGlvbiBzdHJpbmdUb0J5dGVzKHMpIHtcbiAgY29uc3QgYiA9IFtdO1xuICBmb3IgKGxldCBpID0gMDsgaSA8IHMubGVuZ3RoOyBpKyspIHtcbiAgICBiLnB1c2gocy5jaGFyQ29kZUF0KGkpKTtcbiAgfVxuICByZXR1cm4gYjtcbn1cbiJdfQ==
