@@ -110,4 +110,8 @@ export default class BpGroup {
     }
     return this.ctx.ECP.mapit(W);
   }
+
+  hashG2ElemToBIG(G2elem) {
+    return this.hashToBIG(G2elem.toString());
+  }
 }

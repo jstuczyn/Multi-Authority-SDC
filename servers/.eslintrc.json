@@ -11,12 +11,13 @@
   "rules": {
     "no-unused-vars": "warn",
     "no-console": 0,
-    "camelcase": "warn",
+    "camelcase": "off",
     "no-param-reassign": "off",
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "prefer-destructuring": "off",
     "import/prefer-default-export": "warn",
     "object-shorthand": "off",
+    "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "import/no-extraneous-dependencies": ["error", {
       "peerDependencies": true}
     ],
@@ -26,5 +27,14 @@
         "modules"
       ]
     }]
-  }
+  },
+  "overrides": [
+    {
+      "files": "*.test.js",
+      "rules": {
+        "no-unused-expressions": "off",
+        "no-shadow": "off"
+      }
+    }
+  ]
 }
