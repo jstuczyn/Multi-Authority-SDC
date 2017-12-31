@@ -60,3 +60,7 @@ typings/
 # dotenv environment variables file
 .env
 .idea/
+
+servers/dist/test
+servers/dist/*
+!servers/dist/lib
