@@ -25,7 +25,7 @@
     "nyc": "^11.4.1"
   },
   "scripts": {
-    "test": "nyc mocha dist/test --timeout=3000",
+    "test": "nyc mocha dist/test --timeout=10000",
     "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files",
     "start": "node dist/app.js"
   },

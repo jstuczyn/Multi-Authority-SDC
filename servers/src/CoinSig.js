@@ -150,7 +150,44 @@ export default class CoinSig {
     return [signatures[0][0], aggregateSignature];
   }
 
+  static aggregatePublicKeys(params, pks) {
+    const [G, o, g1, g2, e] = params;
+
+    const ag = new G.ctx.ECP2();
+    const aX0 = new G.ctx.ECP2();
+    const aX1 = new G.ctx.ECP2();
+    const aX2 = new G.ctx.ECP2();
+    const aX3 = new G.ctx.ECP2();
+    const aX4 = new G.ctx.ECP2();
+
+    for (let i = 0; i < pks.length; i++) {
+      const [g, X0, X1, X2, X3, X4] = pks[i];
+      if (i === 0) {
+        ag.copy(g);
+        aX0.copy(X0);
+        aX1.copy(X1);
+        aX2.copy(X2);
+        aX3.copy(X3);
+        aX4.copy(X4);
+      } else {
+        aX0.add(X0);
+        aX1.add(X1);
+        aX2.add(X2);
+        aX3.add(X3);
+        aX4.add(X4);
+      }
+    }
+    aX0.affine();
+    aX1.affine();
+    aX2.affine();
+    aX3.affine();
+    aX4.affine();
+
+    return [ag, aX0, aX1, aX2, aX3, aX4];
+  }
+
   static verifyAggregation(params, pks, coin, aggregateSignature) {
-    return;
+    const aPk = CoinSig.aggregatePublicKeys(params, pks);
+    return CoinSig.verify(params, aPk, coin, aggregateSignature);
   }
 }

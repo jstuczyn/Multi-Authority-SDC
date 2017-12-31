@@ -141,7 +141,6 @@ describe('CoinSig Scheme', () => {
       let coin_params;
       before(() => {
         params = CoinSig.setup();
-        const [G, o, g1, g2, e] = params;
         [sk, pk] = CoinSig.keygen(params);
 
         coin_params = BLSSig.setup();
@@ -192,7 +191,6 @@ describe('CoinSig Scheme', () => {
 
     describe('Randomize', () => {
       const params = CoinSig.setup();
-      const [G, o, g1, g2, e] = params;
       const [sk, pk] = CoinSig.keygen(params);
 
       const coin_params = BLSSig.setup();
@@ -215,7 +213,6 @@ describe('CoinSig Scheme', () => {
     describe('Aggregate', () => {
       it('Aggregation(s1) = s1', () => {
         const params = CoinSig.setup();
-        const [G, o, g1, g2, e] = params;
         const [sk, pk] = CoinSig.keygen(params);
 
         const coin_params = BLSSig.setup();
@@ -225,13 +222,13 @@ describe('CoinSig Scheme', () => {
         const sig = CoinSig.sign(params, sk, dummyCoin);
         const aggregateSig = CoinSig.aggregateSignatures(params, [sig]);
 
+        assert.isTrue(sig[0].equals(aggregateSig[0]));
         assert.isTrue(sig[1].equals(aggregateSig[1]));
       });
     });
 
     it('Returns null if one of signatures is invalid (different h)', () => {
       const params = CoinSig.setup();
-      const [G, o, g1, g2, e] = params;
       const [sk, pk] = CoinSig.keygen(params);
 
       const coin_params = BLSSig.setup();
@@ -247,6 +244,95 @@ describe('CoinSig Scheme', () => {
       const aggregateSig = CoinSig.aggregateSignatures(params, [sig1, sig2]);
 
       expect(aggregateSig).to.be.a('null');
+    });
+  });
+
+  describe('Aggregate Verification', () => {
+    describe('Public Key Aggregation', () => {
+      it('Returns same key if single key is sent', () => {
+        const params = CoinSig.setup();
+        const [sk, pk] = CoinSig.keygen(params);
+        const aPk = CoinSig.aggregatePublicKeys(params, [pk]);
+        for (let i = 0; i < pk.length; i++) {
+          assert.isTrue(pk[i].equals(aPk[i]));
+        }
+      });
+    });
+
+    describe('Aggregate Verification', () => {
+      it('Works for single signature', () => {
+        const params = CoinSig.setup();
+        const [sk, pk] = CoinSig.keygen(params);
+
+        const coin_params = BLSSig.setup();
+        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const dummyCoin = getCoin(coin_pk, 42);
+
+        const sig = CoinSig.sign(params, sk, dummyCoin);
+        const aggregateSig = CoinSig.aggregateSignatures(params, [sig]);
+
+        assert.isTrue(CoinSig.verifyAggregation(params, [pk], dummyCoin, aggregateSig));
+      });
+
+      it('Works for three distinct signatures', () => {
+        const params = CoinSig.setup();
+        const [sk, pk] = CoinSig.keygen(params);
+
+        const coin_params = BLSSig.setup();
+        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const dummyCoin = getCoin(coin_pk, 42);
+
+        const coinsToSign = 3;
+        const pks = [];
+        const signatures = [];
+
+        for (let i = 0; i < coinsToSign; i++) {
+          const [sk, pk] = CoinSig.keygen(params);
+          pks.push(pk);
+          const signature = CoinSig.sign(params, sk, dummyCoin);
+          signatures.push(signature);
+        }
+
+        const aggregateSignature = CoinSig.aggregateSignatures(params, signatures);
+
+        assert.isTrue(CoinSig.verifyAggregation(params, pks, dummyCoin, aggregateSignature));
+      });
+
+      it("Doesn't work when one of three signatures is on different coin (but for some reason has same id)", () => {
+        const params = CoinSig.setup();
+        const [G, o, g1, g2, e] = params;
+
+        const [sk, pk] = CoinSig.keygen(params);
+
+        const coin_params = BLSSig.setup();
+        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const dummyCoin = getCoin(coin_pk, 42);
+
+        const coinsToSign = 2;
+        const pks = [];
+        const signatures = [];
+
+        for (let i = 0; i < coinsToSign; i++) {
+          const [sk, pk] = CoinSig.keygen(params);
+          pks.push(pk);
+          const signature = CoinSig.sign(params, sk, dummyCoin);
+          signatures.push(signature);
+        }
+
+        const [another_coin_sk, another_coin_pk] = BLSSig.keygen(coin_params);
+        const anotherCoin = getCoin(another_coin_pk, 43);
+        anotherCoin.id = new G.ctx.ECP2();
+        anotherCoin.id.copy(dummyCoin.id);
+
+        const [skm, pkm] = CoinSig.keygen(params);
+        pks.push(pkm);
+        const maliciousSignature = CoinSig.sign(params, skm, anotherCoin);
+        signatures.push(maliciousSignature);
+
+        const aggregateSignature = CoinSig.aggregateSignatures(params, signatures);
+
+        assert.isNotTrue(CoinSig.verifyAggregation(params, pks, dummyCoin, aggregateSignature));
+      });
     });
   });
 });
