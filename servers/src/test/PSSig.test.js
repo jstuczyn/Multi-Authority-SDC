@@ -140,7 +140,6 @@ describe('Pointcheval-Sanders Short Randomizable Signatures scheme', () => {
     });
   });
 
-
   describe('Randomize', () => {
     const params = PSSig.setup();
     const [G, o, g1, g2, e] = params;

@@ -126,7 +126,11 @@ export default class CoinSig {
   }
 
   static randomize(params, sig) {
-    return;
+    const [G, o, g1, g2, e] = params;
+    const [sig1, sig2] = sig;
+    const t = G.ctx.BIG.randomnum(G.order, G.rngGen);
+
+    return [G.ctx.PAIR.G1mul(sig1, t), G.ctx.PAIR.G1mul(sig2, t)];
   }
 
   static aggregateSignatures(params, signatures) {

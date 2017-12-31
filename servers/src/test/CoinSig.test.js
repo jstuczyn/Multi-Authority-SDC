@@ -189,5 +189,29 @@ describe('CoinSig Scheme', () => {
         assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
       });
     });
+
+    describe('Randomize', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+      const [sk, pk] = CoinSig.keygen(params);
+
+      const coin_params = BLSSig.setup();
+      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const dummyCoin = getCoin(coin_pk, 42);
+
+      let sig = CoinSig.sign(params, sk, dummyCoin);
+      sig = CoinSig.randomize(params, sig);
+
+      it('Successful verification for original coin with randomized signature', () => {
+        assert.isTrue(CoinSig.verify(params, pk, dummyCoin, sig));
+      });
+
+      it('Failed verification for modified coin with the same randomized signature', () => {
+        dummyCoin.value = 43;
+        assert.isNotTrue(CoinSig.verify(params, pk, dummyCoin, sig));
+      });
+    });
+
+
   });
 });
