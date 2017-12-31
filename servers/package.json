@@ -8,9 +8,9 @@
   "main": "app.js",
   "dependencies": {
     "babel-preset-env": "^1.6.1",
+    "babel-preset-es2017": "^6.24.1",
     "body-parser": "^1.18.2",
-    "express": "^4.16.2",
-    "babel-preset-es2017": "^6.24.1"
+    "express": "^4.16.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

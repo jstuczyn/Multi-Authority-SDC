@@ -45,8 +45,9 @@ export default class CoinSig {
     const rand = G.ctx.BIG.randomnum(o, G.rngGen);
     const h = G.ctx.PAIR.G1mul(g1, rand);
 
-    const a1 = G.hashToBIG(coin.value);
-    const a2 = G.hashToBIG(coin.ttl);
+    const a1 = new G.ctx.BIG(coin.value);
+    a1.norm();
+    const a2 = G.hashToBIG(coin.ttl.toString());
     const a3 = G.hashG2ElemToBIG(coin.v);
     const a4 = G.hashG2ElemToBIG(coin.id);
 
@@ -90,8 +91,38 @@ export default class CoinSig {
     return [h, sig];
   }
 
+  //  e(sig1, X0 + a1 * X1 + ...) == e(sig2, g)
   static verify(params, pk, coin, sig) {
-    return;
+    const [G, o, g1, g2, e] = params;
+    const [g, X0, X1, X2, X3, X4] = pk;
+    const [sig1, sig2] = sig;
+
+    const a1 = new G.ctx.BIG(coin.value);
+    a1.norm();
+    const a2 = G.hashToBIG(coin.ttl.toString());
+    const a3 = G.hashG2ElemToBIG(coin.v);
+    const a4 = G.hashG2ElemToBIG(coin.id);
+
+    const G2_tmp1 = G.ctx.PAIR.G2mul(X1, a1);
+    const G2_tmp2 = G.ctx.PAIR.G2mul(X2, a2);
+    const G2_tmp3 = G.ctx.PAIR.G2mul(X3, a3);
+    const G2_tmp4 = G.ctx.PAIR.G2mul(X4, a4);
+
+    // so that the original key wouldn't be mutated
+    const X0_cpy = new G.ctx.ECP2();
+
+    X0_cpy.copy(X0);
+    X0_cpy.add(G2_tmp1);
+    X0_cpy.add(G2_tmp2);
+    X0_cpy.add(G2_tmp3);
+    X0_cpy.add(G2_tmp4);
+
+    X0_cpy.affine();
+
+    const Gt_1 = e(sig1, X0_cpy);
+    const Gt_2 = e(sig2, g);
+
+    return !sig2.INF && Gt_1.equals(Gt_2);
   }
 
   static randomize(params, sig) {

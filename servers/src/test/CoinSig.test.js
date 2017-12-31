@@ -1,9 +1,9 @@
-import { describe, it, xit } from 'mocha';
+import { before, beforeEach, describe, it, xit } from 'mocha';
 import { expect, assert } from 'chai';
 import CoinSig from '../CoinSig';
 import BpGroup from '../BpGroup';
 import Coin from '../Coin';
-import { getCoin } from '../auxiliary';
+import { getCoin, getRandomCoinId } from '../auxiliary';
 import BLSSig from '../BLSSig';
 
 describe('CoinSig Scheme', () => {
@@ -94,8 +94,9 @@ describe('CoinSig Scheme', () => {
         const signature = CoinSig.sign(params, sk, dummyCoin);
         const [sig1, sig2] = signature;
 
-        const a1 = G.hashToBIG(dummyCoin.value);
-        const a2 = G.hashToBIG(dummyCoin.ttl);
+        const a1 = new G.ctx.BIG(dummyCoin.value);
+        a1.norm();
+        const a2 = G.hashToBIG(dummyCoin.ttl.toString());
         const a3 = G.hashG2ElemToBIG(dummyCoin.v);
         const a4 = G.hashG2ElemToBIG(dummyCoin.id);
 
@@ -127,6 +128,65 @@ describe('CoinSig Scheme', () => {
 
         const sig_test = G.ctx.PAIR.G1mul(sig1, K);
         assert.isTrue(sig2.equals(sig_test));
+      });
+    });
+
+    describe('Verify', () => {
+      let params;
+      let sk;
+      let pk;
+      let dummyCoin;
+      let testCoin;
+      let sig;
+      let coin_params;
+      before(() => {
+        params = CoinSig.setup();
+        const [G, o, g1, g2, e] = params;
+        [sk, pk] = CoinSig.keygen(params);
+
+        coin_params = BLSSig.setup();
+        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        dummyCoin = getCoin(coin_pk, 42);
+        testCoin = getCoin(coin_pk, 42); // to make it instance of same class
+
+        sig = CoinSig.sign(params, sk, dummyCoin);
+      });
+
+      // 'resets' the test coin
+      beforeEach(() => {
+        testCoin.ttl = dummyCoin.ttl;
+        testCoin.id = new G.ctx.ECP2();
+        testCoin.id.copy(dummyCoin.id);
+        testCoin.value = dummyCoin.value;
+        testCoin.v = new G.ctx.ECP2();
+        testCoin.v.copy(dummyCoin.v);
+      });
+
+      it('Successful verification of original coin', () => {
+        assert.isTrue(CoinSig.verify(params, pk, dummyCoin, sig));
+      });
+
+      it('Failed verification for coin with different value', () => {
+        testCoin.value = 256;
+        assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
+      });
+
+      it('Failed verification for coin with different ttl', () => {
+        // ttl of actual coin will never be equal to that
+        testCoin.value = new Date().getTime() - 12345678;
+        assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
+      });
+
+      it('Failed verification for coin with different id', () => {
+        const newCoinIde = getRandomCoinId();
+        testCoin.id = G.ctx.PAIR.G2mul(g2, newCoinIde);
+        assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
+      });
+
+      it('Failed verification for coin with different private key', () => {
+        const [new_coin_sk, new_coin_pk] = BLSSig.keygen(coin_params);
+        testCoin.v = new_coin_pk;
+        assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
       });
     });
   });

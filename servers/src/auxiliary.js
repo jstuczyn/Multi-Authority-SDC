@@ -4,15 +4,15 @@ import * as crypto from 'crypto';
 import Coin from './Coin';
 import { ctx } from './config';
 
-export function stringToBytes(s) {
+export const stringToBytes = (s) => {
   const b = [];
   for (let i = 0; i < s.length; i++) {
     b.push(s.charCodeAt(i));
   }
   return b;
-}
+};
 
-const getRandomCoinId = () => {
+export const getRandomCoinId = () => {
   const RAW = crypto.randomBytes(128);
 
   const rng = new ctx.RAND();
@@ -23,6 +23,5 @@ const getRandomCoinId = () => {
 
   return ctx.BIG.randomnum(groupOrder, rng);
 };
-
 
 export const getCoin = (pk, value) => new Coin(pk, getRandomCoinId(), value);
