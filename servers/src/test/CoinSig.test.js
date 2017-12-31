@@ -212,6 +212,41 @@ describe('CoinSig Scheme', () => {
       });
     });
 
+    describe('Aggregate', () => {
+      it('Aggregation(s1) = s1', () => {
+        const params = CoinSig.setup();
+        const [G, o, g1, g2, e] = params;
+        const [sk, pk] = CoinSig.keygen(params);
 
+        const coin_params = BLSSig.setup();
+        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const dummyCoin = getCoin(coin_pk, 42);
+
+        const sig = CoinSig.sign(params, sk, dummyCoin);
+        const aggregateSig = CoinSig.aggregateSignatures(params, [sig]);
+
+        assert.isTrue(sig[1].equals(aggregateSig[1]));
+      });
+    });
+
+    it('Returns null if one of signatures is invalid (different h)', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+      const [sk, pk] = CoinSig.keygen(params);
+
+      const coin_params = BLSSig.setup();
+      const [coin_sk1, coin_pk1] = BLSSig.keygen(coin_params);
+      const [coin_sk2, coin_pk2] = BLSSig.keygen(coin_params);
+
+      const dummyCoin1 = getCoin(coin_pk1, 42);
+      const dummyCoin2 = getCoin(coin_pk2, 43);
+
+      const sig1 = CoinSig.sign(params, sk, dummyCoin1);
+      const sig2 = CoinSig.sign(params, sk, dummyCoin2);
+
+      const aggregateSig = CoinSig.aggregateSignatures(params, [sig1, sig2]);
+
+      expect(aggregateSig).to.be.a('null');
+    });
   });
 });

@@ -41,9 +41,8 @@ export default class CoinSig {
     const [G, o, g1, g2, e] = params;
     const [x0, x1, x2, x3, x4] = sk;
 
-    // todo: should h be a hash to G1 of some attribute? if so of which one?
-    const rand = G.ctx.BIG.randomnum(o, G.rngGen);
-    const h = G.ctx.PAIR.G1mul(g1, rand);
+    // h needs to be 'constant' between signing authorities, each coin has unique id
+    const h = G.hashToPointOnCurve(coin.id.toString());
 
     const a1 = new G.ctx.BIG(coin.value);
     a1.norm();
@@ -134,7 +133,21 @@ export default class CoinSig {
   }
 
   static aggregateSignatures(params, signatures) {
-    return;
+    const [G, o, g1, g2, e] = params;
+
+    const aggregateSignature = new G.ctx.ECP();
+    aggregateSignature.copy(signatures[0][1]);
+
+    for (let i = 1; i < signatures.length; i++) {
+      if (!signatures[0][0].equals(signatures[i][0])) {
+        console.warn('Invalid signatures provided');
+        return null;
+      }
+      aggregateSignature.add(signatures[i][1]);
+    }
+
+    aggregateSignature.affine();
+    return [signatures[0][0], aggregateSignature];
   }
 
   static verifyAggregation(params, pks, coin, aggregateSignature) {

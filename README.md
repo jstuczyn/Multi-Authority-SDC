@@ -12,9 +12,9 @@
 ### Diagram Steps Status:
 - 1.generate_coin() - completed
 - 2.get_signatures() - semi-complete (I have code for it in the 'src_old')
-- 3.sign_coin() - semi-complete (I have code for it in the 'src_old')
-- 4.aggregate_signatures() - semi-complete (I have code for it in the 'src_old')
-- 5.randomize_aggregate() - semi-complete (I have code for it in the 'src_old')
+- 3.sign_coin() - completed
+- 4.aggregate_signatures() - completed
+- 5.randomize_aggregate() - completed
 - 6.spend_coin() - not completed
 - 7.verify_sig() - not completed
 
@@ -24,4 +24,5 @@
 #### TODOs:
 - Re-integrate coin signing
 - Re-integrate client aggregate
+- Re-integrate communication between entitites 
 - Client Merchant entity
