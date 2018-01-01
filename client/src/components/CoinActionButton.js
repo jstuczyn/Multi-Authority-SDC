@@ -34,6 +34,11 @@ const CoinActionButton = (props) => {
       buttonContent = BUTTON_COIN_STATUS.spending;
       break;
 
+    case COIN_STATUS.error:
+      isDisabled = true;
+      buttonContent = BUTTON_COIN_STATUS.error;
+      break;
+
     default:
       break;
   }
