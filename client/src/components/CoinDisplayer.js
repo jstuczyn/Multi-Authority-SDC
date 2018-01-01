@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
-import { COIN_STATUS } from '../config';
+import { ctx, COIN_STATUS, servers } from '../config';
 import Coin from '../../lib/Coin';
-import { wait } from '../utils/api';
+import { wait, signCoin } from '../utils/api';
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -17,11 +17,17 @@ class CoinDisplayer extends React.Component {
 
   handleCoinSign = async () => {
     this.setState({ coinState: COIN_STATUS.signing });
-    console.log('Coin sign request was sent (TODO)');
+    console.log('Coin sign request was sent');
 
-    const waiting = await wait(1000); // simulates async call to signing authorities
+    const signature = await signCoin(servers[0], this.props.coin);
+    const [hBytes, sigBytes] = signature;
 
-    console.log('Coin was signed (TODO)');
+    const h = ctx.ECP.fromBytes(hBytes);
+    const sig = ctx.ECP.fromBytes(sigBytes);
+
+    console.log(h.toString(), sig.toString());
+    // todo: put it to state and then get aggregate
+
     this.setState({ coinState: COIN_STATUS.signed });
   };
 

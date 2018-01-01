@@ -98,6 +98,3 @@ app.listen(port, hostname, () => {
   console.log('X', X.toString());
   console.log('Y', Y.toString());
 });
-
-
-console.log(`Server Started at: http://${hostname}:${port}/`);

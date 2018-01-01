@@ -27,7 +27,7 @@
   "scripts": {
     "test": "nyc mocha dist/test --timeout=10000",
     "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files",
-    "start": "node dist/app.js"
+    "start_sign": "node dist/signingAuthority/server.js"
   },
   "repository": {
     "type": "git",

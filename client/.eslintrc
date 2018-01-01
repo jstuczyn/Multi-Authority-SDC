@@ -18,7 +18,8 @@
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "camelcase": "warn",
     "no-param-reassign": "off",
-    "react/no-unused-state": "warn"
+    "react/no-unused-state": "warn",
+    "prefer-destructuring": "off"
   },
   "overrides": [
     {

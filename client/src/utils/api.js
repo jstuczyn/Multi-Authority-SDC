@@ -1,10 +1,39 @@
-
-import fetch from 'whatwg-fetch';
+import fetch from 'isomorphic-fetch';
 
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
+
+export async function signCoin(server, coin) {
+  const simplifiedCoin = coin.getSimplifiedCoin();
+  let signature = null;
+
+  try {
+    let response = await
+      fetch(`http://${server}/sign`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          coin: simplifiedCoin,
+        }),
+      });
+    response = await response.json();
+    signature = response.signature;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return signature;
+}
+
+
+
+
+
 
 
 // BELOW IS AN OLD API,
