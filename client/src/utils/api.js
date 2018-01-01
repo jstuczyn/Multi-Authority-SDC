@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import { ctx } from '../config';
 
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
@@ -30,75 +31,23 @@ export async function signCoin(server, coin) {
   return signature;
 }
 
-
-
-
-
-
-
-// BELOW IS AN OLD API,
-// TODO: REFACTOR AND CLEAN UP BEFORE REUSING
-
 export async function getPublicKey(server) {
-  let response = null;
-  try {
-    response = await fetch(`http://${server}/testapi/pk`);
-  } catch (err) {
-    throw err;
-  }
-
-  return response;
-}
-
-export async function checkIfAlive(server, shouldGetPublicKey = false) {
-  // only for test to see transitions
-  // await wait(1000);
-
-  // might as well get pk now
-  const response = {
-    status: null,
-    pk: null,
-  };
-  try {
-    let pk = await getPublicKey(server);
-    pk = await pk.json();
-    response.pk = pk.message;
-    response.status = true;
-  }
-  catch (err) {
-    response.pk = 'Error';
-    response.status = false;
-  }
-
-  return response;
-}
-
-
-export async function signMessage(server, message) {
-  const clientResponse = {
-    status: null,
-    signature: null,
-  };
+  const publicKey = [];
 
   try {
-    let response = await
-      fetch(`http://${server}/testapi/sign`, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message,
-        }),
-      });
+    let response = await fetch(`http://${server}/pk`);
     response = await response.json();
-    clientResponse.signature = response.signature;
-    clientResponse.status = true;
+    const pkBytes = response.pk;
+    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
+    publicKey.push(ctx.ECP2.fromBytes(gBytes));
+    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
   } catch (err) {
-    clientResponse.signature = ['Error', 'Error'];
-    clientResponse.status = false;
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
   }
-
-  return clientResponse;
+  return publicKey;
 }

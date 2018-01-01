@@ -10,7 +10,7 @@
     "build:production": "cross-env NODE_ENV=production yarn build",
     "start": "webpack-dev-server",
     "run_test": "set NODE_ENV=test&&npm run test",
-    "test": "./node_modules/.bin/mocha --require ./test/setup.js --compilers js:babel-core/register --recursive"
+    "test": "./node_modules/.bin/mocha --require ./test/setup.js --compilers js:babel-core/register --recursive --timeout=10000"
   },
   "author": "Jedrzej Stuczynski",
   "dependencies": {

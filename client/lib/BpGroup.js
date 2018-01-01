@@ -11,7 +11,6 @@ import CTX from './Milagro-Crypto-Library/ctx';
 import stringToBytes from './auxiliary';
 
 export default class BpGroup {
-// class BpGroup {
   constructor() {
     this.ctx = new CTX('BN254');
 
@@ -53,22 +52,17 @@ export default class BpGroup {
         TODO: Investigate "proper" entropy sources
         TODO: Even though examples used |s| = 100, consider longer seeds?
      */
-    // let RAW = new Uint8Array(128);
-    // crypto.getRandomValues(RAW);
-
-    const RAW = crypto.randomBytes(128);
-
+    let RAW = [];
     const rng = new this.ctx.RAND();
     rng.clean();
+    RAW = crypto.randomBytes(128);
     rng.seed(RAW.length, RAW);
     // old "seed"
     // for (let i = 0; i < 100; i++) RAW[i] = i;
     // rng.seed(100, RAW);
     this.rng = rng;
-
     this.pair = this.pair.bind(this);
   }
-
 
   get rngGen() {
     return this.rng;
@@ -118,5 +112,9 @@ export default class BpGroup {
       for (let i = sha; i < this.ctx.BIG.MODBYTES; i++) W[i] = 0;
     }
     return this.ctx.ECP.mapit(W);
+  }
+
+  hashG2ElemToBIG(G2elem) {
+    return this.hashToBIG(G2elem.toString());
   }
 }
