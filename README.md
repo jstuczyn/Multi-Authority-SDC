@@ -11,10 +11,10 @@
 
 ### Diagram Steps Status:
 - 1.generate_coin() - completed
-- 2.get_signatures() - semi-complete (I have code for it in the 'src_old')
+- 2.get_signatures() - completed
 - 3.sign_coin() - completed
-- 4.aggregate_signatures() - completed
-- 5.randomize_aggregate() - completed
+- 4.aggregate_signatures() - completed (code-wise)
+- 5.randomize_aggregate() - completed (code-wise)
 - 6.spend_coin() - not completed
 - 7.verify_sig() - not completed
 
@@ -22,7 +22,6 @@
 - Does it matter if id is g1^id or g2^id?
 
 #### TODOs:
-- Re-integrate coin signing
 - Re-integrate client aggregate
 - Re-integrate communication between entitites 
 - Client Merchant entity
