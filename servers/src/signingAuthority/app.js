@@ -1,5 +1,6 @@
 import express from 'express';
 import CoinSigController from './api/CoinSignController';
+import PublicKeyController from './api/PublicKeyController';
 
 const app = express();
 
@@ -11,5 +12,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/sign', CoinSigController);
+app.use('/pk', PublicKeyController);
 
 export default app;

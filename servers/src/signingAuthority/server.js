@@ -2,7 +2,6 @@ import app from './app';
 import { hostname } from './config/appConfig';
 import { setupCoinSigKeys } from './config/CoinSigSetup';
 
-
 if (process.argv.length < 3) {
   throw new Error('No port number provided');
 }
