@@ -3,10 +3,14 @@ import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
-import { params, ctx, COIN_STATUS, servers } from '../config';
+import { params, ctx, COIN_STATUS, signingServers, merchant } from '../config';
 import Coin from '../../lib/Coin';
-import { wait, signCoin } from '../utils/api';
+import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
+import { getProofOfSecret } from '../utils/helpers';
+
+//temp
+import { getSimplifiedProof } from "../utils/helpers";
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -50,23 +54,29 @@ class CoinDisplayer extends React.Component {
   handleCoinSign = async () => {
     this.setState({ coinState: COIN_STATUS.signing });
     console.log('Coin sign request(s) were sent');
-    const signatures = await this.getSignatures(servers);
+    const signatures = await this.getSignatures(signingServers);
     this.aggregateAndRandomizeSignatures(signatures);
     if (this.state.randomizedSignature !== null) {
+      console.log('Coin was signed and signatures were aggregated and randomized.');
       this.setState({ coinState: COIN_STATUS.signed });
     } else {
+      console.log('There was an error in signing/aggregating the coin');
       this.setState({ coinState: COIN_STATUS.error });
     }
   };
 
   handleCoinSpend = async () => {
     this.setState({ coinState: COIN_STATUS.spending });
-    console.log('Coin spend request was sent (TODO)');
-
-    const waiting = await wait(1000); // simulates async call to the verifier
-
-    console.log('Coin was spent (TODO)');
-    this.setState({ coinState: COIN_STATUS.spent });
+    const secretProof = getProofOfSecret(this.props.sk);
+    console.log('Coin spend request was sent');
+    const success = await spendCoin(this.props.coin, secretProof, this.state.randomizedSignature, merchant);
+    if (success) {
+      console.log('Coin was successfully spent.');
+      this.setState({ coinState: COIN_STATUS.spent });
+    } else {
+      console.log('There was an error in spending the coin');
+      this.setState({ coinState: COIN_STATUS.error });
+    }
   };
 
   render() {
@@ -88,6 +98,9 @@ class CoinDisplayer extends React.Component {
 
 CoinDisplayer.propTypes = {
   coin: PropTypes.instanceOf(Coin).isRequired,
+  sk: PropTypes.shape({
+    w: PropTypes.arrayOf(PropTypes.number),
+  }).isRequired,
 };
 
 export default CoinDisplayer;

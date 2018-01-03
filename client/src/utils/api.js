@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { ctx } from '../config';
-
+import { getSimplifiedProof } from './helpers';
+import BLSSig from '../../lib/BLSSig';
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
   return new Promise(r => setTimeout(r, t));
@@ -50,4 +51,34 @@ export async function getPublicKey(server) {
     console.warn(`Call to ${server} was unsuccessful`);
   }
   return publicKey;
+}
+
+export async function spendCoin(coin, proof, signature, server) {
+  const simplifiedCoin = coin.getSimplifiedCoin();
+  const simplifiedProof = getSimplifiedProof(proof);
+
+  // todo: add signature
+  const simplifiedSignature = null; // temp
+  let success = false;
+  try {
+    let response = await
+      fetch(`http://${server}/spend`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          coin: simplifiedCoin,
+          proof: simplifiedProof,
+          signature: simplifiedSignature,
+        }),
+      });
+    response = await response.json();
+    success = response.success;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to merchant ${server} was unsuccessful`);
+  }
+  return success;
 }

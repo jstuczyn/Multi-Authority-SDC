@@ -6,7 +6,7 @@ import { shallow, mount, render } from 'enzyme';
 import CoinDisplayer from '../src/components/CoinDisplayer';
 import CoinActionButton from '../src/components/CoinActionButton';
 import MainView from '../src/components/MainView';
-import { params, COIN_STATUS, servers } from '../src/config';
+import { params, COIN_STATUS, signingServers } from '../src/config';
 import { getCoin } from '../src/utils/coinGenerator';
 import CoinSig from '../lib/CoinSig';
 import BLSSig from '../lib/BLSSig';
@@ -71,15 +71,15 @@ describe('CoinDisplayer Component', () => {
   });
 
   describe('getSignatures method (REQUIRES SERVERS SPECIFIED IN config.js TO BE UP)', () => {
-    it('Gets valid signatures from all alive servers', async () => {
+    it('Gets valid signatures from all alive signingServers', async () => {
       const coin_params = BLSSig.setup();
       const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
       const coin = getCoin(coin_pk, 42);
 
       const wrapper = mount(<CoinDisplayer coin={coin} />);
 
-      const signatures = await wrapper.instance().getSignatures(servers);
-      const publicKeys = await Promise.all(servers.map(async server => getPublicKey(server)));
+      const signatures = await wrapper.instance().getSignatures(signingServers);
+      const publicKeys = await Promise.all(signingServers.map(async server => getPublicKey(server)));
 
       for (let i = 0; i < signatures.length; i++) {
         expect(CoinSig.verify(params, publicKeys[i], coin, signatures[i])).to.equal(true);
@@ -87,7 +87,7 @@ describe('CoinDisplayer Component', () => {
     });
 
     it('Gets null if one of requests produced an error (such is if server was down)', async () => {
-      const invalidServers = servers.slice();
+      const invalidServers = signingServers.slice();
       invalidServers.push('127.0.0.1:4000');
       const coin_params = BLSSig.setup();
       const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
@@ -109,8 +109,8 @@ describe('CoinDisplayer Component', () => {
 
       const wrapper = mount(<CoinDisplayer coin={coin} />);
 
-      const signatures = await wrapper.instance().getSignatures(servers);
-      const publicKeys = await Promise.all(servers.map(async server => getPublicKey(server)));
+      const signatures = await wrapper.instance().getSignatures(signingServers);
+      const publicKeys = await Promise.all(signingServers.map(async server => getPublicKey(server)));
 
       const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
 
@@ -120,8 +120,8 @@ describe('CoinDisplayer Component', () => {
     });
 
     it("If one of signatures was null, aggregate won't be created and state will be set appropriately", async () => {
-      const invalidServers = servers.slice();
-      invalidServers.push('127.0.0.1:4000');
+      const invalidServers = signingServers.slice();
+      invalidServers.push('127.0.0.1:5000');
       const coin_params = BLSSig.setup();
       const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
       const coin = getCoin(coin_pk, 42);

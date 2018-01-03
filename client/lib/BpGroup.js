@@ -3,8 +3,6 @@
     - "proper" investigate RNG
  */
 
-// import {stringToBytes} from "../../servers/src/auxiliary"
-
 // replaced in browser
 import * as crypto from 'crypto';
 import CTX from './Milagro-Crypto-Library/ctx';

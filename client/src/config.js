@@ -1,14 +1,17 @@
 import CTX from '../lib/Milagro-Crypto-Library/ctx';
 import CoinSig from '../lib/CoinSig';
 
-export const servers = [
+export const signingServers = [
   '127.0.0.1:3000',
   '127.0.0.1:3001',
   '127.0.0.1:3002',
 ];
 
+export const merchant = '127.0.0.1:4000';
+
 export const ctx = new CTX('BN254');
 export const params = CoinSig.setup();
+// todo: as in helpers.js, should there be separate params_coin for BLSSig?
 
 const COIN_STATUS_CREATED = 'Generated';
 const COIN_STATUS_SIGNING = 'Signing';
