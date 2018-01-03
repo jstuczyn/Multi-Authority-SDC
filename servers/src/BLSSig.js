@@ -73,4 +73,44 @@ export default class BLSSig {
 
     return Gt_1.equals(Gt_2);
   }
+
+  static prepareProofOfSecret(params, sk) {
+    const [G, o, g1, g2, e] = params;
+    const w = G.ctx.BIG.randomnum(G.order, G.rngGen);
+    const W = G.ctx.PAIR.G2mul(g2, w);
+    const cm = G.hashG2ElemToBIG(W);
+
+    // to prevent object mutation
+    const sk_cpy = new G.ctx.BIG(sk);
+    const cm_cpy = new G.ctx.BIG(cm);
+    sk_cpy.mod(o);
+    cm_cpy.mod(o);
+
+    const t1 = G.ctx.BIG.mul(sk_cpy, cm_cpy); // produces DBIG
+    const t2 = t1.mod(o); // but this gives BIG back
+
+    w.mod(o);
+    const r = new G.ctx.BIG(w);
+
+    r.copy(w);
+    r.sub(t2);
+    r.mod(o);
+
+    return [W, cm, r]; // G2Elem, BIG, BIG
+  }
+
+  static verifyProofOfSecret(params, pk, W, cm, r) {
+    const [G, o, g1, g2, e] = params;
+
+    const t1 = G.ctx.PAIR.G2mul(g2, r);
+    const t2 = G.ctx.PAIR.G2mul(pk, cm);
+
+    t1.add(t2);
+    t1.affine();
+
+    const expr1 = t1.equals(W);
+    const expr2 = G.ctx.BIG.comp(cm, G.hashG2ElemToBIG(W)) === 0;
+
+    return expr1 && expr2;
+  }
 }
