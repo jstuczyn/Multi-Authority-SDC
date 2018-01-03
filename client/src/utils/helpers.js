@@ -14,3 +14,13 @@ export const getSimplifiedProof = (proof) => {
 
   return [bytesW, bytesCm, bytesR];
 };
+
+export const getSimplifiedSignature = (signature) => {
+  const [h, sig] = signature;
+  const sigBytes = [];
+  const hBytes = [];
+  sig.toBytes(sigBytes);
+  h.toBytes(hBytes);
+
+  return [hBytes, sigBytes];
+};

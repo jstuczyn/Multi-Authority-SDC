@@ -19,7 +19,8 @@
     "camelcase": "warn",
     "no-param-reassign": "off",
     "react/no-unused-state": "warn",
-    "prefer-destructuring": "off"
+    "prefer-destructuring": "off",
+    "object-shorthand": "off"
   },
   "overrides": [
     {

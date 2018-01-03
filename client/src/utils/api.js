@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { ctx } from '../config';
-import { getSimplifiedProof } from './helpers';
+import { getSimplifiedProof, getSimplifiedSignature } from './helpers';
 import BLSSig from '../../lib/BLSSig';
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
@@ -56,9 +56,8 @@ export async function getPublicKey(server) {
 export async function spendCoin(coin, proof, signature, server) {
   const simplifiedCoin = coin.getSimplifiedCoin();
   const simplifiedProof = getSimplifiedProof(proof);
+  const simplifiedSignature = getSimplifiedSignature(signature);
 
-  // todo: add signature
-  const simplifiedSignature = null; // temp
   let success = false;
   try {
     let response = await

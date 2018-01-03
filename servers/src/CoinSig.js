@@ -118,6 +118,23 @@ export default class CoinSig {
 
     X0_cpy.affine();
 
+    // for some reason sig1.x, sig1.y, sig2.x and sig2.y return false to being instances of FP when signed by SAs,
+    // hence temporary, ugly hack:
+    // I blame javascript pseudo-broken typesystem
+    const tempX1 = new G.ctx.FP(0);
+    const tempY1 = new G.ctx.FP(0);
+    tempX1.copy(sig1.getx());
+    tempY1.copy(sig1.gety());
+    sig1.x = tempX1;
+    sig1.y = tempY1;
+
+    const tempX2 = new G.ctx.FP(0);
+    const tempY2 = new G.ctx.FP(0);
+    tempX2.copy(sig2.getx());
+    tempY2.copy(sig2.gety());
+    sig2.x = tempX2;
+    sig2.y = tempY2;
+
     const Gt_1 = e(sig1, X0_cpy);
     const Gt_2 = e(sig2, g);
 

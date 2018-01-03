@@ -1,9 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import fetch from 'isomorphic-fetch';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
 import BLSSig from '../../BLSSig';
-import { ctx, params } from '../../config';
+import { ctx, params, signingServers } from '../../config';
 
 const router = express.Router();
 
@@ -18,34 +19,72 @@ const fromSimplifiedProof = (simplifiedProof) => {
   return [W, cm, r];
 };
 
-router.post('/', (req, res) => {
+const getPublicKey = async (server) => {
+  const publicKey = [];
+
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
+    publicKey.push(ctx.ECP2.fromBytes(gBytes));
+    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return publicKey;
+};
+
+const getPublicKeys = async (serversArg) => {
+  const publicKeys = await Promise.all(serversArg.map(async (server) => {
+    try {
+      console.log(`Sending request to ${server}...`);
+      const publicKey = await getPublicKey(server);
+      return publicKey;
+    } catch (err) {
+      return null;
+    }
+  }));
+  return publicKeys;
+};
+
+router.post('/', async (req, res) => {
   console.log('spend post');
   let responseStatus = -1;
   let success = false;
   try {
-    console.log("a");
     const simplifiedCoin = req.body.coin;
     const simplifiedProof = req.body.proof;
-    // const [hBytes, sigBytes] = req.body.signature;
-    // const h = ctx.ECP.fromBytes(hBytes);
-    // const sig = ctx.ECP.fromBytes(sigBytes);
+    const [hBytes, sigBytes] = req.body.signature;
+    const h = ctx.ECP.fromBytes(hBytes);
+    const sig = ctx.ECP.fromBytes(sigBytes);
 
     const coin = Coin.fromSimplifiedCoin(simplifiedCoin);
     const [W, cm, r] = fromSimplifiedProof(simplifiedProof);
 
     const isProofValid = BLSSig.verifyProofOfSecret(params, coin.v, W, cm, r);
-    console.log("IS VALID?", isProofValid);
+    // no point in verifying signature if proof is invalid
+    if (!isProofValid) {
+      console.log('Proof was invalid');
+      res.status(200).json({ success: false });
+    }
 
-    const pks = null; // todo: query to signing servers
-    // todo: another params?
-    // const isSignatureValid = CoinSig.verify(params, pks, coin, [h, sig]);
+    const publicKeys = await getPublicKeys(signingServers);
+    const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
 
-    // then check actual signature lol
+    // todo: create another params?
+    const isSignatureValid = CoinSig.verify(params, aggregatePublicKey, coin, [h, sig]);
 
     responseStatus = 200;
-    success = isProofValid;
+    success = isProofValid && isSignatureValid;
+    console.log('Was coin spent: ', success);
   } catch (err) {
-    console.log("b");
+    console.log(err);
 
     responseStatus = 400;
   }
