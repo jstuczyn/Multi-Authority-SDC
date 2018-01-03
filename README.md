@@ -7,7 +7,7 @@
 ![Diagram](https://i.imgur.com/ycQoCbf.png)
 
 ### Current Client Interface:
-![Interface](https://i.imgur.com/ylcVhHo.png)
+![Interface](https://i.imgur.com/BZzLmL8.png)
 
 ### Diagram Steps Status:
 - 1.generate_coin() - completed
