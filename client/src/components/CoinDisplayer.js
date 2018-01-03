@@ -9,16 +9,22 @@ import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
 import { getProofOfSecret } from '../utils/helpers';
 
-//temp
-import { getSimplifiedProof } from "../utils/helpers";
-
 class CoinDisplayer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       coinState: COIN_STATUS.created,
       randomizedSignature: null,
+      remainingValidityString: '',
     };
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(this.updateRemainingValidityString, 200);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   getSignatures = async (serversArg) => {
@@ -49,6 +55,37 @@ class CoinDisplayer extends React.Component {
     const aggregateSignature = CoinSig.aggregateSignatures(params, signatures);
     const randomizedSignature = CoinSig.randomize(params, aggregateSignature);
     this.setState({ randomizedSignature });
+  };
+
+  updateRemainingValidityString = () => {
+    let remainingValidityString;
+    switch (this.state.coinState) {
+      case COIN_STATUS.spent: {
+        remainingValidityString = 'Coin was spent';
+        clearInterval(this.timer);
+        break;
+      }
+      case COIN_STATUS.error: {
+        remainingValidityString = 'Error occurred';
+        clearInterval(this.timer);
+        break;
+      }
+      default: {
+        const currentTime = new Date().getTime();
+        const td = this.props.coin.ttl - currentTime;
+        const seconds = Math.floor((td / 1000) % 60);
+        const minutes = Math.floor((td / 1000 / 60) % 60);
+        const hours = Math.floor((td / (1000 * 60 * 60)));
+
+        const ss = (`0${seconds}`).slice(-2);
+        const mm = (`0${minutes}`).slice(-2);
+        const hh = (`0${hours}`).slice(-2);
+        remainingValidityString = `${hh}:${mm}:${ss}`;
+        break;
+      }
+    }
+
+    this.setState({ remainingValidityString: remainingValidityString });
   };
 
   handleCoinSign = async () => {
@@ -82,8 +119,8 @@ class CoinDisplayer extends React.Component {
   render() {
     return (
       <Segment.Group horizontal>
-        <Segment style={styles.segmentStyle}>Time to live: {this.props.coin.ttl}</Segment>
-        <Segment style={styles.segmentStyle}>Value: {this.props.coin.value}</Segment>
+        <Segment style={styles.segmentStyle}><b>Valid for:</b> {this.state.remainingValidityString}</Segment>
+        <Segment style={styles.segmentStyle}><b>Value:</b> {this.props.coin.value}</Segment>
         <Segment style={styles.segmentStyle}>
           <CoinActionButton
             onSign={this.handleCoinSign}
