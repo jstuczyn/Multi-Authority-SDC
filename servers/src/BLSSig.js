@@ -94,6 +94,7 @@ export default class BLSSig {
 
     r.copy(w);
     r.sub(t2);
+    r.add(o); // to ensure positive result
     r.mod(o);
 
     return [W, cm, r]; // G2Elem, BIG, BIG
