@@ -13,15 +13,14 @@
 - 1.generate_coin() - completed
 - 2.get_signatures() - completed
 - 3.sign_coin() - completed
-- 4.aggregate_signatures() - completed (code-wise)
-- 5.randomize_aggregate() - completed (code-wise)
-- 6.spend_coin() - not completed
-- 7.verify_sig() - not completed
+- 4.aggregate_signatures() - completed
+- 5.randomize_aggregate() - completed
+- 6.spend_coin() - in progress
+- 7.verify_sig() - in progress
 
 #### Questions:
-- Does it matter if id is g1^id or g2^id?
+- Does it matter if id of coin is g1^id or g2^id?
+- Same for NZKP, does it matter if W = g1^w or g2^w?
 
 #### TODOs:
-- Re-integrate client aggregate
-- Re-integrate communication between entitites 
 - Client Merchant entity
