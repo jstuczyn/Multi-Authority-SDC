@@ -10,4 +10,10 @@ export const signingServers = [
 export const merchant = '127.0.0.1:4000';
 
 export const ctx = new CTX('BN254');
-export const params = BLSSig.setup();
+
+export let params;
+if (BLSSig) {
+  params = BLSSig.setup();
+} else {
+  console.log('For some reason Broken in TEST.ENV -- TODO: FIX');
+}
