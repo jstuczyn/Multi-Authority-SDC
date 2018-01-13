@@ -17,6 +17,7 @@
     "prefer-destructuring": "off",
     "import/prefer-default-export": "warn",
     "object-shorthand": "off",
+    "linebreak-style": ["off", "windows"],
     "no-trailing-spaces": ["error", { "skipBlankLines": true }],
     "import/no-extraneous-dependencies": ["error", {
       "peerDependencies": true}
