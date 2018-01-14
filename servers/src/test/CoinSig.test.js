@@ -4,7 +4,6 @@ import CoinSig from '../CoinSig';
 import BpGroup from '../BpGroup';
 import Coin from '../Coin';
 import { getCoin, getRandomCoinId } from '../auxiliary';
-import BLSSig from '../BLSSig';
 
 describe('CoinSig Scheme', () => {
   describe('Setup', () => {
@@ -87,8 +86,8 @@ describe('CoinSig Scheme', () => {
         const [sk, pk] = CoinSig.keygen(params);
         const [x0, x1, x2, x3, x4] = sk;
 
-        const coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         const dummyCoin = getCoin(coin_pk, 42);
 
         const signature = CoinSig.sign(params, sk, dummyCoin);
@@ -143,8 +142,8 @@ describe('CoinSig Scheme', () => {
         params = CoinSig.setup();
         [sk, pk] = CoinSig.keygen(params);
 
-        coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         dummyCoin = getCoin(coin_pk, 42);
         testCoin = getCoin(coin_pk, 42); // to make it instance of same class
 
@@ -183,7 +182,7 @@ describe('CoinSig Scheme', () => {
       });
 
       it('Failed verification for coin with different private key', () => {
-        const [new_coin_sk, new_coin_pk] = BLSSig.keygen(coin_params);
+        const [new_coin_sk, new_coin_pk] = Coin.keygen(coin_params);
         testCoin.v = new_coin_pk;
         assert.isNotTrue(CoinSig.verify(params, pk, testCoin, sig));
       });
@@ -193,8 +192,8 @@ describe('CoinSig Scheme', () => {
       const params = CoinSig.setup();
       const [sk, pk] = CoinSig.keygen(params);
 
-      const coin_params = BLSSig.setup();
-      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const coin_params = CoinSig.setup();
+      const [coin_sk, coin_pk] = Coin.keygen(coin_params);
       const dummyCoin = getCoin(coin_pk, 42);
 
       let sig = CoinSig.sign(params, sk, dummyCoin);
@@ -215,8 +214,8 @@ describe('CoinSig Scheme', () => {
         const params = CoinSig.setup();
         const [sk, pk] = CoinSig.keygen(params);
 
-        const coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         const dummyCoin = getCoin(coin_pk, 42);
 
         const sig = CoinSig.sign(params, sk, dummyCoin);
@@ -231,9 +230,9 @@ describe('CoinSig Scheme', () => {
       const params = CoinSig.setup();
       const [sk, pk] = CoinSig.keygen(params);
 
-      const coin_params = BLSSig.setup();
-      const [coin_sk1, coin_pk1] = BLSSig.keygen(coin_params);
-      const [coin_sk2, coin_pk2] = BLSSig.keygen(coin_params);
+      const coin_params = CoinSig.setup();
+      const [coin_sk1, coin_pk1] = Coin.keygen(coin_params);
+      const [coin_sk2, coin_pk2] = Coin.keygen(coin_params);
 
       const dummyCoin1 = getCoin(coin_pk1, 42);
       const dummyCoin2 = getCoin(coin_pk2, 43);
@@ -264,8 +263,8 @@ describe('CoinSig Scheme', () => {
         const params = CoinSig.setup();
         const [sk, pk] = CoinSig.keygen(params);
 
-        const coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         const dummyCoin = getCoin(coin_pk, 42);
 
         const sig = CoinSig.sign(params, sk, dummyCoin);
@@ -278,8 +277,8 @@ describe('CoinSig Scheme', () => {
         const params = CoinSig.setup();
         const [sk, pk] = CoinSig.keygen(params);
 
-        const coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         const dummyCoin = getCoin(coin_pk, 42);
 
         const coinsToSign = 3;
@@ -304,8 +303,8 @@ describe('CoinSig Scheme', () => {
 
         const [sk, pk] = CoinSig.keygen(params);
 
-        const coin_params = BLSSig.setup();
-        const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+        const coin_params = CoinSig.setup();
+        const [coin_sk, coin_pk] = Coin.keygen(coin_params);
         const dummyCoin = getCoin(coin_pk, 42);
 
         const coinsToSign = 2;
@@ -319,7 +318,7 @@ describe('CoinSig Scheme', () => {
           signatures.push(signature);
         }
 
-        const [another_coin_sk, another_coin_pk] = BLSSig.keygen(coin_params);
+        const [another_coin_sk, another_coin_pk] = Coin.keygen(coin_params);
         const anotherCoin = getCoin(another_coin_pk, 43);
         anotherCoin.id = new G.ctx.ECP2();
         anotherCoin.id.copy(dummyCoin.id);

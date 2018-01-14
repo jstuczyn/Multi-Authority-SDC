@@ -1,7 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { ctx } from '../config';
 import { getSimplifiedProof, getSimplifiedSignature } from './helpers';
-import BLSSig from '../../lib/BLSSig';
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
   return new Promise(r => setTimeout(r, t));

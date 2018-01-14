@@ -4,7 +4,8 @@ import { shallow, mount, render } from 'enzyme';
 import MainView from '../src/components/MainView';
 import CoinRequester from '../src/components/CoinRequester';
 import CoinListDisplayer from '../src/components/CoinListDisplayer';
-import BLSSig from '../lib/BLSSig';
+import Coin from '../lib/Coin';
+import { params } from '../src/config';
 
 describe('MainView Component', () => {
   it('Has a single Grid Child', () => {
@@ -43,7 +44,6 @@ describe('MainView Component', () => {
     });
 
     it("Coin's PK = g2^SK", () => {
-      const params = BLSSig.setup();
       const [G, o, g1, g2, e] = params;
       const { sk } = wrapper.state('coins')[0];
       const pk = wrapper.state('coins')[0].coin.v;

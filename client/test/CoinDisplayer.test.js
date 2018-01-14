@@ -9,7 +9,7 @@ import MainView from '../src/components/MainView';
 import { params, COIN_STATUS, signingServers } from '../src/config';
 import { getCoin } from '../src/utils/coinGenerator';
 import CoinSig from '../lib/CoinSig';
-import BLSSig from '../lib/BLSSig';
+import Coin from '../lib/Coin';
 import { getPublicKey } from '../src/utils/api';
 
 let coinDisplayerNode;
@@ -72,8 +72,7 @@ describe('CoinDisplayer Component', () => {
 
   describe('getSignatures method (REQUIRES SERVERS SPECIFIED IN config.js TO BE UP)', () => {
     it('Gets valid signatures from all alive signingServers', async () => {
-      const coin_params = BLSSig.setup();
-      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const [coin_sk, coin_pk] = Coin.keygen(params);
       const coin = getCoin(coin_pk, 42);
 
       const wrapper = mount(<CoinDisplayer coin={coin} />);
@@ -89,8 +88,7 @@ describe('CoinDisplayer Component', () => {
     it('Gets null if one of requests produced an error (such is if server was down)', async () => {
       const invalidServers = signingServers.slice();
       invalidServers.push('127.0.0.1:4000');
-      const coin_params = BLSSig.setup();
-      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const [coin_sk, coin_pk] = Coin.keygen(params);
       const coin = getCoin(coin_pk, 42);
 
       const wrapper = shallow(<CoinDisplayer coin={coin} />);
@@ -103,8 +101,7 @@ describe('CoinDisplayer Component', () => {
 
   describe('aggregateAndRandomizeSignatures method (REQUIRES SERVERS SPECIFIED IN config.js TO BE UP)', () => {
     it('Produces a valid randomized, aggregate signature and sets state appropriately', async () => {
-      const coin_params = BLSSig.setup();
-      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const [coin_sk, coin_pk] = Coin.keygen(params);
       const coin = getCoin(coin_pk, 42);
 
       const wrapper = mount(<CoinDisplayer coin={coin} />);
@@ -122,8 +119,7 @@ describe('CoinDisplayer Component', () => {
     it("If one of signatures was null, aggregate won't be created and state will be set appropriately", async () => {
       const invalidServers = signingServers.slice();
       invalidServers.push('127.0.0.1:5000');
-      const coin_params = BLSSig.setup();
-      const [coin_sk, coin_pk] = BLSSig.keygen(coin_params);
+      const [coin_sk, coin_pk] = Coin.keygen(params);
       const coin = getCoin(coin_pk, 42);
 
       const wrapper = shallow(<CoinDisplayer coin={coin} />);
@@ -134,5 +130,4 @@ describe('CoinDisplayer Component', () => {
       assert.isNull(wrapper.state('randomizedSignature'));
     });
   });
-
 });

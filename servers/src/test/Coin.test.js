@@ -5,7 +5,7 @@ import { before, describe, it, xit } from 'mocha';
 import * as crypto from 'crypto';
 import Coin from '../Coin';
 import { ctx } from '../config';
-import BLSSig from '../BLSSig';
+import CoinSig from '../CoinSig';
 import { getCoin } from '../auxiliary';
 
 describe('Coin object', () => {
@@ -70,8 +70,8 @@ describe('Coin object', () => {
     let properCoin;
     before(() => {
       const properCoinValue = 42;
-      const params = BLSSig.setup();
-      const [sk, pk] = BLSSig.keygen(params);
+      const params = CoinSig.setup();
+      const [sk, pk] = Coin.keygen(params);
       properCoin = getCoin(pk, properCoinValue);
     });
 

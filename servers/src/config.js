@@ -1,5 +1,5 @@
 import CTX from './lib/Milagro-Crypto-Library/ctx';
-import BLSSig from './BLSSig';
+import CoinSig from './CoinSig';
 
 export const signingServers = [
   '127.0.0.1:3000',
@@ -11,9 +11,4 @@ export const merchant = '127.0.0.1:4000';
 
 export const ctx = new CTX('BN254');
 
-export let params;
-if (BLSSig) {
-  params = BLSSig.setup();
-} else {
-  console.log('For some reason Broken in TEST.ENV -- TODO: FIX');
-}
+export const params = CoinSig.setup();

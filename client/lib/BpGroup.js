@@ -112,7 +112,12 @@ export default class BpGroup {
     return this.ctx.ECP.mapit(W);
   }
 
+  // there are two separate functions in case there was a need to change behaviour of one of them
   hashG2ElemToBIG(G2elem) {
     return this.hashToBIG(G2elem.toString());
+  }
+
+  hashG1ElemToBIG(G1Elem) {
+    return this.hashToBIG(G1Elem.toString());
   }
 }

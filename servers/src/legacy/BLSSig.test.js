@@ -1,6 +1,6 @@
 import { describe, it, xit } from 'mocha';
 import * as chai from 'chai';
-import BLSSig from '../BLSSig';
+import BLSSig from './BLSSig';
 import BpGroup from '../BpGroup';
 
 describe('Boneh–Lynn–Shacham-based Signature scheme', () => {

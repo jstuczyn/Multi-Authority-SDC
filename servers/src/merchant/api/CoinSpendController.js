@@ -3,7 +3,6 @@ import bodyParser from 'body-parser';
 import fetch from 'isomorphic-fetch';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
-import BLSSig from '../../BLSSig';
 import { ctx, params, signingServers } from '../../config';
 
 const router = express.Router();
@@ -67,7 +66,7 @@ router.post('/', async (req, res) => {
     const coin = Coin.fromSimplifiedCoin(simplifiedCoin);
     const [W, cm, r] = fromSimplifiedProof(simplifiedProof);
 
-    const isProofValid = BLSSig.verifyProofOfSecret(params, coin.v, W, cm, r);
+    const isProofValid = Coin.verifyProofOfSecret(params, coin.v, W, cm, r);
     // no point in verifying signature if proof is invalid
     if (!isProofValid) {
       console.log('Proof was invalid');

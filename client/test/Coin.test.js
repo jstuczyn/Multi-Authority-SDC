@@ -2,8 +2,8 @@ import { expect, assert } from 'chai';
 import { before } from 'mocha';
 import * as crypto from 'crypto';
 import Coin from '../lib/Coin';
+import CoinSig from '../lib/CoinSig'; // for params
 import { ctx } from '../src/config';
-import BLSSig from '../lib/BLSSig';
 import { getCoin } from '../src/utils/coinGenerator';
 
 describe('Coin object', () => {
@@ -69,8 +69,8 @@ describe('Coin object', () => {
     let properCoin;
     before(() => {
       const properCoinValue = 42;
-      const params = BLSSig.setup();
-      const [sk, pk] = BLSSig.keygen(params);
+      const params = CoinSig.setup();
+      const [sk, pk] = Coin.keygen(params);
       properCoin = getCoin(pk, properCoinValue);
     });
 
