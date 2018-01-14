@@ -1,15 +1,29 @@
 import { ctx } from './config';
+import ElGamal from './ElGamal';
+import { hashToPointOnCurve } from './auxiliary';
 
 const MIN_TTL_H = 12;
 
 export default class Coin {
-  constructor(v, ide, value, ttl = -1, id = null) {
-    // this.ctx = new CTX('BN254');
+  // unfortunately javascript doesn't have constructor overloading
+  constructor(v, ide, value, ttl = -1, ID = null) {
     this.ctx = ctx;
-    // does it matter if id is g1^id or g2^id ?
+    this.enc_sk = null;
+    this.enc_id = null;
 
+    // todo: set instance of BpGroup instead?
+
+    // Set up instance of g1
+    const g1 = new this.ctx.ECP();
     const x = new this.ctx.BIG(0);
     const y = new this.ctx.BIG(0);
+
+    // Set generator of g1
+    x.rcopy(this.ctx.ROM_CURVE.CURVE_Gx);
+    y.rcopy(this.ctx.ROM_CURVE.CURVE_Gy);
+    g1.setxy(x, y);
+
+    this.g1 = g1;
 
     // Set up instance of g2
     const g2 = new this.ctx.ECP2();
@@ -30,10 +44,10 @@ export default class Coin {
     this.v = v;
     this.value = value;
 
-    if (id === null) {
-      this.id = this.ctx.PAIR.G2mul(this.g2, ide);
+    if (ID === null) {
+      this.ID = this.ctx.PAIR.G1mul(this.g1, ide);
     } else {
-      this.id = id;
+      this.ID = ID;
     }
 
     if (ttl > 0) {
@@ -53,17 +67,72 @@ export default class Coin {
     return this.ttl;
   }
 
-  getSimplifiedCoin() {
-    const bytesId = [];
-    const bytesV = [];
-    this.id.toBytes(bytesId);
-    this.v.toBytes(bytesV);
+  // that is sent to signing authority so they need encrypted id and secret
+  prepareCoinForSigning(ElGamalPK = null, params = null, id = null, sk = null) {
+    if (!this.enc_sk) {
+      const h = hashToPointOnCurve(this.value.toString() +
+                                   this.ttl.toString() +
+                                   this.v.toString() +
+                                   this.ID.toString());
+
+      const [a1, b1, k1] = ElGamal.encrypt(params, ElGamalPK, sk, h);
+      const [a2, b2, k2] = ElGamal.encrypt(params, ElGamalPK, id, h);
+      this.enc_sk = [a1, b1];
+      this.enc_id = [a2, b2];
+    }
+
+    // keep bytes representation of coin attributes -
+    // no point in recomputing them for each authority
+    if (!this.bytesID) {
+      // ID and v required by SA to compute h
+      this.bytesID = [];
+      this.bytesV = [];
+      this.ID.toBytes(this.bytesID);
+      this.v.toBytes(this.bytesV);
+
+      const sk_a_bytes = [];
+      const sk_b_bytes = [];
+      const id_a_bytes = [];
+      const id_b_bytes = [];
+
+      this.enc_sk[0].toBytes(sk_a_bytes);
+      this.enc_sk[1].toBytes(sk_b_bytes);
+      this.enc_id[0].toBytes(id_a_bytes);
+      this.enc_id[1].toBytes(id_b_bytes);
+
+      this.enc_sk_bytes = [sk_a_bytes, sk_b_bytes];
+      this.enc_id_bytes = [id_a_bytes, id_b_bytes];
+    }
+
     return {
-      bytesV: bytesV,
+      bytesV: this.bytesV,
       value: this.value,
       ttl: this.ttl,
-      bytesId: bytesId,
+      bytesID: this.bytesID,
+      enc_sk_bytes: this.enc_sk_bytes,
+      enc_id_bytes: this.enc_id_bytes,
     };
+  }
+
+  static fromSigningCoin(signingCoin) {
+    const {
+      bytesV, value, ttl, bytesID, enc_sk_bytes, enc_id_bytes,
+    } = signingCoin;
+
+    const v = ctx.ECP2.fromBytes(bytesV);
+    const ID = ctx.ECP.fromBytes(bytesID);
+
+    const sk_a = ctx.ECP.fromBytes(enc_sk_bytes[0]);
+    const sk_b = ctx.ECP.fromBytes(enc_sk_bytes[1]);
+
+    const id_a = ctx.ECP.fromBytes(enc_id_bytes[0]);
+    const id_b = ctx.ECP.fromBytes(enc_id_bytes[1]);
+
+    const coin = new Coin(v, null, value, ttl, ID);
+    coin.enc_sk = [sk_a, sk_b];
+    coin.enc_id = [id_a, id_b];
+
+    return coin;
   }
 
   // it is using same curve as the other scheme
@@ -106,7 +175,7 @@ export default class Coin {
     const [G, o, g1, g2, e] = params;
 
     const t1 = G.ctx.PAIR.G2mul(g2, r);
-    const t2 = G.ctx.PAIR.G2mul(pk, cm);
+    const t2 = G.ctx.PAIR.G2mul(pk, cm); // public key is g1^sk now, todo: fix
 
     t1.add(t2);
     t1.affine();
@@ -115,16 +184,6 @@ export default class Coin {
     const expr2 = G.ctx.BIG.comp(cm, G.hashG2ElemToBIG(W)) === 0;
 
     return expr1 && expr2;
-  }
-
-  static fromSimplifiedCoin(simplifiedCoin) {
-    const {
-      bytesV, value, ttl, bytesId,
-    } = simplifiedCoin;
-
-    const v = ctx.ECP2.fromBytes(bytesV); // ECP2?
-    const id = ctx.ECP2.fromBytes(bytesId);
-    return new Coin(v, null, value, ttl, id);
   }
 
   static getHourTimeDifference(date1, date2) {
