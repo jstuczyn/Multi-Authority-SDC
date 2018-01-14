@@ -1,6 +1,6 @@
 import { describe, it, xit } from 'mocha';
 import { expect, assert } from 'chai';
-import PSSig from '../PSSig';
+import PSSig from './PSSig';
 import BpGroup from '../BpGroup';
 
 describe('Pointcheval-Sanders Short Randomizable Signatures scheme', () => {
