@@ -42,7 +42,7 @@ export default class CoinSig {
     const [x0, x1, x2, x3, x4] = sk;
 
     // h needs to be 'constant' between signing authorities, each coin has unique id
-    const h = G.hashToPointOnCurve(coin.id.toString());
+    const h = G.hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.id.toString());
 
     const a1 = new G.ctx.BIG(coin.value);
     a1.norm();
@@ -92,6 +92,10 @@ export default class CoinSig {
 
   //  e(sig1, X0 + a1 * X1 + ...) == e(sig2, g)
   static verify(params, pk, coin, sig) {
+    // if aggregation failed because h differed
+    if (!sig) {
+      return false;
+    }
     const [G, o, g1, g2, e] = params;
     const [g, X0, X1, X2, X3, X4] = pk;
     const [sig1, sig2] = sig;
