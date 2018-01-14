@@ -329,7 +329,6 @@ describe('CoinSig Scheme', () => {
         signatures.push(maliciousSignature);
 
         const aggregateSignature = CoinSig.aggregateSignatures(params, signatures);
-
         assert.isNotTrue(CoinSig.verifyAggregation(params, pks, dummyCoin, aggregateSignature));
       });
     });

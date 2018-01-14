@@ -103,4 +103,86 @@ describe('Coin object', () => {
       assert.isTrue(id_old.equals(id_new));
     });
   });
+
+  describe('Prepare Proof of Secret', () => {
+    it('Returns [W, cm, r], where none are null and cm = H(W)', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk, pk] = Coin.keygen(params);
+      const [W, cm, r] = Coin.prepareProofOfSecret(params, sk);
+
+      assert.isTrue(G.ctx.BIG.comp(cm, G.hashG2ElemToBIG(W)) === 0);
+      assert.isNotNull(W);
+      assert.isNotNull(cm);
+      assert.isNotNull(r);
+    });
+  });
+
+  describe('Verify Proof of Secret', () => {
+    it('Works for valid sk, pk pair', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk, pk] = Coin.keygen(params);
+
+      const [W, cm, r] = Coin.prepareProofOfSecret(params, sk);
+      assert.isTrue(Coin.verifyProofOfSecret(params, pk, W, cm, r));
+    });
+
+    it('Does not work if sk and pk are unrelated', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk1, pk1] = Coin.keygen(params);
+      const [sk2, pk2] = Coin.keygen(params);
+
+      const [W1, cm1, r1] = Coin.prepareProofOfSecret(params, sk1);
+      const [W2, cm2, r2] = Coin.prepareProofOfSecret(params, sk2);
+
+      assert.isNotTrue(Coin.verifyProofOfSecret(params, pk2, W1, cm1, r1));
+      assert.isNotTrue(Coin.verifyProofOfSecret(params, pk1, W2, cm2, r2));
+    });
+
+    it('Does not work if cm != H(W)', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk, pk] = Coin.keygen(params);
+      const [W, cm, r] = Coin.prepareProofOfSecret(params, sk);
+
+      const another_cm = G.ctx.BIG.randomnum(G.order, G.rngGen);
+
+      assert.isNotTrue(Coin.verifyProofOfSecret(params, pk, W, another_cm, r));
+    });
+
+    it('Does not work if W was modified', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk, pk] = Coin.keygen(params);
+      const [W, cm, r] = Coin.prepareProofOfSecret(params, sk);
+
+      const another_w = G.ctx.BIG.randomnum(G.order, G.rngGen);
+      const another_W = G.ctx.PAIR.G2mul(g2, another_w);
+
+      assert.isNotTrue(Coin.verifyProofOfSecret(params, pk, another_W, cm, r));
+    });
+
+    it('Does not work if r was modified', () => {
+      const params = CoinSig.setup();
+      const [G, o, g1, g2, e] = params;
+
+      const [sk, pk] = Coin.keygen(params);
+      const [W, cm, r] = Coin.prepareProofOfSecret(params, sk);
+
+      const t1 = G.ctx.BIG.randomnum(G.order, G.rngGen);
+      const t2 = G.ctx.BIG.randomnum(G.order, G.rngGen);
+      const t3 = G.ctx.BIG.mul(t1, t2);
+
+      const another_r = t3.mod(o);
+
+      assert.isNotTrue(Coin.verifyProofOfSecret(params, pk, W, cm, another_r));
+    });
+  });
 });
