@@ -6,7 +6,6 @@
 // replaced in browser
 import * as crypto from 'crypto';
 import CTX from './Milagro-Crypto-Library/ctx';
-import stringToBytes from './auxiliary';
 
 export default class BpGroup {
   constructor() {
@@ -80,44 +79,5 @@ export default class BpGroup {
 
   pair(g1, g2) {
     return this.ctx.PAIR.fexp(this.ctx.PAIR.ate(g2, g1));
-  }
-
-  hashMessage(m) {
-    const messageBytes = stringToBytes(m);
-    const H = new this.ctx.HASH256();
-    H.process_array(messageBytes);
-    return H.hash();
-  }
-
-  hashToBIG(m) {
-    const R = this.hashMessage(m);
-    return this.ctx.BIG.fromBytes(R);
-  }
-
-  // implementation partially taken from https://github.com/milagro-crypto/milagro-crypto-js/blob/develop/src/node/mpin.js#L125
-  hashToPointOnCurve(m) {
-    const R = this.hashMessage(m);
-
-    if (R.length === 0) return null;
-    const W = [];
-
-    // needs to be adjusted if different curve was to be chosen
-    const sha = 32;
-    if (sha >= this.ctx.BIG.MODBYTES) {
-      for (let i = 0; i < this.ctx.BIG.MODBYTES; i++) W[i] = R[i];
-    } else {
-      for (let i = 0; i < sha; i++) W[i] = R[i];
-      for (let i = sha; i < this.ctx.BIG.MODBYTES; i++) W[i] = 0;
-    }
-    return this.ctx.ECP.mapit(W);
-  }
-
-  // there are two separate functions in case there was a need to change behaviour of one of them
-  hashG2ElemToBIG(G2elem) {
-    return this.hashToBIG(G2elem.toString());
-  }
-
-  hashG1ElemToBIG(G1Elem) {
-    return this.hashToBIG(G1Elem.toString());
   }
 }
