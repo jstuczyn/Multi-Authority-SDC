@@ -6,9 +6,10 @@ export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
 
-export async function signCoin(server, coin) {
-  const simplifiedCoin = coin.getSimplifiedCoin();
+export async function signCoin(server, coin, ElGamalPK = null, params = null, id = null, sk = null) {
+  const signingCoin = coin.prepareCoinForSigning(ElGamalPK, params, id, sk);
   let signature = null;
+  console.log('signinig', signingCoin);
 
   try {
     let response = await
@@ -19,7 +20,7 @@ export async function signCoin(server, coin) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          coin: simplifiedCoin,
+          coin: signingCoin,
         }),
       });
     response = await response.json();
