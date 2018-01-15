@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
 import { params, sk } from '../config/CoinSigSetup';
+import { DEBUG } from '../config/appConfig';
 
 const router = express.Router();
 
@@ -10,12 +11,17 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 router.post('/', (req, res) => {
-  console.log('sign post');
+  if (DEBUG) {
+    console.log('sign post');
+  }
   let responseStatus = -1;
   let signatureBytes = null;
   try {
-    const simplifiedCoin = req.body.coin;
-    const coin = Coin.fromSimplifiedCoin(simplifiedCoin);
+    const signingCoin = req.body.coin;
+    console.log(signingCoin);
+    const coin = Coin.fromSigningCoin(signingCoin);
+    console.log(coin);
+    return;
 
     const [h, sig] = CoinSig.sign(params, sk, coin);
     const sigBytes = [];

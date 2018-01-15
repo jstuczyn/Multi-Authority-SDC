@@ -31,6 +31,8 @@ class CoinDisplayer extends React.Component {
   getSignatures = async (serversArg) => {
     const signatures = await Promise.all(serversArg.map(async (server) => {
       try {
+        // for test sake
+        server = serversArg[0];
         if (DEBUG) {
           console.log(`Sending request to ${server}...`);
         }
