@@ -12,20 +12,6 @@ export const stringToBytes = (s) => {
   return b;
 };
 
-export const getRandomCoinId = () => {
-  const RAW = crypto.randomBytes(128);
-
-  const rng = new ctx.RAND();
-  rng.clean();
-  rng.seed(RAW.length, RAW);
-  const groupOrder = new ctx.BIG(0);
-  groupOrder.rcopy(ctx.ROM_CURVE.CURVE_Order);
-
-  return ctx.BIG.randomnum(groupOrder, rng);
-};
-
-export const getCoin = (pk, value) => new Coin(pk, getRandomCoinId(), value);
-
 export const hashMessage = (m) => {
   const messageBytes = stringToBytes(m);
   const H = new ctx.HASH256();
@@ -58,4 +44,23 @@ export const hashToPointOnCurve = (m) => {
 
 export const hashG2ElemToBIG = (G2elem) => {
   return this.hashToBIG(G2elem.toString());
+};
+
+// the below are in coinGenerator of client
+export const getRandomCoinId = () => {
+  const RAW = crypto.randomBytes(128);
+
+  const rng = new ctx.RAND();
+  rng.clean();
+  rng.seed(RAW.length, RAW);
+  const groupOrder = new ctx.BIG(0);
+  groupOrder.rcopy(ctx.ROM_CURVE.CURVE_Order);
+
+  return ctx.BIG.randomnum(groupOrder, rng);
+};
+
+export const getCoin = (pk, value) => {
+  const coin_id = getRandomCoinId();
+  const coin = new Coin(pk, coin_id, value)
+  return [coin, coin_id];
 };

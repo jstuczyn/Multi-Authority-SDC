@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 import Coin from '../Coin';
 import { ctx } from '../config';
 import CoinSig from '../CoinSig';
-import { getCoin, getRandomCoinId } from '../auxiliary';
+import { getRandomCoinId } from '../auxiliary';
 import ElGamal from '../ElGamal';
 
 describe('Coin object', () => {
