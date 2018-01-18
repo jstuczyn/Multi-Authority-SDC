@@ -4,6 +4,7 @@
 import BpGroup from './BpGroup';
 import { ctx } from './config';
 import { hashToBIG, hashG2ElemToBIG, hashToPointOnCurve, hashMessage } from './auxiliary';
+import ElGamal from './ElGamal';
 
 export default class CoinSig {
   static setup() {
@@ -43,7 +44,7 @@ export default class CoinSig {
     const [G, o, g1, g2, e] = params;
     const [x0, x1, x2, x3, x4] = sk;
 
-    const h = hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.id.toString());
+    const h = hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString());
 
     const a1 = new G.ctx.BIG(coin.value);
     a1.norm();
@@ -218,9 +219,7 @@ export default class CoinSig {
 
   // todo: add extra proof of knowledge here?
   // no need to pass h - encryption is already using it
-  static blindSignComponent(params, sk_component, encrypted_param) {
-    const [G, o, g1, g2, e] = params;
-
+  static blindSignComponent(sk_component, encrypted_param) {
     const [encrypted_param_a, encrypted_param_b] = encrypted_param;
     const sig_a = ctx.PAIR.G1mul(encrypted_param_a, sk_component);
     const sig_b = ctx.PAIR.G1mul(encrypted_param_b, sk_component);
@@ -232,13 +231,14 @@ export default class CoinSig {
     const [G, o, g1, g2, e] = params;
     const [x0, x1, x2, x3, x4] = sk;
 
-    const h = hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.id.toString());
+    const h = hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString());
+
     const a1 = new G.ctx.BIG(coin.value);
     a1.norm();
     const a2 = hashToBIG(coin.ttl.toString());
 
-    const sk_component = CoinSig.blindSignComponent(params, x3, coin.enc_sk);
-    const id_component = CoinSig.blindSignComponent(params, x4, coin.enc_id);
+    const [enc_sk_component_a, enc_sk_component_b] = CoinSig.blindSignComponent(x3, coin.enc_sk);
+    const [enc_id_component_a, enc_id_component_b] = CoinSig.blindSignComponent(x4, coin.enc_id);
 
     // calculate a1 mod p, a2 mod p, etc.
     const a1_cpy = new G.ctx.BIG(a1);
@@ -264,11 +264,73 @@ export default class CoinSig {
     const K = x0DBIG.mod(o);
 
     // sig = K * h
-    const val_ttl_sig_component = G.ctx.PAIR.G1mul(h, K);
-    // todo encrypt that with clients PK and combine with sk_component and id_component
+    // const val_ttl_sig_component = G.ctx.PAIR.G1mul(h, K); // this is done during encryption below
 
+    const [val_ttl_sig_a, val_ttl_sig_b, k] = ElGamal.encrypt(params, ElGamalPK, K, h);
+    const encrypted_full_signature_a = new G.ctx.ECP();
+    encrypted_full_signature_a.copy(val_ttl_sig_a);
+    encrypted_full_signature_a.add(enc_sk_component_a);
+    encrypted_full_signature_a.add(enc_id_component_a);
+    encrypted_full_signature_a.affine();
 
+    const encrypted_full_signature_b = new G.ctx.ECP();
+    encrypted_full_signature_b.copy(val_ttl_sig_b);
+    encrypted_full_signature_b.add(enc_sk_component_b);
+    encrypted_full_signature_b.add(enc_id_component_b);
+    encrypted_full_signature_b.affine();
 
+    return [h, [encrypted_full_signature_a, encrypted_full_signature_b]];
   }
 
+  // assumes id has already been revealed and proof of knowledge of x provided
+  static verifyMixedBlindSign(params, pk, coin, sig, id, pkX) {
+    if (!sig) {
+      return false;
+    }
+    const [G, o, g1, g2, e] = params;
+    const [g, X0, X1, X2, X3, X4] = pk;
+    const [sig1, sig2] = sig;
+
+    const a1 = new G.ctx.BIG(coin.value);
+    a1.norm();
+    const a2 = hashToBIG(coin.ttl.toString());
+
+    const G2_tmp1 = G.ctx.PAIR.G2mul(X1, a1);
+    const G2_tmp2 = G.ctx.PAIR.G2mul(X2, a2);
+    // const G2_tmp3 = G.ctx.PAIR.G2mul(X3, a3); // this is now provided as pkX
+    const G2_tmp4 = G.ctx.PAIR.G2mul(X4, id);
+
+    // so that the original key wouldn't be mutated
+    const X0_cpy = new G.ctx.ECP2();
+
+    X0_cpy.copy(X0);
+    X0_cpy.add(G2_tmp1);
+    X0_cpy.add(G2_tmp2);
+    X0_cpy.add(pkX);
+    X0_cpy.add(G2_tmp4);
+
+    X0_cpy.affine();
+
+    // for some reason sig1.x, sig1.y, sig2.x and sig2.y return false to being instances of FP when signed by SAs,
+    // hence temporary, ugly hack:
+    // I blame javascript pseudo-broken typesystem
+    const tempX1 = new G.ctx.FP(0);
+    const tempY1 = new G.ctx.FP(0);
+    tempX1.copy(sig1.getx());
+    tempY1.copy(sig1.gety());
+    sig1.x = tempX1;
+    sig1.y = tempY1;
+
+    const tempX2 = new G.ctx.FP(0);
+    const tempY2 = new G.ctx.FP(0);
+    tempX2.copy(sig2.getx());
+    tempY2.copy(sig2.gety());
+    sig2.x = tempX2;
+    sig2.y = tempY2;
+
+    const Gt_1 = e(sig1, X0_cpy);
+    const Gt_2 = e(sig2, g);
+
+    return !sig2.INF && Gt_1.equals(Gt_2);
+  }
 }

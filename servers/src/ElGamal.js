@@ -12,11 +12,11 @@ export default class ElGamal {
     return [sk, pk];
   }
 
+  // m is already a BIG
   static encrypt(params, pk, m, h) {
     // encrypts some h^m, where h is element of G1
     const [G, o, g1, g2, e] = params;
     const k = G.ctx.BIG.randomnum(G.order, G.rngGen);
-
     const a = G.ctx.PAIR.G1mul(g1, k);
     const b1 = G.ctx.PAIR.G1mul(pk, k);
     const b2 = G.ctx.PAIR.G1mul(h, m);
@@ -39,6 +39,7 @@ export default class ElGamal {
 
     // mod stuff?
     b_cpy.sub(t1);
+    b_cpy.affine();
     return b_cpy;
   }
 }

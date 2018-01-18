@@ -6,7 +6,7 @@ const MIN_TTL_H = 12;
 
 export default class Coin {
   // unfortunately javascript doesn't have constructor overloading
-  constructor(v, ide, value, ttl = -1, ID = null) {
+  constructor(v, id, value, ttl = -1, ID = null) {
     this.ctx = ctx;
     this.enc_sk = null;
     this.enc_id = null;
@@ -45,7 +45,7 @@ export default class Coin {
     this.value = value;
 
     if (ID === null) {
-      this.ID = this.ctx.PAIR.G1mul(this.g1, ide);
+      this.ID = this.ctx.PAIR.G1mul(this.g1, id);
     } else {
       this.ID = ID;
     }
@@ -77,6 +77,7 @@ export default class Coin {
 
       const [a1, b1, k1] = ElGamal.encrypt(params, ElGamalPK, sk, h);
       const [a2, b2, k2] = ElGamal.encrypt(params, ElGamalPK, id, h);
+
       this.enc_sk = [a1, b1];
       this.enc_id = [a2, b2];
     }
