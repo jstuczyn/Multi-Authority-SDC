@@ -39,6 +39,20 @@ export default class ElGamal {
 
     // mod stuff?
     b_cpy.sub(t1);
+
+    b_cpy.affine();
     return b_cpy;
+  }
+
+  static getPKBytes(pk) {
+    const PKBytes = [];
+    pk.toBytes(PKBytes);
+    return PKBytes;
+  }
+
+  static getPKFromBytes(params, PKBytes) {
+    const [G, o, g1, g2, e] = params;
+    const pk = G.ctx.ECP.fromBytes(PKBytes);
+    return pk;
   }
 }
