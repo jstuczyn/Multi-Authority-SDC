@@ -43,7 +43,7 @@ export const hashToPointOnCurve = (m) => {
 };
 
 export const hashG2ElemToBIG = (G2elem) => {
-  return this.hashToBIG(G2elem.toString());
+  return hashToBIG(G2elem.toString());
 };
 
 // the below are in coinGenerator of client

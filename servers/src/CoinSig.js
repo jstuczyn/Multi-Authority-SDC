@@ -50,9 +50,9 @@ export default class CoinSig {
     a1.norm();
     const a2 = hashToBIG(coin.ttl.toString());
 
-    // this will be replaced by blind signature
+    // this is replaced in blind signature
     const a3 = hashG2ElemToBIG(coin.v);
-    const a4 = hashG2ElemToBIG(coin.id);
+    const a4 = hashG2ElemToBIG(coin.ID);
 
     // calculate a1 mod p, a2 mod p, etc.
     const a1_cpy = new G.ctx.BIG(a1);
@@ -108,7 +108,7 @@ export default class CoinSig {
     a1.norm();
     const a2 = hashToBIG(coin.ttl.toString());
     const a3 = hashG2ElemToBIG(coin.v);
-    const a4 = hashG2ElemToBIG(coin.id);
+    const a4 = hashG2ElemToBIG(coin.ID);
 
     const G2_tmp1 = G.ctx.PAIR.G2mul(X1, a1);
     const G2_tmp2 = G.ctx.PAIR.G2mul(X2, a2);

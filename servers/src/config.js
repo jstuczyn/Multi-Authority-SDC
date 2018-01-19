@@ -10,5 +10,5 @@ export const signingServers = [
 export const merchant = '127.0.0.1:4000';
 
 export const ctx = new CTX('BN254');
-
-export const params = CoinSig.setup();
+// todo: commented for tests, need to remember to uncomment
+// export const params = CoinSig.setup();
