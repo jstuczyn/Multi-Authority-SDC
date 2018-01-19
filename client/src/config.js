@@ -10,6 +10,14 @@ export const signingServers = [
   '127.0.0.1:3002',
 ];
 
+// even though it is set a const, it can still be mutated because it is an object;
+// only the pointer can't be moved
+export const PKs = {
+  '127.0.0.1:3000': null,
+  '127.0.0.1:3001': null,
+  '127.0.0.1:3002': null,
+};
+
 export const merchant = '127.0.0.1:4000';
 
 export const ctx = new CTX('BN254');
