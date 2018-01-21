@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Header, Icon } from 'semantic-ui-react';
 import { SERVER_STATUS, PKs, SERVER_TYPES, DEBUG } from '../config';
-import { getPublicKey } from '../utils/api';
+import { getPublicKey, checkIfAlive } from '../utils/api';
 
 const statusStyle = {
   fontWeight: 'bold',
@@ -71,7 +71,12 @@ class ServerStatus extends React.Component {
         this.setState({ status: SERVER_STATUS.alive });
       }
     } else if (this.props.type === SERVER_TYPES.merchant) {
-      console.log('todo: api for merchant to check status');
+      const isAlive = await checkIfAlive(this.props.address);
+      if (isAlive) {
+        this.setState({ status: SERVER_STATUS.alive });
+      } else {
+        this.setState({ status: SERVER_STATUS.down });
+      }
     }
   };
 

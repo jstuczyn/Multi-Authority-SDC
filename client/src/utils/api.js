@@ -8,6 +8,22 @@ export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
 
+export async function checkIfAlive(server) {
+  let isAlive = false;
+  if (DEBUG) {
+    console.log(`Checking status of ${server}`);
+  }
+  try {
+    let response = await fetch(`http://${server}/status`);
+    response = await response.json();
+    isAlive = response.alive;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return isAlive;
+}
+
 export async function getPublicKey(server) {
   const publicKey = [];
   if (DEBUG) {
