@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
-import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG } from '../config';
+import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG, PKs } from '../config';
 import Coin from '../../lib/Coin';
 import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
 import { getProofOfSecret } from '../utils/helpers';
+import ElGamal from '../../lib/ElGamal';
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -31,25 +32,20 @@ class CoinDisplayer extends React.Component {
   getSignatures = async (serversArg) => {
     const signatures = await Promise.all(serversArg.map(async (server) => {
       try {
-        // for test sake
         if (DEBUG) {
           console.log(`Sending request to ${server}...`);
         }
 
-        const signature = await signCoin(server, this.props.coin, this.props.ElGamalPK, params, this.props.id, this.props.sk);
+        const [h, enc_sig] = await signCoin(server, this.props.coin, this.props.ElGamalPK, params, this.props.id, this.props.sk);
+        const sig = ElGamal.decrypt(params, this.props.ElGamalSK, enc_sig);
 
-        // todo: decrypt signature
-        return null;
-        //
-        // console.log('signed', signature);
-        //
-        // const [hBytes, sigBytes] = signature;
-        //
-        // const h = ctx.ECP.fromBytes(hBytes);
-        // const sig = ctx.ECP.fromBytes(sigBytes);
-        //
-        // return [h, sig];
+        if (DEBUG) {
+          console.log('Decrypted signature:', [h, sig]);
+        }
+
+        return [h, sig];
       } catch (err) {
+        console.warn(err);
         return null;
       }
     }));
@@ -98,6 +94,7 @@ class CoinDisplayer extends React.Component {
 
     this.setState({ remainingValidityString: remainingValidityString });
   };
+
 
   handleCoinSign = async () => {
     this.setState({ coinState: COIN_STATUS.signing });

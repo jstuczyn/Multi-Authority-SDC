@@ -1,6 +1,8 @@
 import fetch from 'isomorphic-fetch';
 import { ctx, DEBUG, PKs } from '../config';
 import { getSimplifiedProof, getSimplifiedSignature } from './helpers';
+import ElGamal from '../../lib/ElGamal';
+
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
   return new Promise(r => setTimeout(r, t));
@@ -8,6 +10,9 @@ export function wait(t) {
 
 export async function getPublicKey(server) {
   const publicKey = [];
+  if (DEBUG) {
+    console.log(`Sending request to get public key of ${server}`);
+  }
   try {
     let response = await fetch(`http://${server}/pk`);
     response = await response.json();
@@ -26,13 +31,15 @@ export async function getPublicKey(server) {
   return publicKey;
 }
 
-export async function signCoin(server, coin, ElGamalPK = null, params = null, id = null, sk = null) {
+export async function signCoin(server, coin, ElGamalPK, params = null, id = null, sk = null) {
   const signingCoin = coin.prepareCoinForSigning(ElGamalPK, params, id, sk);
   let signature = null;
   if (DEBUG) {
-    console.log('signinig', signingCoin);
+    console.log('Compressed coin to sign: ', signingCoin);
   }
 
+  // this would actually be needed for spending coin (to produce X3^x),
+  // but if done here, we could verify if server is running, todo: actually do it
   if (PKs[server] == null) {
     if (DEBUG) {
       console.log(`${server} wasn't queried before. We need to get its PK first.`);
@@ -40,13 +47,16 @@ export async function signCoin(server, coin, ElGamalPK = null, params = null, id
     const publicKey = await getPublicKey(server);
     PKs[server] = publicKey;
   } else if (DEBUG) {
-    console.log(`${server} was queried before. It's PK is:`);
+    console.log(`${server} was queried before. Its PK is:`);
     console.log(PKs[server]);
+  }
+  if (DEBUG) {
+    console.log(`Sending signing query to ${server}`);
   }
 
   try {
     let response = await
-      fetch(`http://${server}/sign`, {
+      fetch(`http://${server}/blindsign`, {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -54,10 +64,19 @@ export async function signCoin(server, coin, ElGamalPK = null, params = null, id
         },
         body: JSON.stringify({
           coin: signingCoin,
+          ElGamalPKBytes: ElGamal.getPKBytes(ElGamalPK),
         }),
       });
     response = await response.json();
-    signature = response.signature;
+
+    // since the call was successful, recreate the objects from bytes representations
+    const [hBytes, [enc_sig_a_Bytes, enc_sig_b_Bytes]] = response.signature;
+
+    const h = ctx.ECP.fromBytes(hBytes);
+    const enc_sig_a = ctx.ECP.fromBytes(enc_sig_a_Bytes);
+    const enc_sig_b = ctx.ECP.fromBytes(enc_sig_b_Bytes);
+
+    signature = [h, [enc_sig_a, enc_sig_b]];
   } catch (err) {
     console.log(err);
     console.warn(`Call to ${server} was unsuccessful`);
