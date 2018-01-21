@@ -1,7 +1,7 @@
 import Coin from '../../lib/Coin';
 import { params } from '../config'; // todo: should I create separate params instead? (those are associated with CoinSig)
 
-export const getProofOfSecret = sk => (Coin.prepareProofOfSecret(params, sk));
+export const getProofOfSecret = (sk, verifier) => (Coin.prepareProofOfSecret(params, sk, verifier));
 
 export const getSimplifiedProof = (proof) => {
   const [W, cm, r] = proof;
