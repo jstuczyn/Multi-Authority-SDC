@@ -58,14 +58,14 @@ class ServerStatus extends React.Component {
   checkServerStatus = async () => {
     // if this is a signing authority, we might as well get its public key since we will need it later
     if (this.props.type === SERVER_TYPES.signing) {
-      if (PKs[this.props.address] === null || PKs[this.props.address] === []) {
+      if (PKs[this.props.address] === null || PKs[this.props.address].length <= 0) {
         if (DEBUG) {
           console.log(`Getting Public Key of ${this.props.address}...`);
         }
         const publicKey = await getPublicKey(this.props.address);
         PKs[this.props.address] = publicKey;
       }
-      if (PKs[this.props.address] === null || PKs[this.props.address] === []) {
+      if (PKs[this.props.address] === null || PKs[this.props.address].length <= 0) {
         this.setState({ status: SERVER_STATUS.down });
       } else {
         this.setState({ status: SERVER_STATUS.alive });
