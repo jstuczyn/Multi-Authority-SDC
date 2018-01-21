@@ -1,6 +1,6 @@
 import { ctx } from '../src/config';
 import ElGamal from './ElGamal';
-import { hashToPointOnCurve } from './auxiliary';
+import { hashToPointOnCurve, hashToBIG } from './auxiliary';
 
 const MIN_TTL_H = 12;
 
@@ -139,29 +139,29 @@ export default class Coin {
   static keygen(params) {
     const [G, o, g1, g2, e] = params;
 
-    const sk = G.ctx.BIG.randomnum(G.order, G.rngGen);
-    const pk = G.ctx.PAIR.G2mul(g2, sk);
+    const sk = ctx.BIG.randomnum(G.order, G.rngGen);
+    const pk = ctx.PAIR.G2mul(g2, sk);
 
     return [sk, pk];
   }
 
-  static prepareProofOfSecret(params, sk) {
+  static prepareProofOfSecret(params, sk, verifier) {
     const [G, o, g1, g2, e] = params;
-    const w = G.ctx.BIG.randomnum(G.order, G.rngGen);
-    const W = G.ctx.PAIR.G2mul(g2, w);
-    const cm = G.hashG2ElemToBIG(W);
+    const w = ctx.BIG.randomnum(G.order, G.rngGen);
+    const W = ctx.PAIR.G2mul(g2, w);
+    const cm = hashToBIG(W.toString() + verifier);
 
     // to prevent object mutation
-    const sk_cpy = new G.ctx.BIG(sk);
-    const cm_cpy = new G.ctx.BIG(cm);
+    const sk_cpy = new ctx.BIG(sk);
+    const cm_cpy = new ctx.BIG(cm);
     sk_cpy.mod(o);
     cm_cpy.mod(o);
 
-    const t1 = G.ctx.BIG.mul(sk_cpy, cm_cpy); // produces DBIG
+    const t1 = ctx.BIG.mul(sk_cpy, cm_cpy); // produces DBIG
     const t2 = t1.mod(o); // but this gives BIG back
 
     w.mod(o);
-    const r = new G.ctx.BIG(w);
+    const r = new ctx.BIG(w);
 
     r.copy(w);
     r.sub(t2);
@@ -171,17 +171,17 @@ export default class Coin {
     return [W, cm, r]; // G2Elem, BIG, BIG
   }
 
-  static verifyProofOfSecret(params, pk, W, cm, r) {
+  static verifyProofOfSecret(params, pk, W, cm, r, verifier) {
     const [G, o, g1, g2, e] = params;
 
-    const t1 = G.ctx.PAIR.G2mul(g2, r);
-    const t2 = G.ctx.PAIR.G2mul(pk, cm); // public key is g1^sk now, todo: fix
+    const t1 = ctx.PAIR.G2mul(g2, r);
+    const t2 = ctx.PAIR.G2mul(pk, cm); // public key is g1^sk now, todo: fix
 
     t1.add(t2);
     t1.affine();
 
     const expr1 = t1.equals(W);
-    const expr2 = G.ctx.BIG.comp(cm, G.hashG2ElemToBIG(W)) === 0;
+    const expr2 = ctx.BIG.comp(cm, hashToBIG(W.toString() + verifier)) === 0;
 
     return expr1 && expr2;
   }
