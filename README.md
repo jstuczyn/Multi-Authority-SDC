@@ -7,7 +7,7 @@
 ![Diagram](https://i.imgur.com/ycQoCbf.png)
 
 ### Current Client Interface:
-![Interface](https://i.imgur.com/BZzLmL8.png)
+![Interface](https://i.imgur.com/KEfSzmX.png)
 
 ### Diagram Steps Status:
 - 1.generate_coin() - completed
@@ -19,9 +19,8 @@
 - 7.verify_sig() - completed
 
 #### Questions:
-- Does it matter if id of coin is g1^id or g2^id?
-- Same for NZKP, does it matter if W = g1^w or g2^w?
 
 #### TODOs:
 - Benchmarking
+- Tests for recently added components and features
 - Next Step - separate entity issuing coins
