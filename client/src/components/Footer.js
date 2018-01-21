@@ -9,7 +9,7 @@ const Footer = () => (
   >
     <Container textAlign="center">
       <Divider inverted section />
-      <h5>Created by Jedrzej Stuczynski </h5>
+      <h5>Created by Jędrzej Stuczyński </h5>
       <Container
         style={{ color: '#ffffff' }}
         as="a"

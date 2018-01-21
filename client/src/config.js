@@ -55,3 +55,21 @@ export const BUTTON_COIN_STATUS = {
   spending: BUTTON_COIN_STATUS_SPENDING_IN_PROGRESS,
   error: BUTTON_COIN_STATUS_ERROR,
 };
+
+const SERVER_TYPE_SA = 'Signing Authority';
+const SERVER_TYPE_MERCHANT = 'Merchant';
+
+export const SERVER_TYPES = {
+  signing: SERVER_TYPE_SA,
+  merchant: SERVER_TYPE_MERCHANT,
+};
+
+const SERVER_STATUS_UP = 'Server is alive';
+const SERVER_STATUS_DOWN = 'Server is down';
+const SERVER_STATUS_CHECK = 'Checking server status...';
+
+export const SERVER_STATUS = {
+  alive: SERVER_STATUS_UP,
+  down: SERVER_STATUS_DOWN,
+  loading: SERVER_STATUS_CHECK,
+};

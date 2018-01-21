@@ -1,5 +1,4 @@
 const siteContentStyle = {
-  marginTop: 150,
   textAlign: 'center',
   flex: 1,
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'semantic-ui-react';
+import { Grid, Segment, Header } from 'semantic-ui-react';
 import CoinRequester from './CoinRequester';
 import CoinListDisplayer from './CoinListDisplayer';
 import { getCoin } from '../utils/coinGenerator';
@@ -43,19 +43,27 @@ class MainView extends React.Component {
 
   render() {
     return (
-      <Grid>
-        <Grid.Row centered={true}>
-          <CoinRequester handleCoinSubmit={this.handleCoinSubmit} />
-        </Grid.Row>
+      <Segment style={{ padding: '8em 0em' }} vertical>
+        <Header
+          as="h2"
+          color="teal"
+          textAlign="center"
+          content="Generate a coin (locally by a client)"
+        />
+        <Grid>
+          <Grid.Row centered={true}>
+            <CoinRequester handleCoinSubmit={this.handleCoinSubmit} />
+          </Grid.Row>
 
-        <Grid.Row centered={true}>
-          <CoinListDisplayer
-            coins={this.state.coins}
-            ElGamalSK={this.state.ElGamalSK}
-            ElGamalPK={this.state.ElGamalPK}
-          />
-        </Grid.Row>
-      </Grid>
+          <Grid.Row centered={true}>
+            <CoinListDisplayer
+              coins={this.state.coins}
+              ElGamalSK={this.state.ElGamalSK}
+              ElGamalPK={this.state.ElGamalPK}
+            />
+          </Grid.Row>
+        </Grid>
+      </Segment>
     );
   }
 }
