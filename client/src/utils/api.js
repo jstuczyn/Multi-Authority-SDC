@@ -78,16 +78,28 @@ export async function signCoin(server, coin, ElGamalPK, params = null, id = null
 
     signature = [h, [enc_sig_a, enc_sig_b]];
   } catch (err) {
-    console.log(err);
+    console.warn(err);
     console.warn(`Call to ${server} was unsuccessful`);
   }
   return signature;
 }
 
-export async function spendCoin(coin, proof, signature, server) {
-  const simplifiedCoin = coin.getSimplifiedCoin();
+// we need to send to the verifier coin(ID, v, ttl, value), id (we reveal it), proof of x, pkX and aggSig
+export async function spendCoin(coin, proof, signature, pkX, id, server) {
+
+  // due to being signed, coin already has bytesV and bytesID attributes
+  const simplifiedCoin = {
+    bytesV: coin.bytesV,
+    bytesID: coin.bytesID,
+    value: coin.value,
+    ttl: coin.ttl,
+  };
   const simplifiedProof = getSimplifiedProof(proof);
   const simplifiedSignature = getSimplifiedSignature(signature);
+  const pkXBytes = [];
+  const idBytes = [];
+  pkX.toBytes(pkXBytes);
+  id.toBytes(idBytes);
 
   let success = false;
   try {
@@ -102,12 +114,14 @@ export async function spendCoin(coin, proof, signature, server) {
           coin: simplifiedCoin,
           proof: simplifiedProof,
           signature: simplifiedSignature,
+          pkX: pkXBytes,
+          id: idBytes,
         }),
       });
     response = await response.json();
     success = response.success;
   } catch (err) {
-    console.log(err);
+    console.warn(err);
     console.warn(`Call to merchant ${server} was unsuccessful`);
   }
   return success;

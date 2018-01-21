@@ -95,6 +95,16 @@ class CoinDisplayer extends React.Component {
     this.setState({ remainingValidityString: remainingValidityString });
   };
 
+  aggregate_pkX_component = (publicKeys) => {
+    const aX3 = new ctx.ECP2();
+    Object.entries(publicKeys).forEach(([server, publicKey]) => {
+      aX3.add(publicKey[4]); // publicKey has structure [g, X0, X1, X2, X3, X4], so we access element at 4th index
+    });
+    aX3.affine();
+
+    const pkX = ctx.PAIR.G2mul(aX3, this.props.sk);
+    return pkX;
+  };
 
   handleCoinSign = async () => {
     this.setState({ coinState: COIN_STATUS.signing });
@@ -118,11 +128,12 @@ class CoinDisplayer extends React.Component {
 
   handleCoinSpend = async () => {
     this.setState({ coinState: COIN_STATUS.spending });
-    const secretProof = getProofOfSecret(this.props.sk);
+    const secretProof = getProofOfSecret(this.props.sk, merchant);
+    const pkX = this.aggregate_pkX_component(PKs);
     if (DEBUG) {
       console.log('Coin spend request was sent');
     }
-    const success = await spendCoin(this.props.coin, secretProof, this.state.randomizedSignature, merchant);
+    const success = await spendCoin(this.props.coin, secretProof, this.state.randomizedSignature, pkX, this.props.id, merchant);
     if (success) {
       if (DEBUG) {
         console.log('Coin was successfully spent.');
