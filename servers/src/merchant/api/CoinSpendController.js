@@ -3,7 +3,8 @@ import bodyParser from 'body-parser';
 import fetch from 'isomorphic-fetch';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
-import { ctx, params, signingServers } from '../../config';
+import { ctx, params, signingServers, merchant } from '../../config'; // todo: import own address or check it in runtime?
+import { DEBUG } from '../config/appConfig';
 
 const router = express.Router();
 
@@ -42,7 +43,9 @@ const getPublicKey = async (server) => {
 const getPublicKeys = async (serversArg) => {
   const publicKeys = await Promise.all(serversArg.map(async (server) => {
     try {
-      console.log(`Sending request to ${server}...`);
+      if (DEBUG) {
+        console.log(`Sending request to ${server}...`);
+      }
       const publicKey = await getPublicKey(server);
       return publicKey;
     } catch (err) {
@@ -52,39 +55,77 @@ const getPublicKeys = async (serversArg) => {
   return publicKeys;
 };
 
+const getCoinAttributesFromBytes = (coinBytes) => {
+  const {
+    bytesV, bytesID, value, ttl,
+  } = coinBytes;
+
+  return {
+    v: ctx.ECP2.fromBytes(bytesV),
+    ID: ctx.ECP.fromBytes(bytesID),
+    value: value,
+    ttl: ttl,
+  };
+};
+
 router.post('/', async (req, res) => {
-  console.log('spend post');
+  if (DEBUG) {
+    console.log('spend post');
+  }
   let responseStatus = -1;
   let success = false;
   try {
+    const [G, o, g1, g2, e] = params;
+
     const simplifiedCoin = req.body.coin;
     const simplifiedProof = req.body.proof;
     const [hBytes, sigBytes] = req.body.signature;
+    const pkXBytes = req.body.pkX;
+    const idBytes = req.body.id;
+
+    const coinAttributes = getCoinAttributesFromBytes(simplifiedCoin);
+    const [W, cm, r] = fromSimplifiedProof(simplifiedProof);
     const h = ctx.ECP.fromBytes(hBytes);
     const sig = ctx.ECP.fromBytes(sigBytes);
+    const pkX = ctx.ECP2.fromBytes(pkXBytes);
+    const id = ctx.BIG.fromBytes(idBytes);
 
-    const coin = Coin.fromSimplifiedCoin(simplifiedCoin);
-    const [W, cm, r] = fromSimplifiedProof(simplifiedProof);
 
-    const isProofValid = Coin.verifyProofOfSecret(params, coin.v, W, cm, r);
+    const isProofValid = Coin.verifyProofOfSecret(params, coinAttributes.v, W, cm, r, merchant);
     // no point in verifying signature if proof is invalid
+    if (DEBUG) {
+      console.log(`Was proof of knowledge of secret valid: ${isProofValid}`);
+    }
     if (!isProofValid) {
-      console.log('Proof was invalid');
+      if (DEBUG) {
+        console.log('Proof was invalid, no further checks will be made.');
+      }
       res.status(200).json({ success: false });
+      return;
     }
 
     const publicKeys = await getPublicKeys(signingServers);
     const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
 
+    // check if the actual id was revealed
+    const isIDValid = coinAttributes.ID.equals(ctx.PAIR.G1mul(g1, id));
+    if (DEBUG) {
+      console.log(`Was actual id revealed: ${isIDValid}`);
+    }
+
     // todo: create another params?
-    const isSignatureValid = CoinSig.verify(params, aggregatePublicKey, coin, [h, sig]);
+    const isSignatureValid = CoinSig.verifyMixedBlindSign(params, aggregatePublicKey, coinAttributes, [h, sig], id, pkX);
+    if (DEBUG) {
+      console.log(`Was signature valid: ${isSignatureValid}`);
+    }
 
     responseStatus = 200;
-    success = isProofValid && isSignatureValid;
-    console.log('Was coin spent: ', success);
+    success = isProofValid && isSignatureValid && isIDValid;
+    if (DEBUG) {
+      console.log(`Was coin successfully spent: ${success}`);
+    }
   } catch (err) {
-    console.log(err);
-
+    console.warn(err);
     responseStatus = 400;
   }
   res.status(responseStatus).json({ success: success });
