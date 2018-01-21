@@ -1,10 +1,19 @@
-const divStyle = {
-  marginTop: 50,
+const siteContentStyle = {
+  marginTop: 150,
   textAlign: 'center',
+  flex: 1,
 };
 
+const siteStyle = {
+  display: 'flex',
+  minHeight: '100vh',
+  flexDirection: 'column',
+};
+
+
 const styles = {
-  divStyle,
+  siteContentStyle,
+  siteStyle,
 };
 
 export default styles;
