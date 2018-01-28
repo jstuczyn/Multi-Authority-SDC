@@ -64,3 +64,6 @@ typings/
 servers/dist/test
 servers/dist/*
 !servers/dist/lib
+
+# ignore postgres data
+docker/postgres-data
