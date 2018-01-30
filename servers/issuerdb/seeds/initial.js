@@ -12,8 +12,8 @@ exports.seed = function (knex, Promise) {
             Balance: 1000.00,
           },
           {
-            Name: 'Issuer',
-            Address: '127.0.0.1:5000',
+            Name: 'Merchant',
+            Address: '127.0.0.1:4000',
             Balance: 1000.00,
           },
         ]);
