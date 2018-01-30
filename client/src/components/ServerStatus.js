@@ -70,7 +70,7 @@ class ServerStatus extends React.Component {
       } else {
         this.setState({ status: SERVER_STATUS.alive });
       }
-    } else if (this.props.type === SERVER_TYPES.merchant) {
+    } else if (this.props.type === SERVER_TYPES.merchant || this.props.type === SERVER_TYPES.issuer) {
       const isAlive = await checkIfAlive(this.props.address);
       if (isAlive) {
         this.setState({ status: SERVER_STATUS.alive });

@@ -61,6 +61,6 @@ export const getRandomCoinId = () => {
 
 export const getCoin = (pk, value) => {
   const coin_id = getRandomCoinId();
-  const coin = new Coin(pk, coin_id, value)
+  const coin = new Coin(pk, coin_id, value);
   return [coin, coin_id];
 };

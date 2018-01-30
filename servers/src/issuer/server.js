@@ -13,6 +13,5 @@ const port = parseInt(process.argv[2], 10);
 
 const server = app.listen(port, hostname, () => {
   setupKeys();
-  let a = getBalance('Client');
   console.log(`Server Started at: http://${hostname}:${port}/`);
 });

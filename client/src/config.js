@@ -19,6 +19,7 @@ export const PKs = {
 };
 
 export const merchant = '127.0.0.1:4000';
+export const issuer = '127.0.0.1:5000';
 
 export const ctx = new CTX('BN254');
 export const params = CoinSig.setup();
@@ -58,10 +59,12 @@ export const BUTTON_COIN_STATUS = {
 
 const SERVER_TYPE_SA = 'Signing Authority';
 const SERVER_TYPE_MERCHANT = 'Merchant';
+const SERVER_TYPE_ISSUER = 'Issuer';
 
 export const SERVER_TYPES = {
   signing: SERVER_TYPE_SA,
   merchant: SERVER_TYPE_MERCHANT,
+  issuer: SERVER_TYPE_ISSUER,
 };
 
 const SERVER_STATUS_UP = 'Server is alive';

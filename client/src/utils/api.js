@@ -8,6 +8,36 @@ export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
 
+export async function getCoin(sk, pk, value, server) {
+  // generating of proof etc will happen here
+  if (DEBUG) {
+    console.log(`Calling ${server} to get a coin`);
+  }
+  try {
+    let response = await
+      fetch(`http://${server}/getcoin`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pk: 'aa',
+          proof: 'bb',
+          value: 42,
+          user: 'Client', // temp, replace with some simple auth system?
+        }),
+      });
+    response = await response.json();
+    console.log(response);
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+
+  return [null, null];
+}
+
 export async function checkIfAlive(server) {
   let isAlive = false;
   if (DEBUG) {

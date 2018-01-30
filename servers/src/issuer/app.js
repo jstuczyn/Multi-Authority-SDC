@@ -14,6 +14,6 @@ app.use((req, res, next) => {
 
 app.use('/pk', PublicKeyController);
 app.use('/status', ServerStatusController);
-app.use('getcoin', CoinIssuanceController);
+app.use('/getcoin', CoinIssuanceController);
 
 export default app;

@@ -8,12 +8,12 @@ exports.seed = function (knex, Promise) {
         .insert([
           {
             Name: 'Client',
-            Address: '127.0.0.1:9000',
+            Address: '127.0.0.1',
             Balance: 1000.00,
           },
           {
             Name: 'Merchant',
-            Address: '127.0.0.1:4000',
+            Address: '127.0.0.1',
             Balance: 1000.00,
           },
         ]);

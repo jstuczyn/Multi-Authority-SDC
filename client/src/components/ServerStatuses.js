@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Table, Header, Segment } from 'semantic-ui-react';
-import { signingServers, merchant, PKs, SERVER_TYPES } from '../config';
+import { signingServers, merchant, issuer, PKs, SERVER_TYPES } from '../config';
 import ServerStatus from './ServerStatus';
 
 const ServerStatuses = () => (
@@ -30,6 +30,11 @@ const ServerStatuses = () => (
           <ServerStatus
             address={merchant}
             type={SERVER_TYPES.merchant}
+          />
+
+          <ServerStatus
+            address={issuer}
+            type={SERVER_TYPES.issuer}
           />
 
 

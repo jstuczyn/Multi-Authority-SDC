@@ -2,9 +2,10 @@ import React from 'react';
 import { Grid, Segment, Header } from 'semantic-ui-react';
 import CoinRequester from './CoinRequester';
 import CoinListDisplayer from './CoinListDisplayer';
-import { getCoin } from '../utils/coinGenerator';
+// import { getCoin } from '../utils/coinGenerator';
+import { getCoin } from '../utils/api';
 import Coin from '../../lib/Coin';
-import { params, DEBUG, DETAILED_DEBUG } from '../config';
+import { params, DEBUG, DETAILED_DEBUG, issuer } from '../config';
 import ElGamal from '../../lib/ElGamal';
 
 class MainView extends React.Component {
@@ -33,9 +34,9 @@ class MainView extends React.Component {
     }
   }
 
-  handleCoinSubmit = (value) => {
+  handleCoinSubmit = async (value) => {
     const [sk, pk] = Coin.keygen(params);
-    const [coin, id] = getCoin(pk, value);
+    const [coin, id] = await getCoin(sk, pk, value, issuer);
     this.setState(prevState => ({
       coins: prevState.coins.concat([{ sk, id, coin }]),
     }));
