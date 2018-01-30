@@ -1,6 +1,7 @@
 import express from 'express';
 import PublicKeyController from './api/PublicKeyController';
 import ServerStatusController from './api/ServerStatusController';
+import CoinIssuanceController from './api/CoinIssuanceController';
 
 const app = express();
 
@@ -13,5 +14,6 @@ app.use((req, res, next) => {
 
 app.use('/pk', PublicKeyController);
 app.use('/status', ServerStatusController);
+app.use('getcoin', CoinIssuanceController);
 
 export default app;
