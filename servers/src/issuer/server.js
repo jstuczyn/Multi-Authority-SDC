@@ -1,9 +1,7 @@
 import 'babel-polyfill';
 import app from './app';
 import { hostname } from './config/appConfig';
-import { setupKeys, pkBytes, skBytes } from './config/KeySetup';
-
-import { getBalance } from './utils/DatabaseManager';
+import { setupKeys } from './config/KeySetup';
 
 if (process.argv.length < 3) {
   throw new Error('No port number provided');

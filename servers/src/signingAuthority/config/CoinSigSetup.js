@@ -35,5 +35,5 @@ export const setupCoinSigKeys = () => {
   pkBytes.push(X3_bytes);
   pkBytes.push(X4_bytes);
 
-  console.log('Generated CoinSig secret and public keys');
+  console.log('Generated CoinSig secret and public sigKeys');
 };

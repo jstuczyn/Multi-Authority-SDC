@@ -8,6 +8,7 @@ export const signingServers = [
 ];
 
 export const merchant = '127.0.0.1:4000';
+export const issuer = '127.0.0.1:5000';
 
 export const ctx = new CTX('BN254');
 export const params = CoinSig.setup();

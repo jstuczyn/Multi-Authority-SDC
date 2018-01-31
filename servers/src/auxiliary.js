@@ -64,3 +64,11 @@ export const getCoin = (pk, value) => {
   const coin = new Coin(pk, coin_id, value);
   return [coin, coin_id];
 };
+
+export const fromSimplifiedProof = (simplifiedProof) => {
+  const [bytesW, bytesCm, bytesR] = simplifiedProof;
+  const W = ctx.ECP2.fromBytes(bytesW);
+  const cm = ctx.BIG.fromBytes(bytesCm);
+  const r = ctx.BIG.fromBytes(bytesR);
+  return [W, cm, r];
+};

@@ -5,19 +5,12 @@ import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
 import { ctx, params, signingServers, merchant } from '../../config'; // todo: import own address or check it in runtime?
 import { DEBUG } from '../config/appConfig';
+import { fromSimplifiedProof } from '../../auxiliary';
 
 const router = express.Router();
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-
-const fromSimplifiedProof = (simplifiedProof) => {
-  const [bytesW, bytesCm, bytesR] = simplifiedProof;
-  const W = ctx.ECP2.fromBytes(bytesW);
-  const cm = ctx.BIG.fromBytes(bytesCm);
-  const r = ctx.BIG.fromBytes(bytesR);
-  return [W, cm, r];
-};
 
 const getPublicKey = async (server) => {
   const publicKey = [];
