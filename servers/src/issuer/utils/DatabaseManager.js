@@ -27,7 +27,15 @@ export const insertUsedId = async (id) => {
 };
 
 export const insertGeneratedId = async (id) => {
+  const id_str = id.toString();
+  await pool.query('\
+  INSERT INTO public."tblGeneratedIds"\
+  ("Id")\
+  VALUES ($1)', [id_str]);
 
+  if (DEBUG) {
+    console.log(`Inserted ${id_str} to generatedIds`);
+  }
 };
 
 export const checkGeneratedId = async (id) => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { getBalance, checkGeneratedId } from '../utils/DatabaseManager';
+import { getBalance, checkGeneratedId, insertGeneratedId } from '../utils/DatabaseManager';
 import { DEBUG } from '../config/appConfig';
 import { ctx, issuer, params } from '../../config';
 import { ISSUE_STATUS } from '../config/constants';
@@ -95,6 +95,8 @@ router.post('/', async (req, res) => {
   const simplifiedCoin = coin.getSimplifiedCoin();
   const idBytes = [];
   coin_id.toBytes(idBytes);
+
+  await insertGeneratedId(coin_id);
 
   if (DEBUG) {
     console.log(ISSUE_STATUS.success);
