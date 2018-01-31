@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
-import { ctx, DEBUG, PKs } from '../config';
-import { getSimplifiedProof, getSimplifiedSignature } from './helpers';
+import { ctx, DEBUG, issuer, PKs } from '../config';
+import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature } from './helpers';
 import ElGamal from '../../lib/ElGamal';
 
 // auxiliary, mostly for testing purposes to simulate delays
@@ -9,6 +9,11 @@ export function wait(t) {
 }
 
 export async function getCoin(sk, pk, value, server) {
+  const pkBytes = [];
+  pk.toBytes(pkBytes);
+  const secretProof = getProofOfSecret(sk, issuer);
+  const simplifiedProof = getSimplifiedProof(secretProof);
+
   // generating of proof etc will happen here
   if (DEBUG) {
     console.log(`Calling ${server} to get a coin`);
@@ -22,9 +27,9 @@ export async function getCoin(sk, pk, value, server) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          pk: 'aa',
-          proof: 'bb',
-          value: 42,
+          pk: pkBytes,
+          proof: simplifiedProof,
+          value: value,
           user: 'Client', // temp, replace with some simple auth system?
         }),
       });
@@ -35,6 +40,7 @@ export async function getCoin(sk, pk, value, server) {
     console.warn(`Call to ${server} was unsuccessful`);
   }
 
+  console.log(response);
   return [null, null];
 }
 
