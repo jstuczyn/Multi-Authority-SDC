@@ -30,3 +30,17 @@ export const insertGeneratedId = async (id) => {
 
 };
 
+export const checkGeneratedId = async (id) => {
+  const res = await pool.query('\
+  SELECT (1)\
+  FROM public."tblGeneratedIds"\
+  WHERE "Id" = $1', [id]);
+
+  const wasGenerated = res.rows.length;
+  if (DEBUG) {
+    console.log(`Checked if coin id ${id} was already generated and result was: ${wasGenerated}`);
+  }
+
+  return wasGenerated;
+};
+
