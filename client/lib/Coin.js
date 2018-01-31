@@ -67,6 +67,32 @@ export default class Coin {
     return this.ttl;
   }
 
+  getSimplifiedCoin() {
+    const bytesID = [];
+    const bytesV = [];
+    this.ID.toBytes(bytesID);
+    this.v.toBytes(bytesV);
+    return {
+      bytesV: bytesV,
+      value: this.value,
+      ttl: this.ttl,
+      bytesID: bytesID,
+      sig: this.sig,
+    };
+  }
+
+  static fromSimplifiedCoin(simplifiedCoin) {
+    const {
+      bytesV, value, ttl, bytesID, sig
+    } = simplifiedCoin;
+
+    const v = ctx.ECP2.fromBytes(bytesV);
+    const ID = ctx.ECP.fromBytes(bytesID);
+    const recreatedCoin = new Coin(v, null, value, ttl, ID);
+    recreatedCoin.sig = sig;
+    return recreatedCoin;
+  }
+
   // that is sent to signing authority so they need encrypted id and secret
   prepareCoinForSigning(ElGamalPK = null, params = null, id = null, sk = null) {
     if (!this.enc_sk) {
