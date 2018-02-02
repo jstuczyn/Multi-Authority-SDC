@@ -1,7 +1,8 @@
 import fetch from 'isomorphic-fetch';
-import { ctx, DEBUG, issuer, PKs } from '../config';
+import { ctx, DEBUG, issuer, PKs, ISSUE_STATUS } from '../config';
 import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature } from './helpers';
 import ElGamal from '../../lib/ElGamal';
+import Coin from '../../lib/Coin';
 
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
@@ -13,7 +14,9 @@ export async function getCoin(sk, pk, value, server) {
   pk.toBytes(pkBytes);
   const secretProof = getProofOfSecret(sk, issuer);
   const simplifiedProof = getSimplifiedProof(secretProof);
-
+  let coin;
+  let coin_id;
+  let issuance_status;
   // generating of proof etc will happen here
   if (DEBUG) {
     console.log(`Calling ${server} to get a coin`);
@@ -34,14 +37,18 @@ export async function getCoin(sk, pk, value, server) {
         }),
       });
     response = await response.json();
-    console.log(response);
+    coin = Coin.fromSimplifiedCoin(response.coin);
+    coin_id = ctx.BIG.fromBytes(response.id);
+    issuance_status = response.status;
   } catch (err) {
     console.log(err);
     console.warn(`Call to ${server} was unsuccessful`);
   }
-
-  console.log(response);
-  return [null, null];
+  if (issuance_status === ISSUE_STATUS.success) {
+    return [coin, coin_id];
+  } else {
+    return [null, null];
+  }
 }
 
 export async function checkIfAlive(server) {

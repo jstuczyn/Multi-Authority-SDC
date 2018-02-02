@@ -83,7 +83,7 @@ export default class Coin {
 
   static fromSimplifiedCoin(simplifiedCoin) {
     const {
-      bytesV, value, ttl, bytesID, sig
+      bytesV, value, ttl, bytesID, sig,
     } = simplifiedCoin;
 
     const v = ctx.ECP2.fromBytes(bytesV);
@@ -137,12 +137,13 @@ export default class Coin {
       bytesID: this.bytesID,
       enc_sk_bytes: this.enc_sk_bytes,
       enc_id_bytes: this.enc_id_bytes,
+      sig: this.sig,
     };
   }
 
   static fromSigningCoin(signingCoin) {
     const {
-      bytesV, value, ttl, bytesID, enc_sk_bytes, enc_id_bytes,
+      bytesV, value, ttl, bytesID, enc_sk_bytes, enc_id_bytes, sig,
     } = signingCoin;
 
     const v = ctx.ECP2.fromBytes(bytesV);
@@ -157,6 +158,7 @@ export default class Coin {
     const coin = new Coin(v, null, value, ttl, ID);
     coin.enc_sk = [sk_a, sk_b];
     coin.enc_id = [id_a, id_b];
+    coin.sig = sig;
 
     return coin;
   }

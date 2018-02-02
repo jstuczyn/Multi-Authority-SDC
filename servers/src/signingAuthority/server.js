@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import app from './app';
 import { hostname } from './config/appConfig';
 import { setupCoinSigKeys } from './config/CoinSigSetup';

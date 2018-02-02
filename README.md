@@ -11,14 +11,14 @@
 
 ### Diagram Steps Status:
 - 1.1 coinKeygen() - completed
-- 1.2 getCoin() - not completed
-- 1.3 checkBalance() - not completed
-- 1.4 generateid() - semi-completed
-- 1.5 generateAndSignCoin() - semi-completed
-- 1.6 return of 1.2. - not completed
+- 1.2 getCoin() - completed
+- 1.3 checkBalance() - completed
+- 1.4 generateid() - completed
+- 1.5 generateAndSignCoin() - completed
+- 1.6 return of 1.2. - completed
 
 - 2.1 getSignatures() - completed
-- 2.2 verifySignature() - not completed
+- 2.2 verifySignature() - completed
 - 2.3 signCoin() - completed
 
 - 3 aggregateAndRandomizeSignatures() - completed

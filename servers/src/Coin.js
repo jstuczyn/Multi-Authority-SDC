@@ -83,7 +83,7 @@ export default class Coin {
 
   static fromSimplifiedCoin(simplifiedCoin) {
     const {
-      bytesV, value, ttl, bytesID, sig
+      bytesV, value, ttl, bytesID, sig,
     } = simplifiedCoin;
 
     const v = ctx.ECP2.fromBytes(bytesV);
@@ -97,13 +97,12 @@ export default class Coin {
   prepareCoinForSigning(ElGamalPK = null, params = null, id = null, sk = null) {
     if (!this.enc_sk) {
       const h = hashToPointOnCurve(this.value.toString() +
-                                   this.ttl.toString() +
-                                   this.v.toString() +
-                                   this.ID.toString());
+        this.ttl.toString() +
+        this.v.toString() +
+        this.ID.toString());
 
       const [a1, b1, k1] = ElGamal.encrypt(params, ElGamalPK, sk, h);
       const [a2, b2, k2] = ElGamal.encrypt(params, ElGamalPK, id, h);
-
       this.enc_sk = [a1, b1];
       this.enc_id = [a2, b2];
     }
@@ -138,12 +137,13 @@ export default class Coin {
       bytesID: this.bytesID,
       enc_sk_bytes: this.enc_sk_bytes,
       enc_id_bytes: this.enc_id_bytes,
+      sig: this.sig,
     };
   }
 
   static fromSigningCoin(signingCoin) {
     const {
-      bytesV, value, ttl, bytesID, enc_sk_bytes, enc_id_bytes,
+      bytesV, value, ttl, bytesID, enc_sk_bytes, enc_id_bytes, sig,
     } = signingCoin;
 
     const v = ctx.ECP2.fromBytes(bytesV);
@@ -158,6 +158,7 @@ export default class Coin {
     const coin = new Coin(v, null, value, ttl, ID);
     coin.enc_sk = [sk_a, sk_b];
     coin.enc_id = [id_a, id_b];
+    coin.sig = sig;
 
     return coin;
   }
