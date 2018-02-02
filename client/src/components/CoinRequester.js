@@ -8,7 +8,7 @@ class CoinRequester extends React.Component {
     super(props);
     this.state = {
       value: 0,
-      isProcessing: false, // unused at the moment
+      isRequesting: false,
     };
   }
 
@@ -16,8 +16,10 @@ class CoinRequester extends React.Component {
     this.setState({ value });
   };
 
-  handleSubmit = (event) => {
-    this.props.handleCoinSubmit(this.state.value);
+  handleSubmit = async (event) => {
+    this.setState({ isRequesting: true });
+    await this.props.handleCoinSubmit(this.state.value);
+    this.setState({ isRequesting: false });
   };
 
   render() {
@@ -25,6 +27,7 @@ class CoinRequester extends React.Component {
       <ValueInput onInputChange={this.handleInputChange}>
         <SubmitButton
           onSubmit={this.handleSubmit}
+          isLoading={this.state.isRequesting}
           isDisabled={this.state.value <= 0}
         />
       </ValueInput>

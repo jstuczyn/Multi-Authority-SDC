@@ -49,7 +49,7 @@ class MainView extends React.Component {
           as="h2"
           color="teal"
           textAlign="center"
-          content="Generate a coin (locally by a client)"
+          content="Generate a coin (by separate issuer entity)"
         />
         <Grid>
           <Grid.Row centered={true}>

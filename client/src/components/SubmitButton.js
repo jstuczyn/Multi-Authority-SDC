@@ -10,11 +10,13 @@ const SubmitButton = props => (
     icon="dollar"
     content="Get Coin"
     onClick={props.onSubmit}
+    loading={props.isLoading}
   />
 );
 
 SubmitButton.propTypes = {
   isDisabled: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 
