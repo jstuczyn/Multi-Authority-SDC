@@ -23,7 +23,15 @@ export const changeBalance = async (user, value) => {
 };
 
 export const insertUsedId = async (id) => {
+  const id_str = id.toString();
+  await pool.query('\
+  INSERT INTO public."tblUsedIds"\
+  ("Id")\
+  VALUES ($1)', [id_str]);
 
+  if (DEBUG) {
+    console.log(`Inserted ${id_str} to UsedIds`);
+  }
 };
 
 export const insertGeneratedId = async (id) => {
@@ -38,6 +46,7 @@ export const insertGeneratedId = async (id) => {
   }
 };
 
+// todo: modify to return a bool
 export const checkGeneratedId = async (id) => {
   const res = await pool.query('\
   SELECT (1)\
@@ -52,3 +61,16 @@ export const checkGeneratedId = async (id) => {
   return wasGenerated;
 };
 
+export const checkUsedId = async (id) => {
+  const res = await pool.query('\
+  SELECT (1)\
+  FROM public."tblUsedIds"\
+  WHERE "Id" = $1', [id]);
+
+  const wasUsed = res.rows.length;
+  if (DEBUG) {
+    console.log(`Checked if coin id ${id} was already used and result was: ${wasUsed}`);
+  }
+
+  return (wasUsed !== 0);
+};

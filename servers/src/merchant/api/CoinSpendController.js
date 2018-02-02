@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import fetch from 'isomorphic-fetch';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
-import { ctx, params, signingServers, merchant } from '../../config'; // todo: import own address or check it in runtime?
+import { ctx, params, signingServers, merchant, issuer } from '../../config'; // todo: import own address or check it in runtime?
 import { DEBUG } from '../config/appConfig';
 import { fromSimplifiedProof } from '../../auxiliary';
 
@@ -61,6 +61,31 @@ const getCoinAttributesFromBytes = (coinBytes) => {
   };
 };
 
+const checkDoubleSpend = async (id, server) => {
+  const id_bytes = [];
+  id.toBytes(id_bytes);
+  try {
+    let response = await
+      fetch(`http://${server}/checkid`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id_bytes,
+        }),
+      });
+    response = await response.json();
+    const wasUsed = response.wasIdUsed;
+    return wasUsed;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+    return true; // if call was unsuccessful assume coin was already spent
+  }
+};
+
 router.post('/', async (req, res) => {
   if (DEBUG) {
     console.log('spend post');
@@ -93,7 +118,8 @@ router.post('/', async (req, res) => {
       if (DEBUG) {
         console.log('Proof was invalid, no further checks will be made.');
       }
-      res.status(200).json({ success: false });
+      res.status(200)
+        .json({ success: false });
       return;
     }
 
@@ -112,8 +138,14 @@ router.post('/', async (req, res) => {
       console.log(`Was signature valid: ${isSignatureValid}`);
     }
 
+    // now finally check if the coin wasn't already spent
+    const wasCoinAlreadySpent = await checkDoubleSpend(id, issuer);
+    if (DEBUG) {
+      console.log(`Was coin already spent: ${wasCoinAlreadySpent}`);
+    }
+
     responseStatus = 200;
-    success = isProofValid && isSignatureValid && isIDValid;
+    success = isProofValid && isSignatureValid && isIDValid && !wasCoinAlreadySpent;
     if (DEBUG) {
       console.log(`Was coin successfully spent: ${success}`);
     }
@@ -121,7 +153,8 @@ router.post('/', async (req, res) => {
     console.warn(err);
     responseStatus = 400;
   }
-  res.status(responseStatus).json({ success: success });
+  res.status(responseStatus)
+    .json({ success: success });
 });
 
 export default router;
