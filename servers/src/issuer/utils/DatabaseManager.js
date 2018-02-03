@@ -18,7 +18,18 @@ export const getBalance = async (user, address) => {
   return res.rows[0].Balance;
 };
 
-export const changeBalance = async (user, value) => {
+// if given user does not exist, it creates him and sets his balance to the value
+export const changeBalance = async (user, address, value) => {
+  await pool.query('\
+  INSERT INTO public."tblClients" ("Name", "Address", "Balance")\
+    VALUES ($1, $2, $3)\
+    ON CONFLICT \
+    ON CONSTRAINT "tblClients_pkey"\
+    DO UPDATE SET "Balance" = public."tblClients"."Balance" + $3', [user, address, value]);
+
+  if (DEBUG) {
+    console.log(`Updated balance of ${user} by ${value}`);
+  }
 
 };
 
