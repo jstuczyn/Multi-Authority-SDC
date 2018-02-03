@@ -73,58 +73,16 @@ export const fromSimplifiedProof = (simplifiedProof) => {
   return [W, cm, r];
 };
 
-// taken directly from ecdh.js, only modified creation of WP from W
-export const ECPVP_DSA_2 = (sha, W, F, C, D) => {
-  var B = [],
-    res = 0,
-    r, gx, gy, f, c, d, h2,
-    G, WP, P;
+export const getCoinAttributesFromBytes = (coinBytes) => {
+  const {
+    bytesV, bytesID, value, ttl, sig,
+  } = coinBytes;
 
-  B = ctx.ECDH.hashit(sha, F, 0, null, ctx.BIG.MODBYTES);
-
-  gx = new ctx.BIG(0);
-  gx.rcopy(ctx.ROM_CURVE.CURVE_Gx);
-  gy = new ctx.BIG(0);
-  gy.rcopy(ctx.ROM_CURVE.CURVE_Gy);
-
-  G = new ctx.ECP(0);
-  G.setxy(gx, gy);
-  r = new ctx.BIG(0);
-  r.rcopy(ctx.ROM_CURVE.CURVE_Order);
-
-  c = ctx.BIG.fromBytes(C);
-  d = ctx.BIG.fromBytes(D);
-  f = ctx.BIG.fromBytes(B);
-
-  if (c.iszilch() || ctx.BIG.comp(c, r) >= 0 || d.iszilch() || ctx.BIG.comp(d, r) >= 0) {
-    res = ctx.ECDH.INVALID;
-  }
-
-  if (res === 0) {
-    d.invmodp(r);
-    f = ctx.BIG.modmul(f, d, r);
-    h2 = ctx.BIG.modmul(c, d, r);
-
-    WP = ctx.ECP.fromBytes(W);
-
-    if (WP.is_infinity()) {
-      res = ctx.ECDH.ERROR;
-    } else {
-      P = new ctx.ECP();
-      P.copy(WP);
-      P = P.mul2(h2, G, f);
-
-      if (P.is_infinity()) {
-        res = ctx.ECDH.INVALID;
-      } else {
-        d = P.getX();
-        d.mod(r);
-        if (ctx.BIG.comp(d, c) !== 0) {
-          res = ctx.ECDH.INVALID;
-        }
-      }
-    }
-  }
-
-  return res;
-}
+  return {
+    v: ctx.ECP2.fromBytes(bytesV),
+    ID: ctx.ECP.fromBytes(bytesID),
+    value: value,
+    ttl: ttl,
+    sig: sig,
+  };
+};

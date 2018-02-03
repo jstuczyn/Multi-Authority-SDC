@@ -152,6 +152,7 @@ export async function spendCoin(coin, proof, signature, pkX, id, server) {
     bytesID: coin.bytesID,
     value: coin.value,
     ttl: coin.ttl,
+    sig: coin.sig,
   };
   const simplifiedProof = getSimplifiedProof(proof);
   const simplifiedSignature = getSimplifiedSignature(signature);

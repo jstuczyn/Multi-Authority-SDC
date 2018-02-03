@@ -3,6 +3,7 @@ import PublicKeyController from './api/PublicKeyController';
 import ServerStatusController from './api/ServerStatusController';
 import CoinIssuanceController from './api/CoinIssuanceController';
 import UsedIdController from './api/UsedIdController';
+import DepositCoinController from './api/DepositCoinController';
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use('/pk', PublicKeyController);
 app.use('/status', ServerStatusController);
 app.use('/getcoin', CoinIssuanceController);
 app.use('/checkid', UsedIdController);
+app.use('/depositcoin', DepositCoinController);
 
 export default app;

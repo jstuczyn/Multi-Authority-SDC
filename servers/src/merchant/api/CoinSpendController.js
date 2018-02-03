@@ -5,7 +5,8 @@ import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
 import { ctx, params, signingServers, merchant, issuer } from '../../config'; // todo: import own address or check it in runtime?
 import { DEBUG } from '../config/appConfig';
-import { fromSimplifiedProof } from '../../auxiliary';
+import { fromSimplifiedProof, getCoinAttributesFromBytes } from '../../auxiliary';
+import { issuer_address } from '../../signingAuthority/config/constants';
 
 const router = express.Router();
 
@@ -48,18 +49,7 @@ const getPublicKeys = async (serversArg) => {
   return publicKeys;
 };
 
-const getCoinAttributesFromBytes = (coinBytes) => {
-  const {
-    bytesV, bytesID, value, ttl,
-  } = coinBytes;
 
-  return {
-    v: ctx.ECP2.fromBytes(bytesV),
-    ID: ctx.ECP.fromBytes(bytesID),
-    value: value,
-    ttl: ttl,
-  };
-};
 
 const checkDoubleSpend = async (id, server) => {
   const id_bytes = [];
@@ -86,9 +76,40 @@ const checkDoubleSpend = async (id, server) => {
   }
 };
 
+const depositCoin = async (coin, proofOfSecret, coin_id, server, client_name, client_address) => {
+  try {
+    let response = await
+      fetch(`http://${server}/depositcoin`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          coin: coin,
+          proof: proofOfSecret,
+          id: coin_id,
+          client_name: client_name,
+          client_address: client_address,
+          name: 'Merchant',
+        }),
+      });
+    response = await response.json();
+    const success = response.success;
+    return success;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+    return false; // if call was unsuccessful assume deposit failed
+  }
+};
+
 router.post('/', async (req, res) => {
+  const client_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const client_name = 'Client';
+
   if (DEBUG) {
-    console.log('spend post');
+    console.log('spend post from ', client_address);
   }
   let responseStatus = -1;
   let success = false;
@@ -144,8 +165,11 @@ router.post('/', async (req, res) => {
       console.log(`Was coin already spent: ${wasCoinAlreadySpent}`);
     }
 
+    // we don't need to create byte representations of all objects because we already have them
+    const wasCoinDeposited = await depositCoin(simplifiedCoin, simplifiedProof, idBytes, issuer_address, client_name, client_address);
+
     responseStatus = 200;
-    success = isProofValid && isSignatureValid && isIDValid && !wasCoinAlreadySpent;
+    success = isProofValid && isSignatureValid && isIDValid && !wasCoinAlreadySpent && wasCoinDeposited;
     if (DEBUG) {
       console.log(`Was coin successfully spent: ${success}`);
     }
