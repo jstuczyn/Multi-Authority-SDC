@@ -8,6 +8,8 @@
 
 ### Current Client Interface:
 ![Interface](https://i.imgur.com/KEfSzmX.png)
+(does not include depositCoin() which I forgot to incldue)
+
 
 ### Diagram Steps Status:
 - 1.1 coinKeygen() - completed
@@ -24,9 +26,9 @@
 - 3 aggregateAndRandomizeSignatures() - completed
 
 - 4.1 spendCoin() - completed
-- 4.2 checkDoubleSpend() - not completed
+- 4.2 checkDoubleSpend() - completed
 - 4.3 verifySignatureAndProof() - completed
-- 4.4 DepositCoin() - not completed
+- 4.4 depositCoin() - completed
 
 
 ### Running the system:
