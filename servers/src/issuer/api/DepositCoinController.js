@@ -25,8 +25,6 @@ router.post('/', async (req, res) => {
   const simplifiedProof = req.body.proof;
   const idBytes = req.body.id;
 
-  const client_name = req.body.client_name;
-  const client_address = req.body.client_address;
   const merchant_name = req.body.name;
   const merchant_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -74,7 +72,6 @@ router.post('/', async (req, res) => {
 
   if (isProofValid && isIDValid && isSignatureValid && !wasCoinAlreadySpent) {
     await insertUsedId(id);
-    await changeBalance(client_name, client_address, -coinAttributes.value);
     await changeBalance(merchant_name, merchant_address, coinAttributes.value);
   }
 
