@@ -1,5 +1,5 @@
 import Coin from '../../lib/Coin';
-import { params } from '../config'; // todo: should I create separate params instead? (those are associated with CoinSig)
+import { ctx, params } from '../config'; // todo: should I create separate params instead? (those are associated with CoinSig)
 
 export const getProofOfSecret = (sk, verifier) => (Coin.prepareProofOfSecret(params, sk, verifier));
 
@@ -23,4 +23,9 @@ export const getSimplifiedSignature = (signature) => {
   h.toBytes(hBytes);
 
   return [hBytes, sigBytes];
+};
+
+export const getRandomNumber = () => {
+  const [G, o, g1, g2, e] = params;
+  return ctx.BIG.randomnum(o, G.rngGen);
 };

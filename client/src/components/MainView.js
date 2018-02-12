@@ -52,10 +52,17 @@ class MainView extends React.Component {
   }
 
   handleCoinSubmit = async (value) => {
-    const [sk, pk] = Coin.keygen(params);
-    const [coin, id] = await getCoin(sk, pk, value, issuer);
+    const [sk_coin, pk_coin] = Coin.keygen(params);
+    const [coin, id] = await getCoin(
+      sk_coin,
+      pk_coin,
+      value,
+      this.state.pk_client,
+      this.state.sk_client,
+      issuer,
+    );
     this.setState(prevState => ({
-      coins: prevState.coins.concat([{ sk, id, coin }]),
+      coins: prevState.coins.concat([{ sk_coin, id, coin }]),
     }));
   };
 

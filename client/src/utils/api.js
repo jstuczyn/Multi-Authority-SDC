@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
-import { ctx, DEBUG, issuer, PKs, ISSUE_STATUS } from '../config';
-import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature } from './helpers';
+import { ctx, DEBUG, issuer, PKs, ISSUE_STATUS, params } from '../config';
+import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature, getRandomNumber } from './helpers';
 import ElGamal from '../../lib/ElGamal';
 import Coin from '../../lib/Coin';
 
@@ -9,15 +9,44 @@ export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
 
-export async function getCoin(sk, pk, value, server) {
-  const pkBytes = [];
-  pk.toBytes(pkBytes);
-  const secretProof = getProofOfSecret(sk, issuer);
+export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, server) {
+  const [G, o, g1, g2, e] = params;
+
+  const coin_id = getRandomNumber();
+  const coin_id_bytes = [];
+  coin_id.toBytes(coin_id_bytes); // don't send it to issuer, unless we generate it together
+
+  const pk_coin_bytes = [];
+  pk_coin.toBytes(pk_coin_bytes);
+  const secretProof = getProofOfSecret(sk_coin, issuer);
   const simplifiedProof = getSimplifiedProof(secretProof);
+
+  const [bytesW, bytesCm, bytesR] = simplifiedProof; // expand to include in our signature
+
+  // we just need to have same representation of both the string on both ends
+  // so for bytes representations, just add up the bytes (it is quicker than concating all elements)
+  const reducer = (acc, cur) => acc + cur;
+
+  const requestStr =
+    pk_client.reduce(reducer) + // client's key
+    value.toString() + // coin's value
+    pk_coin_bytes.reduce(reducer) + // coin's pk
+    bytesW.reduce(reducer) + // part of proof of coin's secret
+    bytesCm.reduce(reducer) + // part of proof of coin's secret
+    bytesR.reduce(reducer); // part of proof of coin's secret
+
+  const sha = ctx.ECDH.HASH_TYPE;
+
+  const C = [];
+  const D = [];
+
+  // to 'authorise' the request
+  ctx.ECDH.ECPSP_DSA(sha, G.rngGen, pk_client, requestStr, C, D);
+  const requestSig = [C, D];
+
   let coin;
-  let coin_id;
   let issuance_status;
-  // generating of proof etc will happen here
+
   if (DEBUG) {
     console.log(`Calling ${server} to get a coin`);
   }
@@ -30,15 +59,15 @@ export async function getCoin(sk, pk, value, server) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          pk: pkBytes,
+          pk_coin: pk_coin_bytes,
           proof: simplifiedProof,
           value: value,
-          user: 'Client', // temp, replace with some simple auth system?
+          pk_client: pk_client,
+          requestSig: requestSig,
         }),
       });
     response = await response.json();
     coin = Coin.fromSimplifiedCoin(response.coin);
-    coin_id = ctx.BIG.fromBytes(response.id);
     issuance_status = response.status;
   } catch (err) {
     console.log(err);
@@ -47,6 +76,7 @@ export async function getCoin(sk, pk, value, server) {
   if (issuance_status === ISSUE_STATUS.success) {
     return [coin, coin_id];
   } else {
+    console.log(issuance_status);
     return [null, null];
   }
 }
