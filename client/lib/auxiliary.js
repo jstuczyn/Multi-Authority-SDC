@@ -45,3 +45,45 @@ export const hashToPointOnCurve = (m) => {
 export const hashG2ElemToBIG = (G2elem) => {
   return this.hashToBIG(G2elem.toString());
 };
+
+export const prepareProofOfSecret = (params, x, verifierStr) => {
+  const [G, o, g1, g2, e] = params;
+  const w = ctx.BIG.randomnum(G.order, G.rngGen);
+  const W = ctx.PAIR.G2mul(g2, w);
+  const cm = hashToBIG(W.toString() + verifierStr);
+
+  // to prevent object mutation
+  const x_cpy = new ctx.BIG(x);
+  const cm_cpy = new ctx.BIG(cm);
+  x_cpy.mod(o);
+  cm_cpy.mod(o);
+
+  const t1 = ctx.BIG.mul(x_cpy, cm_cpy); // produces DBIG
+  const t2 = t1.mod(o); // but this gives BIG back
+
+  w.mod(o);
+  const r = new ctx.BIG(w);
+
+  r.copy(w);
+  r.sub(t2);
+  r.add(o); // to ensure positive result
+  r.mod(o);
+
+  return [W, cm, r]; // G2Elem, BIG, BIG
+};
+
+export const verifyProofOfSecret = (params, pub, proof, verifierStr) => {
+  const [G, o, g1, g2, e] = params;
+  const [W, cm, r] = proof;
+
+  const t1 = ctx.PAIR.G2mul(g2, r);
+  const t2 = ctx.PAIR.G2mul(pub, cm);
+
+  t1.add(t2);
+  t1.affine();
+
+  const expr1 = t1.equals(W);
+  const expr2 = ctx.BIG.comp(cm, hashToBIG(W.toString() + verifierStr)) === 0;
+
+  return expr1 && expr2;
+};
