@@ -165,7 +165,13 @@ class CoinDisplayer extends React.Component {
 }
 
 CoinDisplayer.propTypes = {
-  coin: PropTypes.instanceOf(Coin).isRequired,
+  coin: PropTypes.shape({
+    pk_coin_bytes: PropTypes.arrayOf(PropTypes.number),
+    ttl: PropTypes.number,
+    value: PropTypes.number,
+    pk_client_bytes: PropTypes.arrayOf(PropTypes.number),
+    issuedCoinSig: PropTypes.array,
+  }).isRequired,
   sk: PropTypes.shape({
     w: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,

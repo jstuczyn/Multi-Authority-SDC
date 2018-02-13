@@ -65,15 +65,6 @@ export const getCoin = (pk, value) => {
 };
 
 // todo: remove once new class is written
-export const fromSimplifiedProof = (simplifiedProof) => {
-  const [bytesW, bytesCm, bytesR] = simplifiedProof;
-  const W = ctx.ECP2.fromBytes(bytesW);
-  const cm = ctx.BIG.fromBytes(bytesCm);
-  const r = ctx.BIG.fromBytes(bytesR);
-  return [W, cm, r];
-};
-
-// todo: remove once new class is written
 export const getCoinAttributesFromBytes = (coinBytes) => {
   const {
     bytesV, bytesID, value, ttl, sig,

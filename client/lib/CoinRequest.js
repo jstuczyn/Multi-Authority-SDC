@@ -17,7 +17,7 @@ export const getCoinRequestObject = (
   sk_coin, // to generate proof of secret
   pk_coin, // part of the coin
   value, // part of the coin
-  pk_client, // part of the coin
+  pk_client_bytes, // part of the coin
   sk_client, // to sign the request
   issuingServer, // to include in the proof of secret, it just has to be some string
 ) => {
@@ -35,7 +35,7 @@ export const getCoinRequestObject = (
   const reducer = (acc, cur) => acc + cur;
 
   const requestStr =
-    pk_client.reduce(reducer) + // client's key
+    pk_client_bytes.reduce(reducer) + // client's key
     value.toString() + // coin's value
     pk_coin_bytes.reduce(reducer) + // coin's pk
     bytesW.reduce(reducer) + // part of proof of coin's secret
@@ -54,20 +54,20 @@ export const getCoinRequestObject = (
     pk_coin_bytes: pk_coin_bytes,
     proof_bytes: proof_bytes,
     value: value,
-    pk_client: pk_client,
+    pk_client_bytes: pk_client_bytes,
     requestSig: requestSig,
   };
 };
 
 export const verifyRequestSignature = (coin_request) => {
   const {
-    pk_client, value, pk_coin_bytes, simplifiedProof, signature,
+    pk_coin_bytes, proof_bytes, value, pk_client_bytes, requestSig,
   } = coin_request; // object destructuring
-  const [bytesW, bytesCm, bytesR] = simplifiedProof;
+  const [bytesW, bytesCm, bytesR] = proof_bytes;
   const reducer = (acc, cur) => acc + cur;
 
   const requestStr =
-    pk_client.reduce(reducer) + // client's key
+    pk_client_bytes.reduce(reducer) + // client's key
     value.toString() + // coin's value
     pk_coin_bytes.reduce(reducer) + // coin's pk
     bytesW.reduce(reducer) + // part of proof of coin's secret
@@ -75,9 +75,9 @@ export const verifyRequestSignature = (coin_request) => {
     bytesR.reduce(reducer); // part of proof of coin's secret
 
   const sha = ctx.ECDH.HASH_TYPE;
-  const [C, D] = signature;
+  const [C, D] = requestSig;
 
-  return ctx.ECDH.ECPVP_DSA(sha, pk_client, requestStr, C, D);
+  return ctx.ECDH.ECPVP_DSA(sha, pk_client_bytes, requestStr, C, D) === 0;
 };
 
 const fromBytesProof = (bytesProof) => {

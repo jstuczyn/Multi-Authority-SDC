@@ -3,6 +3,7 @@ import { DEBUG, pgConfig } from '../config/appConfig';
 
 const pool = new pg.Pool(pgConfig);
 
+// todo: update to use pk instead of name
 export const getBalance = async (user, address) => {
   const res = await pool.query('\
   SELECT "Balance" \

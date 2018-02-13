@@ -1,5 +1,4 @@
 import React from 'react';
-import { Header } from 'semantic-ui-react';
 import MainView from './MainView';
 import styles from './App.style';
 import TopMenu from './TopMenu';

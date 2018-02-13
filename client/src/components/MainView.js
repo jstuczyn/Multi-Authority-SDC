@@ -61,6 +61,9 @@ class MainView extends React.Component {
       this.state.sk_client,
       issuer,
     );
+
+    console.log(coin);
+
     this.setState(prevState => ({
       coins: prevState.coins.concat([{ sk_coin, id, coin }]),
     }));
