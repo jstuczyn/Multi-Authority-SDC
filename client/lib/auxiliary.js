@@ -46,10 +46,15 @@ export const hashG2ElemToBIG = (G2elem) => {
   return this.hashToBIG(G2elem.toString());
 };
 
-export const prepareProofOfSecret = (params, x, verifierStr) => {
+export const prepareProofOfSecret = (params, x, verifierStr, proofBase = null) => {
   const [G, o, g1, g2, e] = params;
   const w = ctx.BIG.randomnum(G.order, G.rngGen);
-  const W = ctx.PAIR.G2mul(g2, w);
+  let W;
+  if (!proofBase) {
+    W = ctx.PAIR.G2mul(g2, w);
+  } else {
+    W = ctx.PAIR.G2mul(proofBase, w);
+  }
   const cm = hashToBIG(W.toString() + verifierStr);
 
   // to prevent object mutation
@@ -72,11 +77,17 @@ export const prepareProofOfSecret = (params, x, verifierStr) => {
   return [W, cm, r]; // G2Elem, BIG, BIG
 };
 
-export const verifyProofOfSecret = (params, pub, proof, verifierStr) => {
+export const verifyProofOfSecret = (params, pub, proof, verifierStr, proofBase = null) => {
   const [G, o, g1, g2, e] = params;
   const [W, cm, r] = proof;
 
-  const t1 = ctx.PAIR.G2mul(g2, r);
+  let t1;
+  if (!proofBase) {
+    t1 = ctx.PAIR.G2mul(g2, r);
+  } else {
+    t1 = ctx.PAIR.G2mul(proofBase, r);
+  }
+
   const t2 = ctx.PAIR.G2mul(pub, cm);
 
   t1.add(t2);
