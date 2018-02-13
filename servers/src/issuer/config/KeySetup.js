@@ -1,4 +1,4 @@
-import { ctx, params } from '../../config';
+import { ctx, params } from '../../globalConfig';
 import { DEBUG } from './appConfig';
 
 export const sigKeys = {};

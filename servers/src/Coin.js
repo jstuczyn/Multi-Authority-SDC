@@ -1,4 +1,4 @@
-import { ctx } from './config';
+import { ctx } from './globalConfig';
 import ElGamal from './ElGamal';
 import { hashToPointOnCurve, hashToBIG } from './auxiliary';
 

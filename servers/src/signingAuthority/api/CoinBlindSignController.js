@@ -9,7 +9,7 @@ import { params, sk } from '../config/CoinSigSetup';
 import { DEBUG } from '../config/appConfig';
 import ElGamal from '../../ElGamal';
 import { issuer_address, PKs } from '../config/constants';
-import { ctx, issuer } from '../../config';
+import { ctx, issuer } from '../../globalConfig';
 import { verifySignRequest } from '../../SigningCoin';
 
 const router = express.Router();

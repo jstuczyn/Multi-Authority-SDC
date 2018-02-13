@@ -4,34 +4,44 @@ import { DEBUG, pgConfig } from '../config/appConfig';
 const pool = new pg.Pool(pgConfig);
 
 // todo: update to use pk instead of name
-export const getBalance = async (user, address) => {
-  const res = await pool.query('\
-  SELECT "Balance" \
-  FROM public."tblClients"\
-  WHERE "Name" = $1\
-  AND\
-  "Address" = $2', [user, address]);
+export const getBalance = async (pk_bytes) => {
+  // in order to 'guarantee' unique result, concat all values rather than add them as before:
+  let balance = -1;
+  try {
+    const str_pk_bytes = pk_bytes.join('');
+    const res = await pool.query('\
+      SELECT "Balance" \
+      FROM public."tblClients"\
+      WHERE "Public Key" = $1', [str_pk_bytes]);
 
-  if (DEBUG) {
-    console.log(`Queried balance for ${user} which is is ${res.rows[0].Balance}`);
+    if (DEBUG) {
+      console.log(`Queried balance for ${str_pk_bytes} which is is ${res.rows[0].Balance}`);
+    }
+
+    balance = res.rows[0].Balance;
+  } catch (err) {
+    if (DEBUG) {
+      console.log('Query for balance was unsuccessful');
+    }
   }
-
-  return res.rows[0].Balance;
+  return balance;
 };
 
 // if given user does not exist, it creates him and sets his balance to the value
-export const changeBalance = async (user, address, value) => {
+// TODO: update to use pk as getBalance
+export const changeBalance = async (pk_bytes, value) => {
+  const str_pk_bytes = pk_bytes.join('');
+
   await pool.query('\
-  INSERT INTO public."tblClients" ("Name", "Address", "Balance")\
-    VALUES ($1, $2, $3)\
+  INSERT INTO public."tblClients" ("Public Key", "Balance")\
+    VALUES ($1, $2)\
     ON CONFLICT \
     ON CONSTRAINT "tblClients_pkey"\
-    DO UPDATE SET "Balance" = public."tblClients"."Balance" + $3', [user, address, value]);
+    DO UPDATE SET "Balance" = public."tblClients"."Balance" + $2', [str_pk_bytes, value]);
 
   if (DEBUG) {
-    console.log(`Updated balance of ${user} by ${value}`);
+    console.log(`Updated balance of ${str_pk_bytes} by ${value}`);
   }
-
 };
 
 export const insertUsedId = async (id) => {
@@ -44,33 +54,6 @@ export const insertUsedId = async (id) => {
   if (DEBUG) {
     console.log(`Inserted ${id_str} to UsedIds`);
   }
-};
-
-export const insertGeneratedId = async (id) => {
-  const id_str = id.toString();
-  await pool.query('\
-  INSERT INTO public."tblGeneratedIds"\
-  ("Id")\
-  VALUES ($1)', [id_str]);
-
-  if (DEBUG) {
-    console.log(`Inserted ${id_str} to generatedIds`);
-  }
-};
-
-// todo: modify to return a bool
-export const checkGeneratedId = async (id) => {
-  const res = await pool.query('\
-  SELECT (1)\
-  FROM public."tblGeneratedIds"\
-  WHERE "Id" = $1', [id]);
-
-  const wasGenerated = res.rows.length;
-  if (DEBUG) {
-    console.log(`Checked if coin id ${id} was already generated and result was: ${wasGenerated}`);
-  }
-
-  return wasGenerated;
 };
 
 export const checkUsedId = async (id) => {

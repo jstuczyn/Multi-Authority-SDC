@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import fetch from 'isomorphic-fetch';
 import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
-import { ctx, params, signingServers, merchant, issuer } from '../../config'; // todo: import own address or check it in runtime?
+import { ctx, params, signingServers, merchant, issuer } from '../../globalConfig'; // todo: import own address or check it in runtime?
 import { DEBUG } from '../config/appConfig';
 import { fromBytesProof, verifyProofOfSecret } from '../../auxiliary';
 import { issuer_address } from '../../signingAuthority/config/constants';

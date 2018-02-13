@@ -2,32 +2,30 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { getBalance, changeBalance } from '../utils/DatabaseManager';
 import { DEBUG } from '../config/appConfig';
-import { issuer } from '../../config';
+import { issuer } from '../../globalConfig';
 import { ISSUE_STATUS } from '../config/constants';
 import { sig_skBytes } from '../config/KeySetup';
 import { verifyRequestSignature, verifyRequestProofOfCoinSecret } from '../../CoinRequest';
 import { getIssuedCoin } from '../../IssuedCoin';
 
+
 const router = express.Router();
-
-// todo: in updating balance and querying db, use pk rather than name 'client'
-
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
-
+// don't cache client's pk as he sends it every request
+// and in principle there can be an arbitrary number of clients
 router.post('/', async (req, res) => {
   if (DEBUG) {
     console.log('POST Call to getcoin');
   }
-  const sourceIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const sourceIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress; // just for purpose of debugging
   if (DEBUG) {
     console.log('Request came from', sourceIp);
   }
 
   const coin_request = req.body.coin_request;
-
 
   // start by verifying whether request is legit:
   const isSignatureValid = verifyRequestSignature(coin_request);
@@ -43,9 +41,16 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  const balance = await getBalance('Client', sourceIp); // todo: update to use pk instead
+  let balance = await getBalance(coin_request.pk_client_bytes);
+
   if (DEBUG) {
     console.log('Balance of callee is', balance);
+    // this will only happen in debug mode to make it easier to test the system
+    const cheat_balance = 1000.00;
+    if (balance === -1) {
+      await changeBalance(coin_request.pk_client_bytes, cheat_balance);
+      balance = cheat_balance;
+    }
   }
 
   if (balance < coin_request.value) {
@@ -60,7 +65,11 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  const isProofValid = verifyRequestProofOfCoinSecret(coin_request.proof_bytes, coin_request.pk_coin_bytes, issuer);
+  const isProofValid = verifyRequestProofOfCoinSecret(
+    coin_request.proof_bytes,
+    coin_request.pk_coin_bytes,
+    issuer, // todo: also replace with pk
+  );
 
   if (!isProofValid) {
     if (DEBUG) {
@@ -75,11 +84,14 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  const issuedCoin = getIssuedCoin(coin_request.pk_coin_bytes, coin_request.value, coin_request.pk_client_bytes, sig_skBytes);
+  const issuedCoin = getIssuedCoin(
+    coin_request.pk_coin_bytes,
+    coin_request.value,
+    coin_request.pk_client_bytes,
+    sig_skBytes,
+  );
 
-  // todo: replace with PK
-  await changeBalance('Client', sourceIp, -coin_request.value);
-
+  await changeBalance(coin_request.pk_client_bytes, -coin_request.value);
 
   if (DEBUG) {
     console.log(ISSUE_STATUS.success);

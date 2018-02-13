@@ -2,7 +2,7 @@
 // to allow for larger number of signed messages
 
 import BpGroup from './BpGroup';
-import { ctx } from './config';
+import { ctx } from './globalConfig';
 import { hashToBIG, hashG2ElemToBIG, hashToPointOnCurve, hashMessage } from './auxiliary';
 import ElGamal from './ElGamal';
 

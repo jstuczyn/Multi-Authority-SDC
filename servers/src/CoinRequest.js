@@ -1,4 +1,4 @@
-import { ctx, params } from './config';
+import { ctx, params } from './globalConfig';
 import { prepareProofOfSecret, verifyProofOfSecret, fromBytesProof } from './auxiliary';
 
 const getBytesProof = (proof) => {

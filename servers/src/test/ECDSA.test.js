@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import { expect, assert } from 'chai';
 import { before, describe, it, xit } from 'mocha';
-import { ctx } from '../config';
+import { ctx } from '../globalConfig';
 
 describe('Reference ECDSA', () => {
   let rng;

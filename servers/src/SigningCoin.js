@@ -1,5 +1,5 @@
 import { hashToPointOnCurve } from './auxiliary';
-import { ctx, params } from './config';
+import { ctx, params } from './globalConfig';
 import ElGamal from './ElGamal';
 import { issuer_address, PKs } from './signingAuthority/config/constants';
 import { DEBUG } from './signingAuthority/config/appConfig';

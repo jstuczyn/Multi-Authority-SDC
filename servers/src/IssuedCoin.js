@@ -1,4 +1,4 @@
-import { ctx, params } from './config';
+import { ctx, params } from './globalConfig';
 
 const MIN_TTL_H = 12;
 

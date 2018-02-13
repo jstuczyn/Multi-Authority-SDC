@@ -2,7 +2,7 @@
 
 import * as crypto from 'crypto';
 import Coin from './Coin';
-import { ctx } from './config';
+import { ctx } from './globalConfig';
 
 export const stringToBytes = (s) => {
   const b = [];

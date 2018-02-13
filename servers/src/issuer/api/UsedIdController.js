@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { checkUsedId } from '../utils/DatabaseManager';
-import { ctx } from '../../config';
+import { ctx } from '../../globalConfig';
 import { DEBUG } from '../config/appConfig';
 
 const router = express.Router();

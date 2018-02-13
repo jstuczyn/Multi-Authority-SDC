@@ -3,14 +3,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { checkUsedId, insertUsedId, changeBalance } from '../utils/DatabaseManager';
-import { ctx, merchant, params, signingServers } from '../../config';
+import { ctx, merchant, params, signingServers } from '../../globalConfig';
 import { DEBUG } from '../config/appConfig';
-import Coin from '../../Coin';
-import {
-  fromBytesProof, fromSimplifiedProof, getCoinAttributesFromBytes,
-  verifyProofOfSecret
-} from '../../auxiliary';
-import { sig_pkBytes } from '../config/KeySetup';
+import { fromBytesProof, verifyProofOfSecret } from '../../auxiliary';
 import CoinSig from '../../CoinSig';
 import fetch from 'isomorphic-fetch';
 
@@ -20,7 +15,6 @@ const router = express.Router();
 // TODO: CODE REPETITION, MOVE THEM ELSEWHERE
 const getPublicKey = async (server) => {
   const publicKey = [];
-
   try {
     let response = await fetch(`http://${server}/pk`);
     response = await response.json();
