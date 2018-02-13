@@ -10,40 +10,41 @@ import { DEBUG } from '../config/appConfig';
 import ElGamal from '../../ElGamal';
 import { issuer_address, PKs } from '../config/constants';
 import { ctx, issuer } from '../../config';
+import { verifySignRequest } from '../../SigningCoin';
 
 const router = express.Router();
 
 
-const getPublicKey = async (server) => {
-  try {
-    let response = await fetch(`http://${server}/pk`);
-    response = await response.json();
-    const pkBytes = response.pk;
-    // due to the way they implemeted ECDSA, we do not need to convert it
-    return pkBytes;
-  } catch (err) {
-    console.log(err);
-    console.warn(`Call to ${server} was unsuccessful`);
-    return null;
-  }
-};
-
-const verifyCoinSignature = async (coin) => {
-  if (PKs[issuer_address] == null) {
-    if (DEBUG) {
-      console.log('We do not know PK of the issuer, we need to ask it first.');
-      PKs[issuer_address] = await getPublicKey(issuer_address);
-      if (PKs[issuer_address] == null) {
-        return -1; // we can't verify sig hence sign the coin
-      }
-    }
-  }
-  const sha = ctx.ECDH.HASH_TYPE;
-  const [C, D] = coin.sig;
-
-  const coinStr = coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString();
-  return ctx.ECDH.ECPVP_DSA(sha, PKs[issuer_address], coinStr, C, D);
-};
+// const getPublicKey = async (server) => {
+//   try {
+//     let response = await fetch(`http://${server}/pk`);
+//     response = await response.json();
+//     const pkBytes = response.pk;
+//     // due to the way they implemeted ECDSA, we do not need to convert it
+//     return pkBytes;
+//   } catch (err) {
+//     console.log(err);
+//     console.warn(`Call to ${server} was unsuccessful`);
+//     return null;
+//   }
+// };
+//
+// const verifyCoinSignature = async (coin) => {
+//   if (PKs[issuer_address] == null) {
+//     if (DEBUG) {
+//       console.log('We do not know PK of the issuer, we need to ask it first.');
+//       PKs[issuer_address] = await getPublicKey(issuer_address);
+//       if (PKs[issuer_address] == null) {
+//         return -1; // we can't verify sig hence sign the coin
+//       }
+//     }
+//   }
+//   const sha = ctx.ECDH.HASH_TYPE;
+//   const [C, D] = coin.sig;
+//
+//   const coinStr = coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString();
+//   return ctx.ECDH.ECPVP_DSA(sha, PKs[issuer_address], coinStr, C, D);
+// };
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -57,21 +58,17 @@ router.post('/', async (req, res) => {
   try {
     const signingCoin = req.body.coin;
     const ElGamalPKBytes = req.body.ElGamalPKBytes;
-    // console.log(signingCoin);
-    const coin = Coin.fromSigningCoin(signingCoin);
 
-
-    // before we waste CPU on signing coin, first check if it wasn't tampered with (verify issuer sig)
-    const isSignatureValid = await verifyCoinSignature(coin);
-    if (isSignatureValid !== 0) {
+    // verifies signatures on entire request as well as coin itself (signed by issuer)
+    const isRequestLegit = await verifySignRequest(signingCoin);
+    if (!isRequestLegit) {
       throw new Error('Coin was tampered with.');
     }
 
-    console.log('is valid', isSignatureValid);
 
     const ElGamalPK = ElGamal.getPKFromBytes(params, ElGamalPKBytes);
 
-    const [h, enc_sig] = CoinSig.mixedSignCoin(params, sk, coin, ElGamalPK);
+    const [h, enc_sig] = CoinSig.mixedSignCoin(params, sk, signingCoin, ElGamalPK);
     const hBytes = [];
     const enc_sig_a_Bytes = [];
     const enc_sig_b_Bytes = [];

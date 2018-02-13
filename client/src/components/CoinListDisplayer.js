@@ -12,6 +12,7 @@ const CoinListDisplayer = props => (
         id={coin.id}
         ElGamalSK={props.ElGamalSK}
         ElGamalPK={props.ElGamalPK}
+        sk_client={props.sk_client}
       />
     ))}
   </div>
@@ -21,6 +22,7 @@ CoinListDisplayer.propTypes = {
   coins: PropTypes.array.isRequired,
   ElGamalSK: PropTypes.object.isRequired,
   ElGamalPK: PropTypes.object.isRequired,
+  sk_client: PropTypes.array.isRequired,
 };
 
 export default CoinListDisplayer;

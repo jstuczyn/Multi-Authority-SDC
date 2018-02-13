@@ -14,6 +14,8 @@ class MainView extends React.Component {
       coins: [],
       ElGamalSK: null,
       ElGamalPK: null,
+      sk_client: null,
+      pk_client: null,
     };
   }
 
@@ -88,6 +90,7 @@ class MainView extends React.Component {
               coins={this.state.coins}
               ElGamalSK={this.state.ElGamalSK}
               ElGamalPK={this.state.ElGamalPK}
+              sk_client={this.state.sk_client} // will be required to sign requests to SAs
             />
           </Grid.Row>
         </Grid>

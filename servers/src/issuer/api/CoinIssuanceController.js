@@ -4,9 +4,9 @@ import { getBalance, changeBalance } from '../utils/DatabaseManager';
 import { DEBUG } from '../config/appConfig';
 import { issuer } from '../../config';
 import { ISSUE_STATUS } from '../config/constants';
-import { sig_pkBytes, sig_skBytes } from '../config/KeySetup';
+import { sig_skBytes } from '../config/KeySetup';
 import { verifyRequestSignature, verifyRequestProofOfCoinSecret } from '../../CoinRequest';
-import { getIssuedCoin, verifyCoinSignature } from '../../IssuedCoin';
+import { getIssuedCoin } from '../../IssuedCoin';
 
 const router = express.Router();
 
@@ -76,10 +76,6 @@ router.post('/', async (req, res) => {
   }
 
   const issuedCoin = getIssuedCoin(coin_request.pk_coin_bytes, coin_request.value, coin_request.pk_client_bytes, sig_skBytes);
-
-  const localver = verifyCoinSignature(issuedCoin, sig_pkBytes);
-
-  console.log('local sig ver:', localver);
 
   // todo: replace with PK
   await changeBalance('Client', sourceIp, -coin_request.value);

@@ -2,7 +2,6 @@ import fetch from 'isomorphic-fetch';
 import { ctx, DEBUG, PKs, ISSUE_STATUS, params } from '../config';
 import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature, getRandomNumber } from './helpers';
 import ElGamal from '../../lib/ElGamal';
-import Coin from '../../lib/Coin';
 import { getCoinRequestObject } from '../../lib/CoinRequest';
 
 // auxiliary, mostly for testing purposes to simulate delays
@@ -95,15 +94,14 @@ export async function getPublicKey(server) {
   return publicKey;
 }
 
-export async function signCoin(server, coin, ElGamalPK, params = null, id = null, sk = null) {
-  const signingCoin = coin.prepareCoinForSigning(ElGamalPK, params, id, sk);
+// todo: now
+export async function signCoin(server, signingCoin, ElGamalPK) {
   let signature = null;
   if (DEBUG) {
     console.log('Compressed coin to sign: ', signingCoin);
   }
 
-  // this would actually be needed for spending coin (to produce X3^x),
-  // but if done here, we could verify if server is running, todo: actually do it
+  // this should have already been done when getting server status
   if (PKs[server] == null) {
     if (DEBUG) {
       console.log(`${server} wasn't queried before. We need to get its PK first.`);
@@ -136,6 +134,7 @@ export async function signCoin(server, coin, ElGamalPK, params = null, id = null
     // since the call was successful, recreate the objects from bytes representations
     const [hBytes, [enc_sig_a_Bytes, enc_sig_b_Bytes]] = response.signature;
 
+    // we need to recreate those from bytes representations to aggregate them
     const h = ctx.ECP.fromBytes(hBytes);
     const enc_sig_a = ctx.ECP.fromBytes(enc_sig_a_Bytes);
     const enc_sig_b = ctx.ECP.fromBytes(enc_sig_b_Bytes);

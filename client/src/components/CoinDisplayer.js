@@ -4,11 +4,11 @@ import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
 import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG, PKs } from '../config';
-import Coin from '../../lib/Coin';
 import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
 import { getProofOfSecret } from '../utils/helpers';
 import ElGamal from '../../lib/ElGamal';
+import { getSigningCoin } from '../../lib/SigningCoin';
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -28,15 +28,17 @@ class CoinDisplayer extends React.Component {
     clearInterval(this.timer);
   }
 
-  // todo: put all elgamal stuff here
   getSignatures = async (serversArg) => {
+    const signingCoin =
+      getSigningCoin(this.props.coin, this.props.ElGamalPK, this.props.id, this.props.sk, this.props.sk_client);
+
     const signatures = await Promise.all(serversArg.map(async (server) => {
       try {
         if (DEBUG) {
           console.log(`Sending request to ${server}...`);
         }
 
-        const [h, enc_sig] = await signCoin(server, this.props.coin, this.props.ElGamalPK, params, this.props.id, this.props.sk);
+        const [h, enc_sig] = await signCoin(server, signingCoin, this.props.ElGamalPK);
         const sig = ElGamal.decrypt(params, this.props.ElGamalSK, enc_sig);
 
         if (DEBUG) {
@@ -128,6 +130,8 @@ class CoinDisplayer extends React.Component {
 
   handleCoinSpend = async () => {
     this.setState({ coinState: COIN_STATUS.spending });
+
+    // todo: remember to change proof to use pkX as base and dont send whole coin...
     const secretProof = getProofOfSecret(this.props.sk, merchant);
     const pkX = this.aggregate_pkX_component(PKs);
     if (DEBUG) {
@@ -180,6 +184,7 @@ CoinDisplayer.propTypes = {
   }).isRequired,
   ElGamalSK: PropTypes.object.isRequired,
   ElGamalPK: PropTypes.object.isRequired,
+  sk_client: PropTypes.array.isRequired,
 };
 
 export default CoinDisplayer;
