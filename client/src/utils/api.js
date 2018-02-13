@@ -147,23 +147,21 @@ export async function signCoin(server, signingCoin, ElGamalPK) {
   return signature;
 }
 
-// we need to send to the verifier coin(ID, v, ttl, value), id (we reveal it), proof of x, pkX and aggSig
+// ... we can't send v because it would link us to issuance, we just send value, ttl, id, proof of x (on aX3) and sig
+// pkX = aX3^x
 export async function spendCoin(coin, proof, signature, pkX, id, server) {
-
-  // due to being signed, coin already has bytesV and bytesID attributes
-  const simplifiedCoin = {
-    bytesV: coin.bytesV,
-    bytesID: coin.bytesID,
-    value: coin.value,
-    ttl: coin.ttl,
-    sig: coin.sig,
-  };
   const simplifiedProof = getSimplifiedProof(proof);
   const simplifiedSignature = getSimplifiedSignature(signature);
   const pkXBytes = [];
   const idBytes = [];
   pkX.toBytes(pkXBytes);
   id.toBytes(idBytes);
+
+  const coinAttributes = {
+    value: coin.value,
+    ttl: coin.ttl,
+    idBytes: idBytes,
+  };
 
   let success = false;
   try {
@@ -175,11 +173,10 @@ export async function spendCoin(coin, proof, signature, pkX, id, server) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          coin: simplifiedCoin,
+          coinAttributes: coinAttributes,
           proof: simplifiedProof,
           signature: simplifiedSignature,
           pkX: pkXBytes,
-          id: idBytes,
         }),
       });
     response = await response.json();

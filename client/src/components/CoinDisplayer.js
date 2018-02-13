@@ -9,6 +9,7 @@ import CoinSig from '../../lib/CoinSig';
 import { getProofOfSecret } from '../utils/helpers';
 import ElGamal from '../../lib/ElGamal';
 import { getSigningCoin } from '../../lib/SigningCoin';
+import { prepareProofOfSecret } from '../../lib/auxiliary';
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -104,8 +105,7 @@ class CoinDisplayer extends React.Component {
     });
     aX3.affine();
 
-    const pkX = ctx.PAIR.G2mul(aX3, this.props.sk);
-    return pkX;
+    return aX3;
   };
 
   handleCoinSign = async () => {
@@ -131,9 +131,14 @@ class CoinDisplayer extends React.Component {
   handleCoinSpend = async () => {
     this.setState({ coinState: COIN_STATUS.spending });
 
+
     // todo: remember to change proof to use pkX as base and dont send whole coin...
-    const secretProof = getProofOfSecret(this.props.sk, merchant);
-    const pkX = this.aggregate_pkX_component(PKs);
+
+    const aX3 = this.aggregate_pkX_component(PKs);
+    const pkX = ctx.PAIR.G2mul(aX3, this.props.sk);
+
+    const secretProof = prepareProofOfSecret(params, this.props.sk, merchant, aX3);
+
     if (DEBUG) {
       console.log('Coin spend request was sent');
     }

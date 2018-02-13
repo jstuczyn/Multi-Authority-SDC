@@ -1,5 +1,5 @@
 import { ctx, params } from './config';
-import { prepareProofOfSecret, verifyProofOfSecret } from './auxiliary';
+import { prepareProofOfSecret, verifyProofOfSecret, fromBytesProof } from './auxiliary';
 
 const getBytesProof = (proof) => {
   const [W, cm, r] = proof;
@@ -78,14 +78,6 @@ export const verifyRequestSignature = (coin_request) => {
   const [C, D] = requestSig;
 
   return ctx.ECDH.ECPVP_DSA(sha, pk_client_bytes, requestStr, C, D) === 0;
-};
-
-const fromBytesProof = (bytesProof) => {
-  const [bytesW, bytesCm, bytesR] = bytesProof;
-  const W = ctx.ECP2.fromBytes(bytesW);
-  const cm = ctx.BIG.fromBytes(bytesCm);
-  const r = ctx.BIG.fromBytes(bytesR);
-  return [W, cm, r];
 };
 
 export const verifyRequestProofOfCoinSecret = (proof_bytes, pk_coin_bytes, issuer) => {

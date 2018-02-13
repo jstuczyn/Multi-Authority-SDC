@@ -64,21 +64,6 @@ export const getCoin = (pk, value) => {
   return [coin, coin_id];
 };
 
-// todo: remove once new class is written
-export const getCoinAttributesFromBytes = (coinBytes) => {
-  const {
-    bytesV, bytesID, value, ttl, sig,
-  } = coinBytes;
-
-  return {
-    v: ctx.ECP2.fromBytes(bytesV),
-    ID: ctx.ECP.fromBytes(bytesID),
-    value: value,
-    ttl: ttl,
-    sig: sig,
-  };
-};
-
 export const prepareProofOfSecret = (params, x, verifierStr, proofBase = null) => {
   const [G, o, g1, g2, e] = params;
   const w = ctx.BIG.randomnum(G.order, G.rngGen);
@@ -130,4 +115,12 @@ export const verifyProofOfSecret = (params, pub, proof, verifierStr, proofBase =
   const expr2 = ctx.BIG.comp(cm, hashToBIG(W.toString() + verifierStr)) === 0;
 
   return expr1 && expr2;
+};
+
+export const fromBytesProof = (bytesProof) => {
+  const [bytesW, bytesCm, bytesR] = bytesProof;
+  const W = ctx.ECP2.fromBytes(bytesW);
+  const cm = ctx.BIG.fromBytes(bytesCm);
+  const r = ctx.BIG.fromBytes(bytesR);
+  return [W, cm, r];
 };

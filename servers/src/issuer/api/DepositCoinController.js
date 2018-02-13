@@ -3,13 +3,58 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { checkUsedId, insertUsedId, changeBalance } from '../utils/DatabaseManager';
-import { ctx, merchant, params } from '../../config';
+import { ctx, merchant, params, signingServers } from '../../config';
 import { DEBUG } from '../config/appConfig';
 import Coin from '../../Coin';
-import { fromSimplifiedProof, getCoinAttributesFromBytes } from '../../auxiliary';
+import {
+  fromBytesProof, fromSimplifiedProof, getCoinAttributesFromBytes,
+  verifyProofOfSecret
+} from '../../auxiliary';
 import { sig_pkBytes } from '../config/KeySetup';
+import CoinSig from '../../CoinSig';
+import fetch from 'isomorphic-fetch';
 
 const router = express.Router();
+
+
+// TODO: CODE REPETITION, MOVE THEM ELSEWHERE
+const getPublicKey = async (server) => {
+  const publicKey = [];
+
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
+    publicKey.push(ctx.ECP2.fromBytes(gBytes));
+    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return publicKey;
+};
+
+// todo: get some form of simple cache...
+const getPublicKeys = async (serversArg) => {
+  const publicKeys = await Promise.all(serversArg.map(async (server) => {
+    try {
+      if (DEBUG) {
+        console.log(`Sending request to ${server}...`);
+      }
+      const publicKey = await getPublicKey(server);
+      return publicKey;
+    } catch (err) {
+      return null;
+    }
+  }));
+  return publicKeys;
+};
+
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -21,19 +66,33 @@ router.post('/', async (req, res) => {
   }
   const [G, o, g1, g2, e] = params;
 
-  const simplifiedCoin = req.body.coin;
+  const coinAttributes = req.body.coinAttributes;
   const simplifiedProof = req.body.proof;
-  const idBytes = req.body.id;
+  const [hBytes, sigBytes] = req.body.signature;
+  const pkXBytes = req.body.pkXBytes;
+
+  const proofOfSecret = fromBytesProof(simplifiedProof);
+  const h = ctx.ECP.fromBytes(hBytes);
+  const sig = ctx.ECP.fromBytes(sigBytes);
+  const pkX = ctx.ECP2.fromBytes(pkXBytes);
+  const id = ctx.BIG.fromBytes(coinAttributes.idBytes);
+
 
   const merchant_name = req.body.name;
   const merchant_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-  const coinAttributes = getCoinAttributesFromBytes(simplifiedCoin);
-  const [W, cm, r] = fromSimplifiedProof(simplifiedProof);
-  const id = ctx.BIG.fromBytes(idBytes);
 
-  // at the same time we are able to check if we the coin was really given to merchant
-  const isProofValid = Coin.verifyProofOfSecret(params, coinAttributes.v, W, cm, r, merchant);
+
+
+  // todo: move to auxiliary(or different file?)
+  const publicKeys = await getPublicKeys(signingServers);
+  const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
+
+  // aggregatePublicKey is [ag, aX0, aX1, aX2, aX3, aX4];
+  const aX3 = aggregatePublicKey[4];
+
+  // just check validity of the proof and double spending, we let issuer verify the signature
+  const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchant, aX3);
 
 
   if (DEBUG) {
@@ -48,20 +107,19 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  // check if the actual id was revealed
-  const isIDValid = coinAttributes.ID.equals(ctx.PAIR.G1mul(g1, id));
+  // put here check of signature
+  const isSignatureValid = CoinSig.verifyMixedBlindSign(params, aggregatePublicKey, coinAttributes, [h, sig], id, pkX);
   if (DEBUG) {
-    console.log(`Was actual id revealed: ${isIDValid}`);
+    console.log(`Was signature valid: ${isSignatureValid}`);
   }
 
-  // check signature
-  const sha = ctx.ECDH.HASH_TYPE;
-  const [C, D] = coinAttributes.sig;
-
-  const coinStr = coinAttributes.value.toString() + coinAttributes.ttl.toString() + coinAttributes.v.toString() + coinAttributes.ID.toString();
-  const isSignatureValid = (ctx.ECDH.ECPVP_DSA(sha, sig_pkBytes, coinStr, C, D) === 0);
-  if (DEBUG) {
-    console.log(`Is signature on coin valid: ${isSignatureValid}`);
+  if (!isSignatureValid) {
+    if (DEBUG) {
+      console.log('Signature was invalid.');
+    }
+    res.status(200)
+      .json({ success: false });
+    return;
   }
 
   // now finally check if the coin wasn't already spent
@@ -70,7 +128,7 @@ router.post('/', async (req, res) => {
     console.log(`Was coin already spent: ${wasCoinAlreadySpent}`);
   }
 
-  if (isProofValid && isIDValid && isSignatureValid && !wasCoinAlreadySpent) {
+  if (isProofValid && !wasCoinAlreadySpent && isSignatureValid) {
     await insertUsedId(id);
     await changeBalance(merchant_name, merchant_address, coinAttributes.value);
   }

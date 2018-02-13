@@ -60,6 +60,7 @@ router.post('/', async (req, res) => {
     const ElGamalPKBytes = req.body.ElGamalPKBytes;
 
     // verifies signatures on entire request as well as coin itself (signed by issuer)
+    // todo: cache issuer signatures to prevent signing multiple coins with same signature (i.e. client just generated new id)
     const isRequestLegit = await verifySignRequest(signingCoin);
     if (!isRequestLegit) {
       throw new Error('Coin was tampered with.');
