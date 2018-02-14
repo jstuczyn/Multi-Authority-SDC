@@ -64,11 +64,11 @@ class MainView extends React.Component {
       issuer,
     );
 
-    console.log(coin);
-
-    this.setState(prevState => ({
-      coins: prevState.coins.concat([{ sk_coin, id, coin }]),
-    }));
+    if (coin != null && id != null) {
+      this.setState(prevState => ({
+        coins: prevState.coins.concat([{ sk_coin, id, coin }]),
+      }));
+    }
   };
 
   render() {

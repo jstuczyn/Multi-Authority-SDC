@@ -77,8 +77,6 @@ export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, iss
   let issuedCoin;
   let issuance_status;
 
-  console.log('some key', publicKeys[issuingServer])
-
   if (DEBUG) {
     console.log(`Calling ${issuingServer} to get a coin`);
   }
@@ -101,13 +99,15 @@ export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, iss
     console.log(err);
     console.warn(`Call to ${issuingServer} was unsuccessful`);
   }
-  // todo: handle error codes
+
   if (issuance_status === ISSUE_STATUS.success) {
     return [issuedCoin, coin_id];
+  } else if (issuance_status != null) {
+    console.warn(issuance_status);
   } else {
-    console.log(issuance_status);
-    return [null, null];
+    console.warn(ISSUE_STATUS.error_server);
   }
+  return [null, null];
 }
 
 export async function checkIfAlive(server) {
