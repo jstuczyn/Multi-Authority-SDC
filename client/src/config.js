@@ -12,10 +12,13 @@ export const signingServers = [
 
 // even though it is set a const, it can still be mutated because it is an object;
 // only the pointer can't be moved
+// todo: modify to declare ips only once
 export const PKs = {
   '127.0.0.1:3000': null,
   '127.0.0.1:3001': null,
   '127.0.0.1:3002': null,
+  '127.0.0.1:4000': null,
+  '127.0.0.1:5000': null,
 };
 
 export const merchant = '127.0.0.1:4000';

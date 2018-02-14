@@ -10,7 +10,7 @@ import { params, COIN_STATUS, signingServers } from '../src/config';
 import { getCoin } from '../src/utils/coinGenerator';
 import CoinSig from '../lib/CoinSig';
 import Coin from '../lib/Coin';
-import { getPublicKey } from '../src/utils/api';
+import { getSigningAuthorityPublicKey } from '../src/utils/api';
 
 let coinDisplayerNode;
 
@@ -78,7 +78,7 @@ describe('CoinDisplayer Component', () => {
       const wrapper = mount(<CoinDisplayer coin={coin} />);
 
       const signatures = await wrapper.instance().getSignatures(signingServers);
-      const publicKeys = await Promise.all(signingServers.map(async server => getPublicKey(server)));
+      const publicKeys = await Promise.all(signingServers.map(async server => getSigningAuthorityPublicKey(server)));
 
       for (let i = 0; i < signatures.length; i++) {
         expect(CoinSig.verify(params, publicKeys[i], coin, signatures[i])).to.equal(true);
@@ -107,7 +107,7 @@ describe('CoinDisplayer Component', () => {
       const wrapper = mount(<CoinDisplayer coin={coin} />);
 
       const signatures = await wrapper.instance().getSignatures(signingServers);
-      const publicKeys = await Promise.all(signingServers.map(async server => getPublicKey(server)));
+      const publicKeys = await Promise.all(signingServers.map(async server => getSigningAuthorityPublicKey(server)));
 
       const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
 

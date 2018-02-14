@@ -1,6 +1,7 @@
 import express from 'express';
 import CoinSpendController from './api/CoinSpendController';
 import ServerStatusController from './api/ServerStatusController';
+import PublicKeyController from './api/PublicKeyController';
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/pk', PublicKeyController);
 app.use('/spend', CoinSpendController);
 app.use('/status', ServerStatusController);
 

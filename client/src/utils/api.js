@@ -9,6 +9,23 @@ export function wait(t) {
   return new Promise(r => setTimeout(r, t));
 }
 
+export const getPublicKey = async (server) => {
+  if (DEBUG) {
+    console.log(`Sending request to get public key of ${server}`);
+  }
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    // due to the way they implemeted ECDSA, we do not need to convert it
+    return pkBytes;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+    return null;
+  }
+};
+
 export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, issuingServer) {
   const [G, o, g1, g2, e] = params;
 
@@ -23,6 +40,8 @@ export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, iss
 
   let issuedCoin;
   let issuance_status;
+
+  console.log('some key', PKs[issuingServer])
 
   if (DEBUG) {
     console.log(`Calling ${issuingServer} to get a coin`);
@@ -71,7 +90,7 @@ export async function checkIfAlive(server) {
   return isAlive;
 }
 
-export async function getPublicKey(server) {
+export async function getSigningAuthorityPublicKey(server) {
   const publicKey = [];
   if (DEBUG) {
     console.log(`Sending request to get public key of ${server}`);
@@ -106,7 +125,7 @@ export async function signCoin(server, signingCoin, ElGamalPK) {
     if (DEBUG) {
       console.log(`${server} wasn't queried before. We need to get its PK first.`);
     }
-    const publicKey = await getPublicKey(server);
+    const publicKey = await getSigningAuthorityPublicKey(server);
     PKs[server] = publicKey;
   } else if (DEBUG) {
     console.log(`${server} was queried before. Its PK is:`);
