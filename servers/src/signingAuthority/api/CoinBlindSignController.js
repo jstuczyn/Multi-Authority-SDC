@@ -1,50 +1,15 @@
-// created so that the previous functionality (of normal sign) could be maintained
-
 import express from 'express';
 import bodyParser from 'body-parser';
-import fetch from 'isomorphic-fetch';
-import Coin from '../../Coin';
 import CoinSig from '../../CoinSig';
 import { params, sk } from '../config/CoinSigSetup';
 import { DEBUG } from '../config/appConfig';
 import ElGamal from '../../ElGamal';
-import { issuer_address, PKs } from '../config/constants';
-import { ctx, issuer } from '../../globalConfig';
 import { verifySignRequest } from '../../SigningCoin';
+import { sessionSignatures, publicKeys } from '../cache';
+import { issuer } from '../../globalConfig';
+import { getPublicKey } from '../../auxiliary';
 
 const router = express.Router();
-
-
-// const getPublicKey = async (server) => {
-//   try {
-//     let response = await fetch(`http://${server}/pk`);
-//     response = await response.json();
-//     const pkBytes = response.pk;
-//     // due to the way they implemeted ECDSA, we do not need to convert it
-//     return pkBytes;
-//   } catch (err) {
-//     console.log(err);
-//     console.warn(`Call to ${server} was unsuccessful`);
-//     return null;
-//   }
-// };
-//
-// const verifyCoinSignature = async (coin) => {
-//   if (PKs[issuer_address] == null) {
-//     if (DEBUG) {
-//       console.log('We do not know PK of the issuer, we need to ask it first.');
-//       PKs[issuer_address] = await getPublicKey(issuer_address);
-//       if (PKs[issuer_address] == null) {
-//         return -1; // we can't verify sig hence sign the coin
-//       }
-//     }
-//   }
-//   const sha = ctx.ECDH.HASH_TYPE;
-//   const [C, D] = coin.sig;
-//
-//   const coinStr = coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString();
-//   return ctx.ECDH.ECPVP_DSA(sha, PKs[issuer_address], coinStr, C, D);
-// };
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -59,9 +24,19 @@ router.post('/', async (req, res) => {
     const signingCoin = req.body.coin;
     const ElGamalPKBytes = req.body.ElGamalPKBytes;
 
-    // verifies signatures on entire request as well as coin itself (signed by issuer)
-    // todo: cache issuer signatures to prevent signing multiple coins with same signature (i.e. client just generated new id)
-    const isRequestLegit = await verifySignRequest(signingCoin);
+    // firstly check if the server has not already signed this coin
+    if (sessionSignatures.has(signingCoin.issuedCoinSig)) {
+      throw new Error('This coin was already signed before!');
+    } else {
+      sessionSignatures.add(signingCoin.issuedCoinSig);
+    }
+
+    if (publicKeys[issuer] == null || publicKeys[issuer].length <= 0) {
+      const publicKey = await getPublicKey(issuer);
+      publicKeys[issuer] = publicKey;
+    }
+
+    const isRequestLegit = verifySignRequest(signingCoin, publicKeys[issuer]);
     if (!isRequestLegit) {
       throw new Error('Coin was tampered with.');
     }

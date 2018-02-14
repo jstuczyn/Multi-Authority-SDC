@@ -3,6 +3,7 @@
 import * as crypto from 'crypto';
 import Coin from './Coin';
 import { ctx } from './globalConfig';
+import fetch from 'isomorphic-fetch';
 
 export const stringToBytes = (s) => {
   const b = [];
@@ -123,4 +124,16 @@ export const fromBytesProof = (bytesProof) => {
   const cm = ctx.BIG.fromBytes(bytesCm);
   const r = ctx.BIG.fromBytes(bytesR);
   return [W, cm, r];
+};
+
+export const getPublicKey = async (server) => {
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    return response.pk;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+    return null;
+  }
 };

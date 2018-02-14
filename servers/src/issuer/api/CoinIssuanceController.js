@@ -2,12 +2,10 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { getBalance, changeBalance } from '../utils/DatabaseManager';
 import { DEBUG } from '../config/appConfig';
-import { issuer } from '../../globalConfig';
 import { ISSUE_STATUS } from '../config/constants';
 import { sig_skBytes, sig_pkBytes } from '../config/KeySetup';
 import { verifyRequestSignature, verifyRequestProofOfCoinSecret } from '../../CoinRequest';
 import { getIssuedCoin } from '../../IssuedCoin';
-
 
 const router = express.Router();
 

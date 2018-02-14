@@ -1,9 +1,6 @@
 import { hashToPointOnCurve } from './auxiliary';
 import { ctx, params } from './globalConfig';
 import ElGamal from './ElGamal';
-import { issuer_address, PKs } from './signingAuthority/config/constants';
-import { DEBUG } from './signingAuthority/config/appConfig';
-import fetch from 'isomorphic-fetch';
 
 export const getSigningCoin = (issuedCoin, ElGamalPK, coin_id, coin_sk, sk_client_bytes) => {
   const [G, o, g1, g2, e] = params;
@@ -77,29 +74,9 @@ export const getSigningCoin = (issuedCoin, ElGamalPK, coin_id, coin_sk, sk_clien
    */
 };
 
-const getPublicKey = async (server) => {
-  try {
-    let response = await fetch(`http://${server}/pk`);
-    response = await response.json();
-    const pkBytes = response.pk;
-    // due to the way they implemeted ECDSA, we do not need to convert it
-    return pkBytes;
-  } catch (err) {
-    console.log(err);
-    console.warn(`Call to ${server} was unsuccessful`);
-    return null;
-  }
-};
-
-export const verifySignRequest = async (signingCoin) => {
-  if (PKs[issuer_address] == null) {
-    if (DEBUG) {
-      console.log('We do not know PK of the issuer, we need to ask it first.');
-    }
-    PKs[issuer_address] = await getPublicKey(issuer_address);
-    if (PKs[issuer_address] == null) {
-      return false; // we can't verify sig hence sign the coin
-    }
+export const verifySignRequest = (signingCoin, issuerPK) => {
+  if (issuerPK == null) {
+    return false;
   }
 
   // first verify 'internal' signature of the issuer that such coin was issued and wasn't modified
@@ -114,7 +91,7 @@ export const verifySignRequest = async (signingCoin) => {
     signingCoin.pk_coin_bytes.reduce(reducer) + // coin's pk
     signingCoin.ttl.toString();
 
-  if (ctx.ECDH.ECPVP_DSA(sha, PKs[issuer_address], coinStr, C1, D1) !== 0) {
+  if (ctx.ECDH.ECPVP_DSA(sha, issuerPK, coinStr, C1, D1) !== 0) {
     return false;
   }
 
