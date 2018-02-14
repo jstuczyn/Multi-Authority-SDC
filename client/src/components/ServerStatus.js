@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Header, Icon } from 'semantic-ui-react';
-import { SERVER_STATUS, PKs, SERVER_TYPES, DEBUG } from '../config';
+import { SERVER_STATUS, SERVER_TYPES, DEBUG } from '../config';
+import { publicKeys } from '../cache';
 import { getSigningAuthorityPublicKey, getPublicKey } from '../utils/api';
 
 const statusStyle = {
@@ -56,20 +57,21 @@ class ServerStatus extends React.Component {
   }
 
   checkServerStatus = async () => {
-    // get PKs of all servers since we will need all of them
-    if (PKs[this.props.address] === null || PKs[this.props.address].length <= 0) {
-      if (DEBUG) {
-        console.log(`Getting Public Key of ${this.props.address}...`);
-      }
-      let publicKey;
-      if (this.props.type === SERVER_TYPES.signing) {
-        publicKey = await getSigningAuthorityPublicKey(this.props.address);
-      } else {
-        publicKey = await getPublicKey(this.props.address);
-      }
-      PKs[this.props.address] = publicKey;
+    // get publicKeys of all servers since we will need all of them
+    // make a call regardless if anything is cached (it is only done on component load)
+    // it will to some extent help with stale entries
+    if (DEBUG) {
+      console.log(`Getting Public Key of ${this.props.address}...`);
     }
-    if (PKs[this.props.address] === null || PKs[this.props.address].length <= 0) {
+    let publicKey;
+    if (this.props.type === SERVER_TYPES.signing) {
+      publicKey = await getSigningAuthorityPublicKey(this.props.address);
+    } else {
+      publicKey = await getPublicKey(this.props.address);
+    }
+    publicKeys[this.props.address] = publicKey;
+    // call failed
+    if (publicKeys[this.props.address] == null || publicKeys[this.props.address].length <= 0) {
       this.setState({ status: SERVER_STATUS.down });
     } else {
       this.setState({ status: SERVER_STATUS.alive });

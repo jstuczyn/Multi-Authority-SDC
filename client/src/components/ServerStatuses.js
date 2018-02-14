@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Table, Header, Segment } from 'semantic-ui-react';
-import { signingServers, merchant, issuer, PKs, SERVER_TYPES } from '../config';
+import { signingServers, merchant, issuer, PublicKeys, SERVER_TYPES } from '../config';
 import ServerStatus from './ServerStatus';
 
 const ServerStatuses = () => (
