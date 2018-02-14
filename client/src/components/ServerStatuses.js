@@ -1,47 +1,72 @@
 import React from 'react';
 import { Container, Table, Header, Segment } from 'semantic-ui-react';
-import { signingServers, merchant, issuer, PublicKeys, SERVER_TYPES } from '../config';
+import { signingServers, merchant, issuer, SERVER_TYPES, DEBUG } from '../config';
 import ServerStatus from './ServerStatus';
+import ResetCacheButton from './ResetCacheButton';
+import { publicKeys } from '../cache';
 
-const ServerStatuses = () => (
-  <Segment style={{ padding: '2em 0em' }} vertical>
-    <Container textAlign="center" text>
-      <Header
-        as="h2"
-        textAlign="center"
-        content="Status of Servers"
-      />
-      <Table celled size="small">
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Server</Table.HeaderCell>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
+class ServerStatuses extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      keyPrefix: '0',
+    };
+  }
 
-        <Table.Body>
-          {signingServers.map(server => (
-            <ServerStatus
-              key={server}
-              address={server}
-              type={SERVER_TYPES.signing}
+  buttonCallback = () => {
+    Object.keys(publicKeys).map((key) => { publicKeys[key] = null; return null; });
+    const keyPrefix = this.state.keyPrefix === '0' ? '1' : '0';
+    this.setState({ keyPrefix });
+  };
+
+  render() {
+    return (
+      <div>
+        <Segment style={{ padding: '2em 0em' }} vertical>
+          <Container textAlign="center" text>
+            <Header
+              as="h2"
+              textAlign="center"
+              content="Status of Servers"
             />
-          ))}
-          <ServerStatus
-            address={merchant}
-            type={SERVER_TYPES.merchant}
-          />
+            <Table celled size="small">
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Server</Table.HeaderCell>
+                  <Table.HeaderCell>Status</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
 
-          <ServerStatus
-            address={issuer}
-            type={SERVER_TYPES.issuer}
-          />
+              <Table.Body>
+                {signingServers.map(server => (
+                  <ServerStatus
+                    key={this.state.keyPrefix + server}
+                    address={server}
+                    type={SERVER_TYPES.signing}
+                  />
+                ))}
+                <ServerStatus
+                  key={this.state.keyPrefix + merchant}
+                  address={merchant}
+                  type={SERVER_TYPES.merchant}
+                />
 
+                <ServerStatus
+                  key={this.state.keyPrefix + issuer}
+                  address={issuer}
+                  type={SERVER_TYPES.issuer}
+                />
+              </Table.Body>
 
-        </Table.Body>
-      </Table>
-    </Container>
-  </Segment>
-);
+            </Table>
+          </Container>
+        </Segment>
+        {DEBUG &&
+          <ResetCacheButton onClickCallback={this.buttonCallback} />
+        }
+      </div>
+    );
+  }
+}
 
 export default ServerStatuses;
