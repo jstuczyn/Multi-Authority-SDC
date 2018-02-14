@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ValueInput from './ValueInput';
 import SubmitButton from './SubmitButton';
+import { publicKeys } from '../cache';
+import { issuer } from '../config';
 
 class CoinRequester extends React.Component {
   constructor(props) {
@@ -28,7 +30,7 @@ class CoinRequester extends React.Component {
         <SubmitButton
           onSubmit={this.handleSubmit}
           isLoading={this.state.isRequesting}
-          isDisabled={this.state.value <= 0}
+          isDisabled={this.state.value <= 0 || publicKeys[issuer] == null}
         />
       </ValueInput>
     );
