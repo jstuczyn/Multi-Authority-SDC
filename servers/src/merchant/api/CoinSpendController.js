@@ -53,7 +53,6 @@ const depositCoin = async (coinAttributes, simplifiedProof, sigBytes, pkXBytes, 
           proof: simplifiedProof,
           signature: sigBytes,
           pkXBytes: pkXBytes,
-          name: 'Merchant', // todo: replace with PK once generated
         }),
       });
     response = await response.json();
@@ -85,16 +84,9 @@ router.post('/', async (req, res) => {
     const pkX = ctx.ECP2.fromBytes(pkXBytes);
     const id = ctx.BIG.fromBytes(coinAttributes.idBytes);
 
-    // const signingAuthoritiesPublicKeys = Object.keys(publicKeys)
-    //   .filter(server => signingServers.includes(server))
-    //   .reduce((obj, server) => {
-    //     obj[server] = publicKeys[server];
-    //     return obj;
-    //   }, {})
-
     const signingAuthoritiesPublicKeys = Object.entries(publicKeys)
-      .filter(([server, publicKey]) => signingServers.includes(server))
-      .map(([server, publicKey]) => publicKey);
+      .filter(entry => signingServers.includes(entry[0]))
+      .map(entry => entry[1]);
 
 
     // if all keys of signing authorities were cached, we can assume that the aggregate was also cached

@@ -1,69 +1,14 @@
-// todo: does it also need to verify whole signature?
-
 import express from 'express';
 import bodyParser from 'body-parser';
 import { checkUsedId, insertUsedId, changeBalance } from '../utils/DatabaseManager';
 import { ctx, merchant, params, signingServers } from '../../globalConfig';
 import { DEBUG } from '../config/appConfig';
-import { fromBytesProof, verifyProofOfSecret } from '../../auxiliary';
+import { fromBytesProof, verifyProofOfSecret, getSigningAuthorityPublicKey, getPublicKey } from '../../auxiliary';
 import CoinSig from '../../CoinSig';
-import fetch from 'isomorphic-fetch';
+import { publicKeys } from '../cache';
 
 const router = express.Router();
 
-
-// TODO: CODE REPETITION, MOVE THEM ELSEWHERE
-const getPublicKey = async (server) => {
-  const publicKey = [];
-  try {
-    let response = await fetch(`http://${server}/pk`);
-    response = await response.json();
-    const pkBytes = response.pk;
-    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
-    publicKey.push(ctx.ECP2.fromBytes(gBytes));
-    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
-  } catch (err) {
-    console.log(err);
-    console.warn(`Call to ${server} was unsuccessful`);
-  }
-  return publicKey;
-};
-
-// todo: get some form of simple cache...
-const getPublicKeys = async (serversArg) => {
-  const publicKeys = await Promise.all(serversArg.map(async (server) => {
-    try {
-      if (DEBUG) {
-        console.log(`Sending request to ${server}...`);
-      }
-      const publicKey = await getPublicKey(server);
-      return publicKey;
-    } catch (err) {
-      return null;
-    }
-  }));
-  return publicKeys;
-};
-
-
-// remove...
-const getMerchantPublicKey = async (server) => {
-  try {
-    let response = await fetch(`http://${server}/pk`);
-    response = await response.json();
-    const pkBytes = response.pk;
-    // due to the way they implemeted ECDSA, we do not need to convert it
-    return pkBytes;
-  } catch (err) {
-    console.log(err);
-    console.warn(`Call to ${server} was unsuccessful`);
-    return null;
-  }
-};
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -73,7 +18,6 @@ router.post('/', async (req, res) => {
   if (DEBUG) {
     console.log('Deposit coin post');
   }
-  const [G, o, g1, g2, e] = params;
 
   const coinAttributes = req.body.coinAttributes;
   const simplifiedProof = req.body.proof;
@@ -87,28 +31,43 @@ router.post('/', async (req, res) => {
   const id = ctx.BIG.fromBytes(coinAttributes.idBytes);
 
 
-  const merchant_name = req.body.name;
-  const merchant_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const signingAuthoritiesPublicKeys = Object.entries(publicKeys)
+    .filter(entry => signingServers.includes(entry[0]))
+    .map(entry => entry[1]);
 
 
+  // if all keys of signing authorities were cached, we can assume that the aggregate was also cached
+  let aggregatePublicKey;
+  if (signingAuthoritiesPublicKeys.length !== signingServers.length) {
+    await Promise.all(signingServers.map(async (server) => {
+      try {
+        const publicKey = await getSigningAuthorityPublicKey(server);
+        publicKeys[server] = publicKey;
+        signingAuthoritiesPublicKeys.push(publicKey);
+      } catch (err) {
+        console.warn(err);
+      }
+    }));
+    aggregatePublicKey = CoinSig.aggregatePublicKeys(params, signingAuthoritiesPublicKeys);
 
-
-  // todo: move to auxiliary(or different file?)
-  const publicKeys = await getPublicKeys(signingServers);
-  const aggregatePublicKey = CoinSig.aggregatePublicKeys(params, publicKeys);
+    publicKeys['Aggregate'] = aggregatePublicKey;
+  } else {
+    aggregatePublicKey = publicKeys['Aggregate'];
+  }
 
   // aggregatePublicKey is [ag, aX0, aX1, aX2, aX3, aX4];
   const aX3 = aggregatePublicKey[4];
 
   // just check validity of the proof and double spending, we let issuer verify the signature
   // temporary (to make whole system work), to remove when refactoring this file
-  const merchant_pk = await getMerchantPublicKey(merchant);
-  const merchantStr = merchant_pk.join('');
 
+  if (publicKeys[merchant] == null || publicKeys[merchant].length <= 0) {
+    const merchantPK = await getPublicKey(merchant);
+    publicKeys[merchant] = merchantPK;
+  }
 
-
+  const merchantStr = publicKeys[merchant].join('');
   const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchantStr, aX3);
-
 
   if (DEBUG) {
     console.log(`Was proof of knowledge of secret valid: ${isProofValid}`);
@@ -122,7 +81,6 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  // put here check of signature
   const isSignatureValid = CoinSig.verifyMixedBlindSign(params, aggregatePublicKey, coinAttributes, [h, sig], id, pkX);
   if (DEBUG) {
     console.log(`Was signature valid: ${isSignatureValid}`);
@@ -145,7 +103,7 @@ router.post('/', async (req, res) => {
 
   if (isProofValid && !wasCoinAlreadySpent && isSignatureValid) {
     await insertUsedId(id);
-    await changeBalance(merchant_pk, coinAttributes.value);
+    await changeBalance(publicKeys[merchant], coinAttributes.value);
   }
 
   res.status(200)
