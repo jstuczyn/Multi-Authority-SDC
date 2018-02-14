@@ -4,7 +4,7 @@ import { getBalance, changeBalance } from '../utils/DatabaseManager';
 import { DEBUG } from '../config/appConfig';
 import { issuer } from '../../globalConfig';
 import { ISSUE_STATUS } from '../config/constants';
-import { sig_skBytes } from '../config/KeySetup';
+import { sig_skBytes, sig_pkBytes } from '../config/KeySetup';
 import { verifyRequestSignature, verifyRequestProofOfCoinSecret } from '../../CoinRequest';
 import { getIssuedCoin } from '../../IssuedCoin';
 
@@ -65,10 +65,12 @@ router.post('/', async (req, res) => {
     return;
   }
 
+  const issuerStr = sig_pkBytes.join('');
+
   const isProofValid = verifyRequestProofOfCoinSecret(
     coin_request.proof_bytes,
     coin_request.pk_coin_bytes,
-    issuer, // todo: also replace with pk
+    issuerStr,
   );
 
   if (!isProofValid) {

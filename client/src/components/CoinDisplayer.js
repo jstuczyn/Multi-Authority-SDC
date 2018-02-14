@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
-import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG, PKs } from '../config';
+import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG, PublicKeys } from '../config';
 import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
 import { getProofOfSecret } from '../utils/helpers';
@@ -134,7 +134,7 @@ class CoinDisplayer extends React.Component {
 
     // todo: remember to change proof to use pkX as base and dont send whole coin...
 
-    const aX3 = this.aggregate_pkX_component(PKs);
+    const aX3 = this.aggregate_pkX_component(PublicKeys);
     const pkX = ctx.PAIR.G2mul(aX3, this.props.sk);
 
     const secretProof = prepareProofOfSecret(params, this.props.sk, merchant, aX3);

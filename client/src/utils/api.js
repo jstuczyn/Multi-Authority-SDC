@@ -1,8 +1,9 @@
 import fetch from 'isomorphic-fetch';
-import { ctx, DEBUG, PKs, ISSUE_STATUS, params } from '../config';
-import { getProofOfSecret, getSimplifiedProof, getSimplifiedSignature, getRandomNumber } from './helpers';
+import { ctx, DEBUG, ISSUE_STATUS, params } from '../config';
+import { getSimplifiedProof, getSimplifiedSignature, getRandomNumber } from './helpers';
 import ElGamal from '../../lib/ElGamal';
 import { getCoinRequestObject } from '../../lib/CoinRequest';
+import { publicKeys } from '../cache';
 
 // auxiliary, mostly for testing purposes to simulate delays
 export function wait(t) {
@@ -26,6 +27,29 @@ export const getPublicKey = async (server) => {
   }
 };
 
+export async function getSigningAuthorityPublicKey(server) {
+  const publicKey = [];
+  if (DEBUG) {
+    console.log(`Sending request to get public key of ${server}`);
+  }
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
+    publicKey.push(ctx.ECP2.fromBytes(gBytes));
+    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return publicKey;
+}
+
 export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, issuingServer) {
   const [G, o, g1, g2, e] = params;
 
@@ -33,15 +57,27 @@ export async function getCoin(sk_coin, pk_coin, value, pk_client, sk_client, iss
   const coin_id_bytes = [];
   coin_id.toBytes(coin_id_bytes); // don't send it to issuer, unless we generate it together
 
+  // for some reason we have no cached pk, lets try to get it
+  if (publicKeys[issuingServer] == null || publicKeys[issuingServer].length <= 0) {
+    const publicKey = await getPublicKey(issuingServer);
+    publicKeys[issuingServer] = publicKey;
 
-  // get pk of issuer instead
+    // the call failed
+    if (publicKeys[issuingServer] == null || publicKeys[issuingServer].length <= 0) {
+      console.warn(ISSUE_STATUS.error_server);
+      return [null, null];
+    }
+  }
+
+  const issuingServerStr = publicKeys[issuingServer].join('');
+
   const coinRequestObject =
-    getCoinRequestObject(sk_coin, pk_coin, value, pk_client, sk_client, issuingServer);
+    getCoinRequestObject(sk_coin, pk_coin, value, pk_client, sk_client, issuingServerStr);
 
   let issuedCoin;
   let issuance_status;
 
-  console.log('some key', PKs[issuingServer])
+  console.log('some key', publicKeys[issuingServer])
 
   if (DEBUG) {
     console.log(`Calling ${issuingServer} to get a coin`);
@@ -90,29 +126,6 @@ export async function checkIfAlive(server) {
   return isAlive;
 }
 
-export async function getSigningAuthorityPublicKey(server) {
-  const publicKey = [];
-  if (DEBUG) {
-    console.log(`Sending request to get public key of ${server}`);
-  }
-  try {
-    let response = await fetch(`http://${server}/pk`);
-    response = await response.json();
-    const pkBytes = response.pk;
-    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
-    publicKey.push(ctx.ECP2.fromBytes(gBytes));
-    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
-    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
-  } catch (err) {
-    console.log(err);
-    console.warn(`Call to ${server} was unsuccessful`);
-  }
-  return publicKey;
-}
-
 // todo: now
 export async function signCoin(server, signingCoin, ElGamalPK) {
   let signature = null;
@@ -121,15 +134,15 @@ export async function signCoin(server, signingCoin, ElGamalPK) {
   }
 
   // this should have already been done when getting server status
-  if (PKs[server] == null) {
+  if (PublicKeys[server] == null) {
     if (DEBUG) {
       console.log(`${server} wasn't queried before. We need to get its PK first.`);
     }
     const publicKey = await getSigningAuthorityPublicKey(server);
-    PKs[server] = publicKey;
+    PublicKeys[server] = publicKey;
   } else if (DEBUG) {
     console.log(`${server} was queried before. Its PK is:`);
-    console.log(PKs[server]);
+    console.log(PublicKeys[server]);
   }
   if (DEBUG) {
     console.log(`Sending signing query to ${server}`);

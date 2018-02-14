@@ -19,13 +19,13 @@ export const getCoinRequestObject = (
   value, // part of the coin
   pk_client_bytes, // part of the coin
   sk_client, // to sign the request
-  issuingServer, // to include in the proof of secret, it just has to be some string
+  issuingServerStr, // to include in the proof of secret, it just has to be some string
 ) => {
   const [G, o, g1, g2, e] = params;
 
   const pk_coin_bytes = [];
   pk_coin.toBytes(pk_coin_bytes);
-  const secretProof = prepareProofOfSecret(params, sk_coin, issuingServer);
+  const secretProof = prepareProofOfSecret(params, sk_coin, issuingServerStr);
   const proof_bytes = getBytesProof(secretProof);
 
   const [bytesW, bytesCm, bytesR] = proof_bytes; // expand to include in our signature
