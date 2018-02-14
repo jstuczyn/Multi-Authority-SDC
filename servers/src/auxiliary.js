@@ -1,9 +1,8 @@
 // set of auxiliary functions that don't belong to any existing class/module
 
-import * as crypto from 'crypto';
-import Coin from './Coin';
-import { ctx } from './globalConfig';
 import fetch from 'isomorphic-fetch';
+import * as crypto from 'crypto';
+import { ctx } from './globalConfig';
 
 export const stringToBytes = (s) => {
   const b = [];
@@ -56,13 +55,6 @@ export const getRandomCoinId = () => {
   groupOrder.rcopy(ctx.ROM_CURVE.CURVE_Order);
 
   return ctx.BIG.randomnum(groupOrder, rng);
-};
-
-// todo: check if safe to remove
-export const getCoin = (pk, value) => {
-  const coin_id = getRandomCoinId();
-  const coin = new Coin(pk, coin_id, value);
-  return [coin, coin_id];
 };
 
 export const prepareProofOfSecret = (params, x, verifierStr, proofBase = null) => {
@@ -137,3 +129,24 @@ export const getPublicKey = async (server) => {
     return null;
   }
 };
+
+export async function getSigningAuthorityPublicKey(server) {
+  const publicKey = [];
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    const [gBytes, X0Bytes, X1Bytes, X2Bytes, X3Bytes, X4Bytes] = pkBytes;
+    publicKey.push(ctx.ECP2.fromBytes(gBytes));
+    publicKey.push(ctx.ECP2.fromBytes(X0Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X1Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X2Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X3Bytes));
+    publicKey.push(ctx.ECP2.fromBytes(X4Bytes));
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+  }
+  return publicKey;
+}
+
