@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
-import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG, PublicKeys } from '../config';
+import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG } from '../config';
 import { wait, signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
-import { getProofOfSecret } from '../utils/helpers';
 import ElGamal from '../../lib/ElGamal';
 import { getSigningCoin } from '../../lib/SigningCoin';
 import { prepareProofOfSecret } from '../../lib/auxiliary';
+import { publicKeys } from '../cache';
 
 class CoinDisplayer extends React.Component {
   constructor(props) {
@@ -98,9 +98,9 @@ class CoinDisplayer extends React.Component {
     this.setState({ remainingValidityString: remainingValidityString });
   };
 
-  aggregate_pkX_component = (publicKeys) => {
+  aggregate_pkX_component = (signingAuthoritiesPublicKeys) => {
     const aX3 = new ctx.ECP2();
-    Object.entries(publicKeys).forEach(([server, publicKey]) => {
+    Object.entries(signingAuthoritiesPublicKeys).forEach(([server, publicKey]) => {
       aX3.add(publicKey[4]); // publicKey has structure [g, X0, X1, X2, X3, X4], so we access element at 4th index
     });
     aX3.affine();
@@ -131,13 +131,19 @@ class CoinDisplayer extends React.Component {
   handleCoinSpend = async () => {
     this.setState({ coinState: COIN_STATUS.spending });
 
+    const signingAuthoritiesPublicKeys = Object.keys(publicKeys)
+      .filter(server => signingServers.includes(server))
+      .reduce((obj, server) => {
+        obj[server] = publicKeys[server];
+        return obj;
+      }, {});
 
-    // todo: remember to change proof to use pkX as base and dont send whole coin...
-
-    const aX3 = this.aggregate_pkX_component(PublicKeys);
+    const aX3 = this.aggregate_pkX_component(signingAuthoritiesPublicKeys);
     const pkX = ctx.PAIR.G2mul(aX3, this.props.sk);
 
-    const secretProof = prepareProofOfSecret(params, this.props.sk, merchant, aX3);
+
+    const merchantStr = publicKeys[merchant].join('');
+    const secretProof = prepareProofOfSecret(params, this.props.sk, merchantStr, aX3);
 
     if (DEBUG) {
       console.log('Coin spend request was sent');

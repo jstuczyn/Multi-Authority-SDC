@@ -50,6 +50,21 @@ const getPublicKeys = async (serversArg) => {
 };
 
 
+// remove...
+const getMerchantPublicKey = async (server) => {
+  try {
+    let response = await fetch(`http://${server}/pk`);
+    response = await response.json();
+    const pkBytes = response.pk;
+    // due to the way they implemeted ECDSA, we do not need to convert it
+    return pkBytes;
+  } catch (err) {
+    console.log(err);
+    console.warn(`Call to ${server} was unsuccessful`);
+    return null;
+  }
+};
+
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
@@ -86,7 +101,13 @@ router.post('/', async (req, res) => {
   const aX3 = aggregatePublicKey[4];
 
   // just check validity of the proof and double spending, we let issuer verify the signature
-  const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchant, aX3);
+  // temporary (to make whole system work), to remove when refactoring this file
+  const merchant_pk = await getMerchantPublicKey(merchant);
+  const merchantStr = merchant_pk.join('');
+
+
+
+  const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchantStr, aX3);
 
 
   if (DEBUG) {
@@ -124,7 +145,7 @@ router.post('/', async (req, res) => {
 
   if (isProofValid && !wasCoinAlreadySpent && isSignatureValid) {
     await insertUsedId(id);
-    await changeBalance(merchant_name, merchant_address, coinAttributes.value);
+    await changeBalance(merchant_pk, coinAttributes.value);
   }
 
   res.status(200)

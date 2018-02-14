@@ -87,6 +87,7 @@ router.post('/', async (req, res) => {
 
     responseStatus = 200;
   } catch (err) {
+    console.log(err);
     responseStatus = 400;
   }
   res.status(responseStatus).json({ signature: signatureBytes });

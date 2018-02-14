@@ -7,6 +7,7 @@ import { ctx, params, signingServers, merchant, issuer } from '../../globalConfi
 import { DEBUG } from '../config/appConfig';
 import { fromBytesProof, verifyProofOfSecret } from '../../auxiliary';
 import { issuer_address } from '../../signingAuthority/config/constants';
+import { sig_pkBytes } from '../config/KeySetup';
 
 const router = express.Router();
 
@@ -134,7 +135,8 @@ router.post('/', async (req, res) => {
     const aX3 = aggregatePublicKey[4];
 
     // just check validity of the proof and double spending, we let issuer verify the signature
-    const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchant, aX3);
+    const merchantStr = sig_pkBytes.join('');
+    const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchantStr, aX3);
 
     if (DEBUG) {
       console.log(`Was proof of knowledge of secret valid: ${isProofValid}`);

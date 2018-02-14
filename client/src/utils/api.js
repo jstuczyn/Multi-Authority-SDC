@@ -133,16 +133,15 @@ export async function signCoin(server, signingCoin, ElGamalPK) {
     console.log('Compressed coin to sign: ', signingCoin);
   }
 
-  // this should have already been done when getting server status
-  if (PublicKeys[server] == null) {
+  if (publicKeys[server] == null || publicKeys[server].length <= 0) {
     if (DEBUG) {
       console.log(`${server} wasn't queried before. We need to get its PK first.`);
     }
     const publicKey = await getSigningAuthorityPublicKey(server);
-    PublicKeys[server] = publicKey;
+    publicKeys[server] = publicKey;
   } else if (DEBUG) {
     console.log(`${server} was queried before. Its PK is:`);
-    console.log(PublicKeys[server]);
+    console.log(publicKeys[server]);
   }
   if (DEBUG) {
     console.log(`Sending signing query to ${server}`);
