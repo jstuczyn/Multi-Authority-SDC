@@ -7,7 +7,7 @@
     "analyze": "cross-env ANALYZE_ENV=true yarn build",
     "analyze:production": "cross-env ANALYZE_ENV=true yarn build:production",
     "build": "webpack",
-    "build:production": "cross-env NODE_ENV=production yarn build",
+    "build:production": "cross-env NODE_ENV=production webpack",
     "start": "webpack-dev-server",
     "run_test": "set NODE_ENV=test&&npm run test",
     "test": "./node_modules/.bin/mocha --require ./test/setup.js --compilers js:babel-core/register --recursive --timeout=10000"
@@ -50,6 +50,7 @@
     "jsdom": "^11.6.2",
     "mocha": "^4.1.0",
     "sinon": "^4.3.0",
+    "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack-bundle-analyzer": "^2.10.0",
     "webpack-dev-server": "^2.11.1"
   }

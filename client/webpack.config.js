@@ -1,4 +1,5 @@
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -16,7 +17,7 @@ const webpackConfig = {
   devServer: {
     // contentBase: path.join(__dirname, "dist"),
     contentBase: './dist',
-    port: 9000
+    port: 9000,
   },
 
   module: {
@@ -28,7 +29,7 @@ const webpackConfig = {
       {
         test: /\.exec\.js$/,
         include: path.resolve('lib'),
-        loader: 'script-loader'
+        loader: 'script-loader',
       },
 
     ],
@@ -63,17 +64,9 @@ if (analyze) {
 
 if (env === 'production') {
   webpackConfig.plugins.push(
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false,
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        unused: true,
-        dead_code: true,
-        warnings: false,
-      },
-    })
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new UglifyJSPlugin(),
+    new webpack.HashedModuleIdsPlugin(),
   );
 }
 
