@@ -6,75 +6,75 @@ const analyze = !!process.env.ANALYZE_ENV;
 const env = process.env.NODE_ENV || 'development';
 
 const webpackConfig = {
-    name: 'client',
-    target: 'web',
+  name: 'client',
+  target: 'web',
 
-    entry: {
-        app: path.resolve('src/main.js'),
+  entry: {
+    app: path.resolve('src/main.js'),
+  },
+
+  devServer: {
+    // contentBase: path.join(__dirname, "dist"),
+    contentBase: './dist',
+    port: 9000
+  },
+
+  module: {
+    rules: [{
+      test: /\.(js|jsx)$/,
+      exclude: /node_modules/,
+      loader: 'babel-loader',
     },
+      {
+        test: /\.exec\.js$/,
+        include: path.resolve('lib'),
+        loader: 'script-loader'
+      },
 
-    devServer: {
-        // contentBase: path.join(__dirname, "dist"),
-        contentBase: "./dist",
-        port: 9000
-    },
-
-    module: {
-        rules: [{
-            test: /\.(js|jsx)$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-        },
-            {
-                test: /\.exec\.js$/,
-                include: path.resolve('lib'),
-                loader: 'script-loader'
-            },
-
-        ],
-    },
-
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(env),
-            },
-        }),
     ],
+  },
 
-    output: {
-        filename: '[name].js',
-        path: path.resolve('dist/js'),
-        publicPath: '/js/',
-    },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(env),
+      },
+    }),
+  ],
 
-    resolve: {
-        modules: [
-            path.resolve('src'),
-            'node_modules',
-        ],
-        extensions: ['.js', '.jsx'],
-    },
+  output: {
+    filename: '[name].js',
+    path: path.resolve('dist/js'),
+    publicPath: '/js/',
+  },
+
+  resolve: {
+    modules: [
+      path.resolve('src'),
+      'node_modules',
+    ],
+    extensions: ['.js', '.jsx'],
+  },
 };
 
 if (analyze) {
-    webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+  webpackConfig.plugins.push(new BundleAnalyzerPlugin());
 }
 
 if (env === 'production') {
-    webpackConfig.plugins.push(
-        new webpack.LoaderOptionsPlugin({
-            minimize: true,
-            debug: false,
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                unused: true,
-                dead_code: true,
-                warnings: false,
-            },
-        })
-    )
+  webpackConfig.plugins.push(
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false,
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        unused: true,
+        dead_code: true,
+        warnings: false,
+      },
+    })
+  );
 }
 
-module.exports = webpackConfig
+module.exports = webpackConfig;

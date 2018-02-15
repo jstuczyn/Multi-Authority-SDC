@@ -28,7 +28,7 @@
     "react-dom": "^16.2.0",
     "script-loader": "^0.7.2",
     "semantic-ui-react": "^0.78.2",
-    "webpack": "^2.7.0",
+    "webpack": "^3.11.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
