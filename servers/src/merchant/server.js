@@ -1,6 +1,5 @@
 import 'babel-polyfill';
 import app from './app';
-import { hostname } from './config/appConfig';
 import { setupKeys } from './config/KeySetup';
 
 if (process.argv.length < 3) {
@@ -9,7 +8,7 @@ if (process.argv.length < 3) {
 
 const port = parseInt(process.argv[2], 10);
 
-const server = app.listen(port, hostname, () => {
+const server = app.listen(port, () => {
   setupKeys();
-  console.log(`Server Started at: http://${hostname}:${port}/`);
+  console.log(`Server Started at: at port ${port}`);
 });
