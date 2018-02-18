@@ -6,8 +6,8 @@ export const DETAILED_DEBUG = true;
 
 export const signingServers = (process.env.NODE_ENV === 'production') ? [
   '35.177.85.84:3000',
-  '35.177.164.153:3001',
-  '35.176.145.134:3002',
+  '35.177.164.153:3000',
+  '35.176.145.134:3000',
 ] : [
   '127.0.0.1:3000',
   '127.0.0.1:3001',
