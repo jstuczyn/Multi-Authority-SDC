@@ -10,5 +10,5 @@ const port = parseInt(process.argv[2], 10);
 
 const server = app.listen(port, () => {
   setupKeys();
-  console.log(`Server Started at: at port ${port}`);
+  console.log(`Server Started on port ${port}`);
 });
