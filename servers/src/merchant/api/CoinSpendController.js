@@ -1,11 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fetch from 'isomorphic-fetch';
-import { ctx, params, signingServers, merchant, issuer } from '../../globalConfig';
+import { ctx, params, signingServers, issuer } from '../../globalConfig';
 import CoinSig from '../../CoinSig';
 import { DEBUG } from '../config/appConfig';
 import { fromBytesProof, verifyProofOfSecret, getSigningAuthorityPublicKey } from '../../auxiliary';
-import { issuer_address } from '../../signingAuthority/config/constants';
 import { sig_pkBytes } from '../config/KeySetup';
 import { publicKeys } from '../cache';
 
@@ -135,7 +134,7 @@ router.post('/', async (req, res) => {
 
     // we don't need to create byte representations of all objects because we already have them
     // should we sign the request by merchant?
-    const wasCoinDeposited = await depositCoin(coinAttributes, simplifiedProof, req.body.signature, pkXBytes, issuer_address);
+    const wasCoinDeposited = await depositCoin(coinAttributes, simplifiedProof, req.body.signature, pkXBytes, issuer);
 
     responseStatus = 200;
     success = isProofValid && !wasCoinAlreadySpent && wasCoinDeposited;
