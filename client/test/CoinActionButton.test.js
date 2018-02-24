@@ -16,19 +16,40 @@ describe('CoinActionButton Component', () => {
   };
 
   it('Should have received "onSign" function as a prop', () => {
-    const mainWrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+    const mainWrapper = mount(<CoinDisplayer
+      coin={dummyCoin}
+      sk={{ dummy: 'value' }}
+      id={{ dummy: 'value' }}
+      ElGamalPK={{ dummy: 'value' }}
+      ElGamalSK={{ dummy: 'value' }}
+      sk_client={[]}
+    />);
     const wrapper = mainWrapper.find(CoinActionButton);
     expect(wrapper.props().onSign).to.be.a('Function');
   });
 
   it('Should have received "onSpend" function as a prop', () => {
-    const mainWrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+    const mainWrapper = mount(<CoinDisplayer
+      coin={dummyCoin}
+      sk={{ dummy: 'value' }}
+      id={{ dummy: 'value' }}
+      ElGamalPK={{ dummy: 'value' }}
+      ElGamalSK={{ dummy: 'value' }}
+      sk_client={[]}
+    />);
     const wrapper = mainWrapper.find(CoinActionButton);
     expect(wrapper.props().onSpend).to.be.a('Function');
   });
 
   it('Should have received "coinState" string as a prop, which is one of attributes of COIN_STATUS', () => {
-    const mainWrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+    const mainWrapper = mount(<CoinDisplayer
+      coin={dummyCoin}
+      sk={{ dummy: 'value' }}
+      id={{ dummy: 'value' }}
+      ElGamalPK={{ dummy: 'value' }}
+      ElGamalSK={{ dummy: 'value' }}
+      sk_client={[]}
+    />);
     const wrapper = mainWrapper.find(CoinActionButton);
     const { coinState } = wrapper.props();
     expect(coinState).to.be.a('string');
@@ -41,33 +62,45 @@ describe('CoinActionButton Component', () => {
 
   it('Should be disabled if "coinState" is either "signing", "spending", "spent" or "error"', () => {
     const wrapper1 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.created}
     />);
     const wrapper2 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.signing}
     />);
     const wrapper3 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.signed}
     />);
     const wrapper4 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.spent}
     />);
     const wrapper5 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.spending}
     />);
     const wrapper6 = shallow(<CoinActionButton
-      onSign={() => {}}
-      onSpend={() => {}}
+      onSign={() => {
+      }}
+      onSpend={() => {
+      }}
       coinState={COIN_STATUS.error}
     />);
 

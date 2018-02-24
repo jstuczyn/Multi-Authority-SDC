@@ -22,9 +22,9 @@ describe('CoinRequester Component', () => {
     expect(wrapper.state().value).to.equal(0);
   });
 
-  it('Should have initial isProcessing state of false', () => {
+  it('Should have initial isRequesting state of false', () => {
     const wrapper = mount(<CoinRequester />);
-    expect(wrapper.state().isProcessing).to.equal(false);
+    expect(wrapper.state().isRequesting).to.equal(false);
   });
 
   it('Should have received "handleCoinSubmit" function as a prop', () => {

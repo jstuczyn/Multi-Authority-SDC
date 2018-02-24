@@ -1,8 +1,8 @@
 import CTX from '../lib/Milagro-Crypto-Library/ctx';
 import CoinSig from '../lib/CoinSig';
 
-export const DEBUG = true;
-export const DETAILED_DEBUG = true;
+export const DEBUG = false;
+export const DETAILED_DEBUG = false;
 
 export const signingServers = (process.env.NODE_ENV === 'production') ? [
   '35.177.85.84:3000',

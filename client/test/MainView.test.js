@@ -4,8 +4,8 @@ import { shallow, mount, render } from 'enzyme';
 import MainView from '../src/components/MainView';
 import CoinRequester from '../src/components/CoinRequester';
 import CoinListDisplayer from '../src/components/CoinListDisplayer';
-import Coin from '../lib/Coin';
 import { params } from '../src/config';
+import { wait } from '../src/utils/api';
 
 describe('MainView Component', () => {
   it('Has a single Grid Child', () => {
@@ -28,7 +28,7 @@ describe('MainView Component', () => {
     expect(wrapper.state().coins).to.be.an('Array').that.is.empty;
   });
 
-  describe('Coin generation', () => {
+  describe('Coin generation', async () => {
     const coinValue = 42;
     const wrapper = mount(<MainView />);
     const input = wrapper.find(CoinRequester).find('input');
@@ -38,6 +38,8 @@ describe('MainView Component', () => {
     // submit value
     const button = wrapper.find(CoinRequester).find('button');
     button.simulate('click');
+
+    await wait(200);
 
     it('Upon submitting coin of given value, the Coin object has that value', () => {
       expect(wrapper.state('coins')[0].coin.value).to.equal(coinValue);

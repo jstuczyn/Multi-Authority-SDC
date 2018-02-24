@@ -11,25 +11,18 @@ let coinListDisplayerNode;
 
 describe('CoinListDisplayer Component', () => {
   let wrapper;
-  before(() => {
+  before(async () => {
     wrapper = mount(<MainView />);
-    wrapper.find('input').simulate('change', { target: { value: 42 } });
-    wrapper.find(CoinRequester).find('button').simulate('click');
-
-    wrapper.find('input').simulate('change', { target: { value: 43 } });
-    wrapper.find(CoinRequester).find('button').simulate('click');
-
+    await wrapper.find(CoinRequester).at(0).props().handleCoinSubmit(212);
+    await wrapper.find(CoinRequester).at(0).props().handleCoinSubmit(213);
+    wrapper.update();
     coinListDisplayerNode = wrapper.find(CoinListDisplayer);
   });
 
-  it('Should have received array of {sk, coin} objects', () => {
+  it('Should have received array of coin objects', () => {
     expect(coinListDisplayerNode.props().coins).to.be.an('Array').to.not.be.empty;
     expect(coinListDisplayerNode.props().coins[0]).to.be.an('object').to.not.be.empty;
     expect(coinListDisplayerNode.props().coins[1]).to.be.an('object').to.not.be.empty;
-    expect(coinListDisplayerNode.props().coins[0].sk).to.be.an('object').to.not.be.empty;
-    expect(coinListDisplayerNode.props().coins[0].coin).to.be.an('object').to.not.be.empty;
-    expect(coinListDisplayerNode.props().coins[1].sk).to.be.an('object').to.not.be.empty;
-    expect(coinListDisplayerNode.props().coins[1].coin).to.be.an('object').to.not.be.empty;
   });
 
   it('Contains as many CoinDisplayer children as it got coin objects in props', () => {
