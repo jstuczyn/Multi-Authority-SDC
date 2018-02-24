@@ -6,22 +6,27 @@ import { shallow, mount, render } from 'enzyme';
 import CoinDisplayer from '../src/components/CoinDisplayer';
 import CoinActionButton from '../src/components/CoinActionButton';
 import MainView from '../src/components/MainView';
-import { params, COIN_STATUS, signingServers } from '../src/config';
-import { getCoin } from '../src/utils/coinGenerator';
+import { params, COIN_STATUS, signingServers, issuer, ctx } from '../src/config';
 import CoinSig from '../lib/CoinSig';
 import Coin from '../lib/Coin';
-import { getSigningAuthorityPublicKey } from '../src/utils/api';
+import { getSigningAuthorityPublicKey, getCoin } from '../src/utils/api';
+
+import CoinRequester from '../src/components/CoinRequester';
+import ElGamal from '../lib/ElGamal';
 
 let coinDisplayerNode;
+let requestedCoin;
 
-describe('CoinDisplayer Component', () => {
+describe('CoinDisplayer Component', async () => {
   const coinValue = 42;
-  before(() => {
+  before(async () => {
     const wrapper = mount(<MainView />);
     wrapper.find('input').simulate('change', { target: { value: coinValue } });
-    wrapper.find('button').simulate('click');
+    await wrapper.find(CoinRequester).at(0).props().handleCoinSubmit(coinValue);
 
+    wrapper.update();
     coinDisplayerNode = wrapper.find(CoinDisplayer);
+    requestedCoin = coinDisplayerNode.props().coin;
   });
   describe('Should have received Coin as a prop', () => {
     it('That has TTL in a future', () => {
@@ -32,23 +37,16 @@ describe('CoinDisplayer Component', () => {
       expect(coinDisplayerNode.props().coin.value).to.equal(coinValue);
     });
   });
-  // save time by not generating entire object that we do not need anyway
-  const dummyCoin = {
-    coin: {
-      ttl: new Date().getTime(),
-      value: 42,
-    },
-  };
 
   describe('CoinActionButton child behaviour', () => {
     it('Has CoinActionButton child component', () => {
-      const wrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+      const wrapper = mount(<CoinDisplayer coin={requestedCoin} sk={null} id={null} ElGamalPK={null} ElGamalSK={null} sk_client={null} />);
 
       expect(coinDisplayerNode.find(CoinActionButton)).to.have.length(1);
     });
 
     it('If CoinDisplayer has coinState "Generated", CoinActionButton will call "handleCoinSign" on click', () => {
-      const wrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+      const wrapper = mount(<CoinDisplayer coin={requestedCoin} />);
       wrapper.setState({ coinState: COIN_STATUS.created });
       const spy = sinon.spy(wrapper.instance(), 'handleCoinSign');
 
@@ -59,7 +57,7 @@ describe('CoinDisplayer Component', () => {
     });
 
     it('If CoinDisplayer has coinState "Signed", CoinActionButton will call "handleCoinSpend" on click', () => {
-      const wrapper = mount(<CoinDisplayer coin={dummyCoin} />);
+      const wrapper = mount(<CoinDisplayer coin={requestedCoin} />);
       wrapper.setState({ coinState: COIN_STATUS.signed });
       const spy = sinon.spy(wrapper.instance(), 'handleCoinSpend');
 
@@ -72,26 +70,78 @@ describe('CoinDisplayer Component', () => {
 
   describe('getSignatures method (REQUIRES SERVERS SPECIFIED IN config.js TO BE UP)', () => {
     it('Gets valid signatures from all alive signingServers', async () => {
-      const [coin_sk, coin_pk] = Coin.keygen(params);
-      const coin = getCoin(coin_pk, 42);
+      const [G, o, g1, g2, e] = params;
 
-      const wrapper = mount(<CoinDisplayer coin={coin} />);
+      const [sk_elgamal, pk_elgamal] = ElGamal.keygen(params);
+      const skBytes_client = [];
+      const pkBytes_client = [];
+      const sk_client = G.ctx.BIG.randomnum(o, G.rngGen);
+      sk_client.toBytes(skBytes_client);
+      const pk_client = g1.mul(sk_client);
+      pk_client.toBytes(pkBytes_client);
+
+      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin, id] = await getCoin(
+        coin_sk,
+        coin_pk,
+        42,
+        pkBytes_client,
+        skBytes_client,
+        issuer,
+      );
+
+      const wrapper = mount(<CoinDisplayer
+        key={id}
+        coin={coin}
+        sk={coin_sk}
+        id={id}
+        ElGamalSK={sk_elgamal}
+        ElGamalPK={pk_elgamal}
+        sk_client={skBytes_client}
+      />);
 
       const signatures = await wrapper.instance().getSignatures(signingServers);
       const publicKeys = await Promise.all(signingServers.map(async server => getSigningAuthorityPublicKey(server)));
 
       for (let i = 0; i < signatures.length; i++) {
-        expect(CoinSig.verify(params, publicKeys[i], coin, signatures[i])).to.equal(true);
+        const pkX = ctx.PAIR.G2mul(publicKeys[i][4], coin_sk);
+        expect(CoinSig.verifyMixedBlindSign(params, publicKeys[i], coin, signatures[i], id, pkX)).to.equal(true);
       }
     });
 
     it('Gets null if one of requests produced an error (such is if server was down)', async () => {
       const invalidServers = signingServers.slice();
-      invalidServers.push('127.0.0.1:4000');
-      const [coin_sk, coin_pk] = Coin.keygen(params);
-      const coin = getCoin(coin_pk, 42);
+      invalidServers.push('127.0.0.1:3645');
 
-      const wrapper = shallow(<CoinDisplayer coin={coin} />);
+      const [G, o, g1, g2, e] = params;
+
+      const [sk_elgamal, pk_elgamal] = ElGamal.keygen(params);
+      const skBytes_client = [];
+      const pkBytes_client = [];
+      const sk_client = G.ctx.BIG.randomnum(o, G.rngGen);
+      sk_client.toBytes(skBytes_client);
+      const pk_client = g1.mul(sk_client);
+      pk_client.toBytes(pkBytes_client);
+
+      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin, id] = await getCoin(
+        coin_sk,
+        coin_pk,
+        42,
+        pkBytes_client,
+        skBytes_client,
+        issuer,
+      );
+
+      const wrapper = mount(<CoinDisplayer
+        key={id}
+        coin={coin}
+        sk={coin_sk}
+        id={id}
+        ElGamalSK={sk_elgamal}
+        ElGamalPK={pk_elgamal}
+        sk_client={skBytes_client}
+      />);
 
       const signatures = await wrapper.instance().getSignatures(invalidServers);
 
@@ -101,10 +151,35 @@ describe('CoinDisplayer Component', () => {
 
   describe('aggregateAndRandomizeSignatures method (REQUIRES SERVERS SPECIFIED IN config.js TO BE UP)', () => {
     it('Produces a valid randomized, aggregate signature and sets state appropriately', async () => {
-      const [coin_sk, coin_pk] = Coin.keygen(params);
-      const coin = getCoin(coin_pk, 42);
+      const [G, o, g1, g2, e] = params;
 
-      const wrapper = mount(<CoinDisplayer coin={coin} />);
+      const [sk_elgamal, pk_elgamal] = ElGamal.keygen(params);
+      const skBytes_client = [];
+      const pkBytes_client = [];
+      const sk_client = G.ctx.BIG.randomnum(o, G.rngGen);
+      sk_client.toBytes(skBytes_client);
+      const pk_client = g1.mul(sk_client);
+      pk_client.toBytes(pkBytes_client);
+
+      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin, id] = await getCoin(
+        coin_sk,
+        coin_pk,
+        42,
+        pkBytes_client,
+        skBytes_client,
+        issuer,
+      );
+
+      const wrapper = mount(<CoinDisplayer
+        key={id}
+        coin={coin}
+        sk={coin_sk}
+        id={id}
+        ElGamalSK={sk_elgamal}
+        ElGamalPK={pk_elgamal}
+        sk_client={skBytes_client}
+      />);
 
       const signatures = await wrapper.instance().getSignatures(signingServers);
       const publicKeys = await Promise.all(signingServers.map(async server => getSigningAuthorityPublicKey(server)));
@@ -113,16 +188,43 @@ describe('CoinDisplayer Component', () => {
 
       wrapper.instance().aggregateAndRandomizeSignatures(signatures);
       assert.isNotNull(wrapper.state('randomizedSignature'));
-      expect(CoinSig.verify(params, aggregatePublicKey, coin, wrapper.state('randomizedSignature'))).to.equal(true);
+
+      const pkX = ctx.PAIR.G2mul(aggregatePublicKey[4], coin_sk);
+      expect(CoinSig.verifyMixedBlindSign(params, aggregatePublicKey, coin, wrapper.state('randomizedSignature'), id, pkX)).to.equal(true);
     });
 
     it("If one of signatures was null, aggregate won't be created and state will be set appropriately", async () => {
       const invalidServers = signingServers.slice();
-      invalidServers.push('127.0.0.1:5000');
-      const [coin_sk, coin_pk] = Coin.keygen(params);
-      const coin = getCoin(coin_pk, 42);
+      invalidServers.push('127.0.0.1:8451');
+      const [G, o, g1, g2, e] = params;
 
-      const wrapper = shallow(<CoinDisplayer coin={coin} />);
+      const [sk_elgamal, pk_elgamal] = ElGamal.keygen(params);
+      const skBytes_client = [];
+      const pkBytes_client = [];
+      const sk_client = G.ctx.BIG.randomnum(o, G.rngGen);
+      sk_client.toBytes(skBytes_client);
+      const pk_client = g1.mul(sk_client);
+      pk_client.toBytes(pkBytes_client);
+
+      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin, id] = await getCoin(
+        coin_sk,
+        coin_pk,
+        42,
+        pkBytes_client,
+        skBytes_client,
+        issuer,
+      );
+
+      const wrapper = mount(<CoinDisplayer
+        key={id}
+        coin={coin}
+        sk={coin_sk}
+        id={id}
+        ElGamalSK={sk_elgamal}
+        ElGamalPK={pk_elgamal}
+        sk_client={skBytes_client}
+      />);
 
       const signatures = await wrapper.instance().getSignatures(invalidServers);
       wrapper.instance().aggregateAndRandomizeSignatures(signatures);
