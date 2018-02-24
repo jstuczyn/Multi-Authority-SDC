@@ -5,7 +5,6 @@
 
 import * as crypto from 'crypto';
 import CTX from '../../servers/src/lib/Milagro-Crypto-Library/ctx';
-import { stringToBytes } from './auxiliary';
 
 export default class BpGroup {
   constructor() {
