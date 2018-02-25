@@ -1,6 +1,6 @@
 import BpGroup from '../../../servers/dist/BpGroup';
 
-const preparePairing = () => {
+const prepare = () => {
   const G = new BpGroup();
   const g1 = G.gen1;
   const g2 = G.gen2;
@@ -8,7 +8,7 @@ const preparePairing = () => {
   return [[G], [G, g1, g2]];
 };
 
-const beforePairing = (G, g1, g2) => {
+const before = (G, g1, g2) => {
   const r1 = G.ctx.BIG.randomnum(G.order, G.rngGen);
   const r2 = G.ctx.BIG.randomnum(G.order, G.rngGen);
 
@@ -22,8 +22,8 @@ const doPairing = (G, G1elem, G2elem) => G.pair(G1elem, G2elem);
 
 const pairingBenchmark = {
   name: 'pairing',
-  prep: preparePairing, // should give [a,b] array where a are args for fn and b are args for beforeEach
-  beforeEach: beforePairing, // returns [c] array which are args for fn
+  prep: prepare, // should give [a,b] array where a are args for fn and b are args for beforeEach
+  beforeEach: before, // returns [c] array which are args for fn
   fn: doPairing, // takes ...a, ...c
 };
 

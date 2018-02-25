@@ -1,9 +1,13 @@
-// import 'babel-polyfill';
+import 'babel-polyfill';
 import { performance } from 'perf_hooks';
 import * as fs from 'fs';
-import pairingBenchmark from './primitives/pairing';
 
-const MAX_REPETITIONS = 1000;
+import pairingBenchmark from './primitives/pairing';
+import randomBenchmark from './primitives/random';
+import ElGamalKeygenBenchmark from './primitives/ElGamalKeygen';
+import EntityKeygenBenchmark from './primitives/entityKeygen';
+
+const MAX_REPETITIONS = 100;
 const MAX_TIME_PER_FUNCTION = 30000; // we can test each function for at most 30s
 
 const doBenchmark = (benchmark) => {
@@ -46,4 +50,7 @@ const doBenchmark = (benchmark) => {
   });
 };
 
-doBenchmark(pairingBenchmark);
+// doBenchmark(pairingBenchmark);
+// doBenchmark(randomBenchmark);
+// doBenchmark(ElGamalKeygenBenchmark);
+doBenchmark(EntityKeygenBenchmark);
