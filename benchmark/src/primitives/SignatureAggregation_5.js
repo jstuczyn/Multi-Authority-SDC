@@ -39,7 +39,6 @@ const before = () => {
   const issuedCoin = getIssuedCoin(coin_pk_bytes, value, pkBytes_client, sk_issuer_bytes);
   const signingCoin = getSigningCoin(issuedCoin, ElGamalPK, coin_id, coin_sk, skBytes_client);
 
-  const pks = [];
   for (let i = 0; i < ITERATIONS; i++) {
     const [sk, pk] = CoinSig.keygen(params);
     const [h, enc_sig] = CoinSig.mixedSignCoin(params, sk, signingCoin, ElGamalPK);
@@ -47,7 +46,6 @@ const before = () => {
     const sig = ElGamal.decrypt(params, ElGamalSK, enc_sig);
 
     signatures.push([h, sig]);
-    pks.push(pk);
   }
   return [signatures];
 };

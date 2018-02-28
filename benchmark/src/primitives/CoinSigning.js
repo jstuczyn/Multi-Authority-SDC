@@ -8,9 +8,6 @@ import { getSigningCoin } from '../../../servers/dist/SigningCoin';
 const prepare = () => ([[], []]);
 
 const before = () => {
-  const ITERATIONS = 10;
-  const signatures = [];
-
   const [G, o, g1, g2, e] = params;
 
   const value = 42;
@@ -39,26 +36,19 @@ const before = () => {
   const issuedCoin = getIssuedCoin(coin_pk_bytes, value, pkBytes_client, sk_issuer_bytes);
   const signingCoin = getSigningCoin(issuedCoin, ElGamalPK, coin_id, coin_sk, skBytes_client);
 
-  for (let i = 0; i < ITERATIONS; i++) {
-    const [sk, pk] = CoinSig.keygen(params);
-    const [h, enc_sig] = CoinSig.mixedSignCoin(params, sk, signingCoin, ElGamalPK);
-
-    const sig = ElGamal.decrypt(params, ElGamalSK, enc_sig);
-
-    signatures.push([h, sig]);
-  }
-  return [signatures];
+  const [sk, pk] = CoinSig.keygen(params);
+  return [sk, signingCoin, ElGamalPK];
 };
 
-const SignatureAggregation = (signatures) => {
-  return CoinSig.aggregateSignatures(params, signatures);
+const signCoin = (sk, signingCoin, ElGamalPK) => {
+  return CoinSig.mixedSignCoin(params, sk, signingCoin, ElGamalPK);
 };
 
-const SignatureAggregation_10 = {
-  name: 'SignatureAggregation_10',
+const CoinSigning = {
+  name: 'CoinSigning',
   prep: prepare, // should give [a,b] array where a are args for fn and b are args for beforeEach
   beforeEach: before, // returns [c] array which are args for fn
-  fn: SignatureAggregation, // takes ...a, ...c
+  fn: signCoin, // takes ...a, ...c
 };
 
-export default SignatureAggregation_10;
+export default CoinSigning;
