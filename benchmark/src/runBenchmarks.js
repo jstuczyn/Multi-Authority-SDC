@@ -6,6 +6,9 @@ import pairingBenchmark from './primitives/pairing';
 import randomBenchmark from './primitives/random';
 import ElGamalKeygenBenchmark from './primitives/ElGamalKeygen';
 import EntityKeygenBenchmark from './primitives/entityKeygen';
+import CoinSigKeygenBenchmark from './primitives/CoinSigKeygen';
+import NZKPCreationBenchmark from './primitives/NZKP_creation';
+import NZKPVerificationBenchmark from './primitives/NZKP_verification';
 
 const MAX_REPETITIONS = 100;
 const MAX_TIME_PER_FUNCTION = 30000; // we can test each function for at most 30s
@@ -53,4 +56,7 @@ const doBenchmark = (benchmark) => {
 // doBenchmark(pairingBenchmark);
 // doBenchmark(randomBenchmark);
 // doBenchmark(ElGamalKeygenBenchmark);
-doBenchmark(EntityKeygenBenchmark);
+// doBenchmark(EntityKeygenBenchmark);
+// doBenchmark(CoinSigKeygenBenchmark);
+// doBenchmark(NZKPCreationBenchmark);
+doBenchmark(NZKPVerificationBenchmark);
