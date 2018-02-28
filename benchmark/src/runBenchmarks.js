@@ -11,8 +11,15 @@ import NZKPCreationBenchmark from './primitives/NZKP_creation';
 import NZKPVerificationBenchmark from './primitives/NZKP_verification';
 import ElGamalEncryptionBenchmark from './primitives/ElGamalEncryption';
 import ElGamalDecryptionBenchmark from './primitives/ElGamalDecryption';
+import PublicKeyAggregation_2 from './primitives/PublicKeyAggregation_2';
+import PublicKeyAggregation_5 from './primitives/PublicKeyAggregation_5';
+import PublicKeyAggregation_10 from './primitives/PublicKeyAggregation_10';
+import SignatureAggregation_2 from './primitives/SignatureAggregation_2';
+import SignatureAggregation_5 from './primitives/SignatureAggregation_5';
+import SignatureAggregation_10 from './primitives/SignatureAggregation_10';
 
-const MAX_REPETITIONS = 100;
+
+const MAX_REPETITIONS = 100 ;
 const MAX_TIME_PER_FUNCTION = 30000; // we can test each function for at most 30s
 
 const doBenchmark = (benchmark) => {
@@ -20,6 +27,7 @@ const doBenchmark = (benchmark) => {
   const timings = [];
   let runningTotal = 0;
   for (let i = 0; i < MAX_REPETITIONS + 2; i++) {
+    console.log(`${benchmark.name}, iteration: ${i}`);
     const beforeEachResult = benchmark.beforeEach(...prepResult[1]);
 
     performance.mark(`start${benchmark.name}${i}`);
@@ -63,4 +71,10 @@ const doBenchmark = (benchmark) => {
 // doBenchmark(NZKPCreationBenchmark);
 // doBenchmark(NZKPVerificationBenchmark);
 // doBenchmark(ElGamalEncryptionBenchmark);
-doBenchmark(ElGamalDecryptionBenchmark);
+// doBenchmark(ElGamalDecryptionBenchmark);
+// doBenchmark(PublicKeyAggregation_2);
+// doBenchmark(PublicKeyAggregation_5);
+// doBenchmark(PublicKeyAggregation_10);
+// doBenchmark(SignatureAggregation_2);
+// doBenchmark(SignatureAggregation_5);
+// doBenchmark(SignatureAggregation_10);
