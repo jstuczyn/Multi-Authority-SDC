@@ -20,7 +20,6 @@ const before = () => {
   const verifierStr = pkBytes.join('');
 
   const pub = G.ctx.PAIR.G2mul(gr, x);
-  // return [x, verifierStr, gr];
   const proof = prepareProofOfSecret(params, x, verifierStr, gr);
 
   return [pub, proof, verifierStr, gr];

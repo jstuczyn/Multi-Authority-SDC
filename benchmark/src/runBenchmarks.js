@@ -9,6 +9,8 @@ import EntityKeygenBenchmark from './primitives/entityKeygen';
 import CoinSigKeygenBenchmark from './primitives/CoinSigKeygen';
 import NZKPCreationBenchmark from './primitives/NZKP_creation';
 import NZKPVerificationBenchmark from './primitives/NZKP_verification';
+import ElGamalEncryptionBenchmark from './primitives/ElGamalEncryption';
+import ElGamalDecryptionBenchmark from './primitives/ElGamalDecryption';
 
 const MAX_REPETITIONS = 100;
 const MAX_TIME_PER_FUNCTION = 30000; // we can test each function for at most 30s
@@ -59,4 +61,6 @@ const doBenchmark = (benchmark) => {
 // doBenchmark(EntityKeygenBenchmark);
 // doBenchmark(CoinSigKeygenBenchmark);
 // doBenchmark(NZKPCreationBenchmark);
-doBenchmark(NZKPVerificationBenchmark);
+// doBenchmark(NZKPVerificationBenchmark);
+// doBenchmark(ElGamalEncryptionBenchmark);
+doBenchmark(ElGamalDecryptionBenchmark);
