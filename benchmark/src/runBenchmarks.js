@@ -44,33 +44,28 @@ const doBenchmark = (benchmark) => {
     }
   }
 
-  const outputFile = fs.createWriteStream(`results/${benchmark.name}_timing.txt`);
-  outputFile.on('error', () => {
-    console.warn('Error occured while writing to the file');
-  });
+  const writeString = timings.join('\n'); // more memory intensive but should not affect results
+  // as now each write is written before new benchmark is started
 
-  timings.forEach((val, index) => {
-    if (index !== 0 && index !== 1) {
-      outputFile.write(`${val}\n`);
-    }
-  });
-
-  outputFile.end();
+  fs.writeFileSync(`results/${benchmark.name}_timing.txt`, writeString, () => {
+    console.log(`${benchmark.name} results were written to a file`);
 };
 
 doBenchmark(pairingBenchmark);
 doBenchmark(randomBenchmark);
-// doBenchmark(ElGamalKeygenBenchmark);
-// doBenchmark(EntityKeygenBenchmark);
-// doBenchmark(CoinSigKeygenBenchmark);
-// doBenchmark(NZKPCreationBenchmark);
-// doBenchmark(NZKPVerificationBenchmark);
-// doBenchmark(ElGamalEncryptionBenchmark);
-// doBenchmark(ElGamalDecryptionBenchmark);
-// doBenchmark(PublicKeyAggregation_2);
-// doBenchmark(PublicKeyAggregation_5);
-// doBenchmark(PublicKeyAggregation_10);
-// doBenchmark(SignatureAggregation_2);
-// doBenchmark(SignatureAggregation_5);
-// doBenchmark(SignatureAggregation_10);
-// doBenchmark(CoinSigning);
+doBenchmark(ElGamalKeygenBenchmark);
+doBenchmark(EntityKeygenBenchmark);
+doBenchmark(CoinSigKeygenBenchmark);
+doBenchmark(NZKPCreationBenchmark);
+doBenchmark(NZKPVerificationBenchmark);
+doBenchmark(ElGamalEncryptionBenchmark);
+doBenchmark(ElGamalDecryptionBenchmark);
+doBenchmark(PublicKeyAggregation_2);
+doBenchmark(PublicKeyAggregation_5);
+doBenchmark(PublicKeyAggregation_10);
+doBenchmark(SignatureAggregation_2);
+doBenchmark(SignatureAggregation_5);
+doBenchmark(SignatureAggregation_10);
+doBenchmark(CoinSigning);
+
+
