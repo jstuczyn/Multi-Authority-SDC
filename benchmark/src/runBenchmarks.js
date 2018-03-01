@@ -49,6 +49,7 @@ const doBenchmark = (benchmark) => {
 
   fs.writeFileSync(`results/${benchmark.name}_timing.txt`, writeString, () => {
     console.log(`${benchmark.name} results were written to a file`);
+  });
 };
 
 doBenchmark(pairingBenchmark);
