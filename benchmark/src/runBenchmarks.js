@@ -20,7 +20,7 @@ import SignatureAggregation_10 from './primitives/SignatureAggregation_10';
 import CoinSigning from './primitives/CoinSigning';
 
 
-const MAX_REPETITIONS = 1000;
+const MAX_REPETITIONS = 100;
 const MAX_TIME_PER_FUNCTION = 120000; // we can test each function for at most 120s (PREP TIME NOT INCLUDED);
 
 const doBenchmark = (benchmark) => {
@@ -44,39 +44,33 @@ const doBenchmark = (benchmark) => {
     }
   }
 
-  fs.open(`results/${benchmark.name}_timing.txt`, 'w', (err, fd) => {
-    if (err) {
-      throw err;
-    }
-
-    timings.forEach((val, index) => {
-      // for some reason first pairing is consistently slower than the rest,
-      // perhaps due to file loading/paging? (most likely JIT),
-      // don't record the first entry (two entries?)
-      if (index !== 0 && index !== 1) {
-        fs.write(fd, `${val}\n`, () => {});
-      }
-    });
-
-    fs.close(fd, () => {
-      console.log('Written results to file.');
-    });
+  const outputFile = fs.createWriteStream(`results/${benchmark.name}_timing.txt`);
+  outputFile.on('error', () => {
+    console.warn('Error occured while writing to the file');
   });
+
+  timings.forEach((val, index) => {
+    if (index !== 0 && index !== 1) {
+      outputFile.write(`${val}\n`);
+    }
+  });
+
+  outputFile.end();
 };
 
 doBenchmark(pairingBenchmark);
 doBenchmark(randomBenchmark);
-doBenchmark(ElGamalKeygenBenchmark);
-doBenchmark(EntityKeygenBenchmark);
-doBenchmark(CoinSigKeygenBenchmark);
-doBenchmark(NZKPCreationBenchmark);
-doBenchmark(NZKPVerificationBenchmark);
-doBenchmark(ElGamalEncryptionBenchmark);
-doBenchmark(ElGamalDecryptionBenchmark);
-doBenchmark(PublicKeyAggregation_2);
-doBenchmark(PublicKeyAggregation_5);
-doBenchmark(PublicKeyAggregation_10);
-doBenchmark(SignatureAggregation_2);
-doBenchmark(SignatureAggregation_5);
-doBenchmark(SignatureAggregation_10);
-doBenchmark(CoinSigning);
+// doBenchmark(ElGamalKeygenBenchmark);
+// doBenchmark(EntityKeygenBenchmark);
+// doBenchmark(CoinSigKeygenBenchmark);
+// doBenchmark(NZKPCreationBenchmark);
+// doBenchmark(NZKPVerificationBenchmark);
+// doBenchmark(ElGamalEncryptionBenchmark);
+// doBenchmark(ElGamalDecryptionBenchmark);
+// doBenchmark(PublicKeyAggregation_2);
+// doBenchmark(PublicKeyAggregation_5);
+// doBenchmark(PublicKeyAggregation_10);
+// doBenchmark(SignatureAggregation_2);
+// doBenchmark(SignatureAggregation_5);
+// doBenchmark(SignatureAggregation_10);
+// doBenchmark(CoinSigning);
