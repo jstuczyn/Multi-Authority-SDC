@@ -18,7 +18,7 @@ import SignatureAggregation_2 from './primitives/SignatureAggregation_2';
 import SignatureAggregation_5 from './primitives/SignatureAggregation_5';
 import SignatureAggregation_10 from './primitives/SignatureAggregation_10';
 import CoinSigning from './primitives/CoinSigning';
-
+import coinVerification from './primitives/CoinSignVerification';
 
 const MAX_REPETITIONS = 100;
 const MAX_TIME_PER_FUNCTION = 120000; // we can test each function for at most 120s (PREP TIME NOT INCLUDED);
@@ -68,5 +68,4 @@ doBenchmark(SignatureAggregation_2);
 doBenchmark(SignatureAggregation_5);
 doBenchmark(SignatureAggregation_10);
 doBenchmark(CoinSigning);
-
-
+doBenchmark(coinVerification);
