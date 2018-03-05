@@ -44,6 +44,9 @@ const doBenchmark = (benchmark) => {
     }
   }
 
+  // start by removing first two elements of the array due to them being considerably bigger because of JIT
+  timings.shift();
+  timings.shift();
   const writeString = timings.join('\n'); // more memory intensive but should not affect results
   // as now each write is written before new benchmark is started
 
