@@ -3,9 +3,7 @@ import { DEBUG, pgConfig } from '../config/appConfig';
 
 const pool = new pg.Pool(pgConfig);
 
-// todo: update to use pk instead of name
 export const getBalance = async (pk_bytes) => {
-  // in order to 'guarantee' unique result, concat all values rather than add them as before:
   let balance = -1;
   try {
     const str_pk_bytes = pk_bytes.join('');
@@ -28,7 +26,6 @@ export const getBalance = async (pk_bytes) => {
 };
 
 // if given user does not exist, it creates him and sets his balance to the value
-// TODO: update to use pk as getBalance
 export const changeBalance = async (pk_bytes, value) => {
   const str_pk_bytes = pk_bytes.join('');
 

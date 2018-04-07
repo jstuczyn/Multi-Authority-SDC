@@ -11,6 +11,7 @@ class ValueInput extends React.Component {
   }
 
   // only allows integer values
+  // server-side check is performed later anyway
   handleInputChange = (event) => {
     const stringValue = event.target.value;
     // ensures that it won't try to extract num from garbage

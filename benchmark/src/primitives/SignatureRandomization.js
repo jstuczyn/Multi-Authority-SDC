@@ -43,19 +43,18 @@ const before = () => {
 
   const signature = [h, sig];
 
-  const pkX = G.ctx.PAIR.G2mul(pk[4], coin_sk);
-  return [pk, signingCoin, signature, coin_id, pkX];
+  return [signature];
 };
 
-const verifyCoin = (pk, coin, sig, id, pkX) => {
-  CoinSig.verifyMixedBlindSign(params, pk, coin, sig, id, pkX);
+const SigRandomization = (signature) => {
+  return CoinSig.randomize(params, signature);
 };
 
-const coinVerification = {
-  name: 'CoinSignVerify',
+const SignatureRandomization = {
+  name: 'SignatureRandomization',
   prep: prepare, // should give [a,b] array where a are args for fn and b are args for beforeEach
   beforeEach: before, // returns [c] array which are args for fn
-  fn: verifyCoin, // takes ...a, ...c
+  fn: SigRandomization, // takes ...a, ...c
 };
 
-export default coinVerification;
+export default SignatureRandomization;

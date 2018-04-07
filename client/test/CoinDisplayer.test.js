@@ -8,7 +8,6 @@ import CoinActionButton from '../src/components/CoinActionButton';
 import MainView from '../src/components/MainView';
 import { params, COIN_STATUS, signingServers, issuer, ctx } from '../src/config';
 import CoinSig from '../lib/CoinSig';
-import Coin from '../lib/Coin';
 import { getSigningAuthorityPublicKey, getCoin } from '../src/utils/api';
 
 import CoinRequester from '../src/components/CoinRequester';
@@ -16,6 +15,13 @@ import ElGamal from '../lib/ElGamal';
 
 let coinDisplayerNode;
 let requestedCoin;
+
+const generateCoinSecret = () => {
+  const [G, o, g1, g2, e] = params;
+  const sk = ctx.BIG.randomnum(G.order, G.rngGen);
+  const pk = ctx.PAIR.G2mul(g2, sk);
+  return [sk, pk];
+};
 
 describe('CoinDisplayer Component', async () => {
   const coinValue = 42;
@@ -80,7 +86,7 @@ describe('CoinDisplayer Component', async () => {
       const pk_client = g1.mul(sk_client);
       pk_client.toBytes(pkBytes_client);
 
-      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin_sk, coin_pk] = generateCoinSecret();
       const [coin, id] = await getCoin(
         coin_sk,
         coin_pk,
@@ -123,7 +129,7 @@ describe('CoinDisplayer Component', async () => {
       const pk_client = g1.mul(sk_client);
       pk_client.toBytes(pkBytes_client);
 
-      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin_sk, coin_pk] = generateCoinSecret();
       const [coin, id] = await getCoin(
         coin_sk,
         coin_pk,
@@ -161,7 +167,7 @@ describe('CoinDisplayer Component', async () => {
       const pk_client = g1.mul(sk_client);
       pk_client.toBytes(pkBytes_client);
 
-      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin_sk, coin_pk] = generateCoinSecret();
       const [coin, id] = await getCoin(
         coin_sk,
         coin_pk,
@@ -206,7 +212,7 @@ describe('CoinDisplayer Component', async () => {
       const pk_client = g1.mul(sk_client);
       pk_client.toBytes(pkBytes_client);
 
-      const [coin_sk, coin_pk] = Coin.keygen(params);
+      const [coin_sk, coin_pk] = generateCoinSecret();
       const [coin, id] = await getCoin(
         coin_sk,
         coin_pk,

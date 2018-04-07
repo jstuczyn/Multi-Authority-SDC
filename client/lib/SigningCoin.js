@@ -61,15 +61,49 @@ export const getSigningCoin = (issuedCoin, ElGamalPK, coin_id, coin_sk, sk_clien
     requestSig: requestSig,
   };
 
-  // need:
+  // Representation:
   /*
-  {{v
-  val
-  ttl
-  pk_c
-  }signed by issuer
-  E[h^id]
-  E[h^x]
+  { { v
+      val
+      ttl
+      pk_c
+    }signed by issuer
+    E[h^id]
+    E[h^x]
   }signed by client
-   */
+ */
+};
+
+export const verifySignRequest = (signingCoin, issuerPK) => {
+  if (issuerPK == null) {
+    return false;
+  }
+
+  // first verify 'internal' signature of the issuer that such coin was issued and wasn't modified
+  const sha = ctx.ECDH.HASH_TYPE;
+  const [C1, D1] = signingCoin.issuedCoinSig;
+
+  const reducer = (acc, cur) => acc + cur;
+
+  const coinStr =
+    signingCoin.pk_client_bytes.reduce(reducer) + // client's key
+    signingCoin.value.toString() + // coin's value
+    signingCoin.pk_coin_bytes.reduce(reducer) + // coin's pk
+    signingCoin.ttl.toString();
+
+  if (ctx.ECDH.ECPVP_DSA(sha, issuerPK, coinStr, C1, D1) !== 0) {
+    return false;
+  }
+
+  const requestStr = coinStr +
+    C1.reduce(reducer) +
+    D1.reduce(reducer) +
+    signingCoin.enc_sk_bytes[0].reduce(reducer) +
+    signingCoin.enc_sk_bytes[1].reduce(reducer) +
+    signingCoin.enc_id_bytes[0].reduce(reducer) +
+    signingCoin.enc_id_bytes[1].reduce(reducer);
+
+  const [C2, D2] = signingCoin.requestSig;
+
+  return ctx.ECDH.ECPVP_DSA(sha, signingCoin.pk_client_bytes, requestStr, C2, D2) === 0;
 };

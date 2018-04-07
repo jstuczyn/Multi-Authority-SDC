@@ -1,6 +1,5 @@
 import * as crypto from 'crypto';
 import { ctx } from '../config';
-import Coin from '../../lib/Coin';
 
 // uses same RNG generator as the one used for key generation
 // it is exported to be used in Coin tests
@@ -14,10 +13,4 @@ export const getRandomCoinId = () => {
   groupOrder.rcopy(ctx.ROM_CURVE.CURVE_Order);
 
   return ctx.BIG.randomnum(groupOrder, rng);
-};
-
-export const getCoin = (pk, value) => {
-  const coin_id = getRandomCoinId();
-  const coin = new Coin(pk, coin_id, value)
-  return [coin, coin_id];
 };

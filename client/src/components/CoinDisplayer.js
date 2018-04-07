@@ -4,7 +4,7 @@ import { Segment } from 'semantic-ui-react';
 import CoinActionButton from './CoinActionButton';
 import styles from './CoinDisplayer.style';
 import { params, ctx, COIN_STATUS, signingServers, merchant, DEBUG } from '../config';
-import { wait, signCoin, spendCoin } from '../utils/api';
+import { signCoin, spendCoin } from '../utils/api';
 import CoinSig from '../../lib/CoinSig';
 import ElGamal from '../../lib/ElGamal';
 import { getSigningCoin } from '../../lib/SigningCoin';

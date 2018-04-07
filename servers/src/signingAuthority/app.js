@@ -1,5 +1,4 @@
 import express from 'express';
-import CoinSignController from './api/CoinSignController';
 import PublicKeyController from './api/PublicKeyController';
 import CoinBlindSignController from './api/CoinBlindSignController';
 
@@ -13,7 +12,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/blindsign', CoinBlindSignController);
-app.use('/sign', CoinSignController);
 app.use('/pk', PublicKeyController);
 
 export default app;

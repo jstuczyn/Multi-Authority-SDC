@@ -1,14 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Header, Icon } from 'semantic-ui-react';
+import styles from './ServerStatus.style';
 import { SERVER_STATUS, SERVER_TYPES, DEBUG } from '../config';
 import { publicKeys } from '../cache';
 import { getSigningAuthorityPublicKey, getPublicKey } from '../utils/api';
-
-const statusStyle = {
-  fontWeight: 'bold',
-  display: 'inline',
-};
 
 const ServerStatusInfo = (props) => {
   switch (props.status) {
@@ -16,7 +12,7 @@ const ServerStatusInfo = (props) => {
       return (
         <div>
           <Icon name="checkmark" color="green" size="large" />
-          <p style={statusStyle}>{props.status}</p>
+          <p style={styles.statusStyle}>{props.status}</p>
         </div>
       );
 
@@ -24,7 +20,7 @@ const ServerStatusInfo = (props) => {
       return (
         <div>
           <Icon name="circle notched" loading size="large" />
-          <p style={statusStyle}>{props.status}</p>
+          <p style={styles.statusStyle}>{props.status}</p>
         </div>
       );
 
@@ -33,7 +29,7 @@ const ServerStatusInfo = (props) => {
       return (
         <div>
           <Icon name="remove" color="red" size="large" />
-          <p style={statusStyle}>{props.status}</p>
+          <p style={styles.statusStyle}>{props.status}</p>
         </div>
       );
   }

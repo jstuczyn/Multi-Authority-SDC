@@ -1,5 +1,4 @@
 // set of auxiliary functions that don't belong to any existing class/module
-
 import fetch from 'isomorphic-fetch';
 import * as crypto from 'crypto';
 import { ctx } from './globalConfig';
@@ -24,7 +23,8 @@ export const hashToBIG = (m) => {
   return ctx.BIG.fromBytes(R);
 };
 
-// implementation partially taken from https://github.com/milagro-crypto/milagro-crypto-js/blob/develop/src/node/mpin.js#L125
+// implementation partially taken from https://github.com/milagro-crypto/milagro-crypto-js/blob/develop/src/mpin.js#L151
+// From MPIN API - hashit: function(sha, n, B)
 export const hashToPointOnCurve = (m) => {
   const R = hashMessage(m);
 

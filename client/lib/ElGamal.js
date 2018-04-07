@@ -1,9 +1,4 @@
 export default class ElGamal {
-  static setup() {
-    // not needed since its the same as CoinSig?
-    return 0;
-  }
-
   static keygen(params) {
     const [G, o, g1, g2, e] = params;
     const sk = G.ctx.BIG.randomnum(G.order, G.rngGen);
@@ -37,7 +32,6 @@ export default class ElGamal {
     const b_cpy = new G.ctx.ECP();
     b_cpy.copy(b);
 
-    // mod stuff?
     b_cpy.sub(t1);
 
     b_cpy.affine();

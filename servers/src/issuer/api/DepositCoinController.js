@@ -30,6 +30,15 @@ router.post('/', async (req, res) => {
   const pkX = ctx.ECP2.fromBytes(pkXBytes);
   const id = ctx.BIG.fromBytes(coinAttributes.idBytes);
 
+  // start by checking if the coin is still valid
+  if (coinAttributes.ttl < new Date().getTime()) {
+    if (DEBUG) {
+      console.log('Coin has expired, no further checks will be made.');
+    }
+    res.status(200)
+      .json({ success: false });
+    return;
+  }
 
   const signingAuthoritiesPublicKeys = Object.entries(publicKeys)
     .filter(entry => signingServers.includes(entry[0]))
@@ -57,9 +66,6 @@ router.post('/', async (req, res) => {
 
   // aggregatePublicKey is [ag, aX0, aX1, aX2, aX3, aX4];
   const aX3 = aggregatePublicKey[4];
-
-  // just check validity of the proof and double spending, we let issuer verify the signature
-  // temporary (to make whole system work), to remove when refactoring this file
 
   if (publicKeys[merchant] == null || publicKeys[merchant].length <= 0) {
     const merchantPK = await getPublicKey(merchant);

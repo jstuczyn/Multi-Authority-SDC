@@ -18,7 +18,7 @@ export const getPublicKey = async (server) => {
     let response = await fetch(`http://${server}/pk`);
     response = await response.json();
     const pkBytes = response.pk;
-    // due to the way they implemeted ECDSA, we do not need to convert it
+    // due to the way they implemented ECDSA, we do not need to convert it
     return pkBytes;
   } catch (err) {
     console.log(err);
@@ -126,7 +126,6 @@ export async function checkIfAlive(server) {
   return isAlive;
 }
 
-// todo: now
 export async function signCoin(server, signingCoin, ElGamalPK) {
   let signature = null;
   if (DEBUG) {

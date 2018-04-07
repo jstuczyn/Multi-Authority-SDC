@@ -1,5 +1,5 @@
 // A slightly modified Pointcheval-Sanders Short Randomizable Signatures scheme
-// to allow for larger number of signed messages
+// to allow for larger number of signed messages from multiple authorities
 
 import BpGroup from './BpGroup';
 import { ctx } from './globalConfig';
@@ -216,8 +216,6 @@ export default class CoinSig {
     return CoinSig.verify(params, aPk, coin, aggregateSignature);
   }
 
-
-  // todo: add extra proof of knowledge here?
   // no need to pass h - encryption is already using it
   static blindSignComponent(sk_component, encrypted_param) {
     const [encrypted_param_a, encrypted_param_b] = encrypted_param;

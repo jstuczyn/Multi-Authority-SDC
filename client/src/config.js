@@ -15,17 +15,10 @@ export const signingServers = (process.env.NODE_ENV === 'production') ? [
 ];
 
 export const merchant = (process.env.NODE_ENV === 'production') ? '35.178.0.223:3001' : '127.0.0.1:4000';
-
 export const issuer = (process.env.NODE_ENV === 'production') ? '35.178.15.103:3002' : '127.0.0.1:5000';
-
-
-
-// even though it is set a const, it can still be mutated because it is an object;
-// only the pointer can't be moved
 
 export const ctx = new CTX('BN254');
 export const params = CoinSig.setup();
-// todo: as in helpers.js, should there be separate params_coin for BLSSig?
 
 const COIN_STATUS_CREATED = 'Generated';
 const COIN_STATUS_SIGNING = 'Signing';

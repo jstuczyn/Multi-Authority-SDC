@@ -61,17 +61,17 @@ export const getSigningCoin = (issuedCoin, ElGamalPK, coin_id, coin_sk, sk_clien
     requestSig: requestSig,
   };
 
-  // need:
+  // Representation:
   /*
-  {{v
-  val
-  ttl
-  pk_c
-  }signed by issuer
-  E[h^id]
-  E[h^x]
+  { { v
+      val
+      ttl
+      pk_c
+    }signed by issuer
+    E[h^id]
+    E[h^x]
   }signed by client
-   */
+ */
 };
 
 export const verifySignRequest = (signingCoin, issuerPK) => {

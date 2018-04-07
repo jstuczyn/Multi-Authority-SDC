@@ -19,7 +19,10 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-stage-3": "^6.24.1",
     "chai": "^4.1.2",
     "eslint": "^4.14.0",
     "eslint-config-airbnb": "^16.1.0",
@@ -30,8 +33,8 @@
     "nyc": "^11.4.1"
   },
   "scripts": {
-    "test": "nyc mocha dist/test --timeout=10000",
-    "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files" ,
+    "test": "nyc mocha dist/test --require babel-polyfill --no-timeouts",
+    "build": "babel src --ignore lib --out-dir dist --source-maps inline --copy-files",
     "start_sign": "NODE_ENV=development node dist/signingAuthority/server.js",
     "start_merchant": "NODE_ENV=development node dist/merchant/server.js",
     "start_issuer": "NODE_ENV=development node dist/issuer/server.js",

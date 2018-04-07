@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { pkBytes } from '../config/CoinSigSetup';
+import { DEBUG } from '../config/appConfig';
 
 const router = express.Router();
 
@@ -9,7 +10,9 @@ router.use(bodyParser.json());
 
 
 router.get('/', (req, res) => {
-  console.log('pk get');
+  if (DEBUG) {
+    console.log('pk get');
+  }
   res.status(200).json({
     pk: pkBytes,
   });

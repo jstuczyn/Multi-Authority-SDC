@@ -1,5 +1,5 @@
 // A slightly modified Pointcheval-Sanders Short Randomizable Signatures scheme
-// to allow for larger number of signed messages
+// to allow for larger number of signed messages from multiple authorities
 
 import BpGroup from './BpGroup';
 import { ctx } from '../src/config';
@@ -96,7 +96,7 @@ export default class CoinSig {
 
   //  e(sig1, X0 + a1 * X1 + ...) == e(sig2, g)
   static verify(params, pk, coin, sig) {
-    // if aggregation failed because h differed
+    // aggregation failed because h differed
     if (!sig) {
       return false;
     }
@@ -216,8 +216,6 @@ export default class CoinSig {
     return CoinSig.verify(params, aPk, coin, aggregateSignature);
   }
 
-
-  // todo: add extra proof of knowledge here?
   // no need to pass h - encryption is already using it
   static blindSignComponent(sk_component, encrypted_param) {
     const [encrypted_param_a, encrypted_param_b] = encrypted_param;
@@ -227,18 +225,31 @@ export default class CoinSig {
     return [sig_a, sig_b];
   }
 
-  static mixedSignCoin(params, sk, coin, ElGamalPK) {
+  static mixedSignCoin(params, sk, signingCoin, ElGamalPK) {
     const [G, o, g1, g2, e] = params;
     const [x0, x1, x2, x3, x4] = sk;
 
-    const h = hashToPointOnCurve(coin.value.toString() + coin.ttl.toString() + coin.v.toString() + coin.ID.toString());
+    const reducer = (acc, cur) => acc + cur;
 
-    const a1 = new G.ctx.BIG(coin.value);
+    const coinStr =
+      signingCoin.pk_client_bytes.reduce(reducer) + // client's key
+      signingCoin.value.toString() + // coin's value
+      signingCoin.pk_coin_bytes.reduce(reducer) + // coin's pk
+      signingCoin.ttl.toString() +
+      signingCoin.issuedCoinSig[0].reduce(reducer) +
+      signingCoin.issuedCoinSig[1].reduce(reducer);
+
+    const h = hashToPointOnCurve(coinStr);
+
+    const enc_sk = [ctx.ECP.fromBytes(signingCoin.enc_sk_bytes[0]), ctx.ECP.fromBytes(signingCoin.enc_sk_bytes[1])];
+    const enc_id = [ctx.ECP.fromBytes(signingCoin.enc_id_bytes[0]), ctx.ECP.fromBytes(signingCoin.enc_id_bytes[1])];
+
+    const a1 = new G.ctx.BIG(signingCoin.value);
     a1.norm();
-    const a2 = hashToBIG(coin.ttl.toString());
+    const a2 = hashToBIG(signingCoin.ttl.toString());
 
-    const [enc_sk_component_a, enc_sk_component_b] = CoinSig.blindSignComponent(x3, coin.enc_sk);
-    const [enc_id_component_a, enc_id_component_b] = CoinSig.blindSignComponent(x4, coin.enc_id);
+    const [enc_sk_component_a, enc_sk_component_b] = CoinSig.blindSignComponent(x3, enc_sk);
+    const [enc_id_component_a, enc_id_component_b] = CoinSig.blindSignComponent(x4, enc_id);
 
     // calculate a1 mod p, a2 mod p, etc.
     const a1_cpy = new G.ctx.BIG(a1);

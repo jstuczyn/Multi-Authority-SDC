@@ -8,7 +8,6 @@ import { fromBytesProof, verifyProofOfSecret, getSigningAuthorityPublicKey } fro
 import { sig_pkBytes } from '../config/KeySetup';
 import { publicKeys } from '../cache';
 
-
 const router = express.Router();
 
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -111,6 +110,7 @@ router.post('/', async (req, res) => {
     const aX3 = aggregatePublicKey[4];
 
     // just check validity of the proof and double spending, we let issuer verify the signature
+    // successful verification of the proof assures the coin was supposed to be used in that transaction
     const merchantStr = sig_pkBytes.join('');
     const isProofValid = verifyProofOfSecret(params, pkX, proofOfSecret, merchantStr, aX3);
 
@@ -133,7 +133,6 @@ router.post('/', async (req, res) => {
     }
 
     // we don't need to create byte representations of all objects because we already have them
-    // should we sign the request by merchant?
     const wasCoinDeposited = await depositCoin(coinAttributes, simplifiedProof, req.body.signature, pkXBytes, issuer);
 
     responseStatus = 200;

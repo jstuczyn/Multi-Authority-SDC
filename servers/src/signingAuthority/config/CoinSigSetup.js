@@ -1,3 +1,4 @@
+import { ctx } from '../../globalConfig'; // required to resolve circular dependency issue
 import CoinSig from '../../CoinSig';
 
 export const params = [];

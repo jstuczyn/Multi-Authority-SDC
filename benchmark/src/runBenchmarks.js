@@ -19,9 +19,11 @@ import SignatureAggregation_5 from './primitives/SignatureAggregation_5';
 import SignatureAggregation_10 from './primitives/SignatureAggregation_10';
 import CoinSigning from './primitives/CoinSigning';
 import coinVerification from './primitives/CoinSignVerification';
+import ECDSA_Sign from './primitives/ECDSA_sig';
+import ECDSA_Verify from './primitives/ECDSA_ver';
+import SignatureRandomization from './primitives/SignatureRandomization';
 
-const MAX_REPETITIONS = 100;
-const MAX_TIME_PER_FUNCTION = 120000; // we can test each function for at most 120s (PREP TIME NOT INCLUDED);
+const MAX_REPETITIONS = 1000;
 
 const doBenchmark = (benchmark) => {
   const prepResult = benchmark.prep();
@@ -39,9 +41,9 @@ const doBenchmark = (benchmark) => {
     const measure = performance.getEntriesByName(`timing${benchmark.name}${i}`)[0];
     timings.push(measure.duration);
     runningTotal += measure.duration;
-    if (runningTotal > MAX_TIME_PER_FUNCTION) {
-      break;
-    }
+    // if (runningTotal > MAX_TIME_PER_FUNCTION) {
+    //   break;
+    // }
   }
 
   // start by removing first two elements of the array due to them being considerably bigger because of JIT
@@ -72,3 +74,6 @@ doBenchmark(SignatureAggregation_5);
 doBenchmark(SignatureAggregation_10);
 doBenchmark(CoinSigning);
 doBenchmark(coinVerification);
+doBenchmark(ECDSA_Sign);
+doBenchmark(ECDSA_Verify);
+doBenchmark(SignatureRandomization);

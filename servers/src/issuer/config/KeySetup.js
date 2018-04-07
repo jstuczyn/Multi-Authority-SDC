@@ -8,7 +8,6 @@ export const sig_skBytes = [];
 export const setupKeys = () => {
   const [G, o, g1, g2, e] = params;
 
-  // todo: when refactoring entire codebase, change all randomnum calls to that
   sigKeys.sk = ctx.BIG.randomnum(o, G.rngGen);
   sigKeys.sk.toBytes(sig_skBytes);
   sigKeys.pk = g1.mul(sigKeys.sk);
