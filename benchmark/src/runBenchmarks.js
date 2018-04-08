@@ -41,6 +41,9 @@ const doBenchmark = (benchmark) => {
     const measure = performance.getEntriesByName(`timing${benchmark.name}${i}`)[0];
     timings.push(measure.duration);
     runningTotal += measure.duration;
+    performance.clearMarks();
+    performance.clearMeasures();
+
     // if (runningTotal > MAX_TIME_PER_FUNCTION) {
     //   break;
     // }
