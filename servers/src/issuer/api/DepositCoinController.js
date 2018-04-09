@@ -15,6 +15,7 @@ router.use(bodyParser.json());
 
 
 router.post('/', async (req, res) => {
+  const t0 = new Date().getTime();
   if (DEBUG) {
     console.log('Deposit coin post');
   }
@@ -111,6 +112,9 @@ router.post('/', async (req, res) => {
     await insertUsedId(id);
     await changeBalance(publicKeys[merchant], coinAttributes.value);
   }
+
+  const t1 = new Date().getTime();
+  console.log('Deposit took: ', t1 - t0);
 
   res.status(200)
     .json({

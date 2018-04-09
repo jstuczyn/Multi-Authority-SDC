@@ -15,6 +15,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 router.post('/', async (req, res) => {
+  const t0 = new Date().getTime();
   if (DEBUG) {
     console.log('blindsign post');
   }
@@ -65,6 +66,8 @@ router.post('/', async (req, res) => {
     console.log(err);
     responseStatus = 400;
   }
+  const t1 = new Date().getTime();
+  console.log('Request took: ', t1 - t0);
   res.status(responseStatus).json({ signature: signatureBytes });
 });
 

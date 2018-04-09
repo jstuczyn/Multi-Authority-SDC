@@ -15,6 +15,7 @@ router.use(bodyParser.json());
 // don't cache client's pk as he sends it every request
 // and in principle there can be an arbitrary number of clients
 router.post('/', async (req, res) => {
+  const t0 = new Date().getTime();
   if (DEBUG) {
     console.log('POST Call to getcoin');
   }
@@ -104,7 +105,8 @@ router.post('/', async (req, res) => {
   if (DEBUG) {
     console.log(ISSUE_STATUS.success);
   }
-
+  const t1 = new Date().getTime();
+  console.log('Issueance request took: ', t1 - t0);
   res.status(200)
     .json({
       coin: issuedCoin,

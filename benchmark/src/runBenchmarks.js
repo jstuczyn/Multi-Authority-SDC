@@ -22,8 +22,10 @@ import coinVerification from './primitives/CoinSignVerification';
 import ECDSA_Sign from './primitives/ECDSA_sig';
 import ECDSA_Verify from './primitives/ECDSA_ver';
 import SignatureRandomization from './primitives/SignatureRandomization';
+import G1mul from './primitives/G1mul';
+import G2mul from './primitives/G2mul';
 
-const MAX_REPETITIONS = 1000;
+const MAX_REPETITIONS = 10;
 
 const doBenchmark = (benchmark) => {
   const prepResult = benchmark.prep();
@@ -48,7 +50,6 @@ const doBenchmark = (benchmark) => {
     //   break;
     // }
   }
-
   // start by removing first two elements of the array due to them being considerably bigger because of JIT
   timings.shift();
   timings.shift();
@@ -60,23 +61,25 @@ const doBenchmark = (benchmark) => {
   });
 };
 
-doBenchmark(pairingBenchmark);
-doBenchmark(randomBenchmark);
-doBenchmark(ElGamalKeygenBenchmark);
-doBenchmark(EntityKeygenBenchmark);
-doBenchmark(CoinSigKeygenBenchmark);
-doBenchmark(NZKPCreationBenchmark);
-doBenchmark(NZKPVerificationBenchmark);
-doBenchmark(ElGamalEncryptionBenchmark);
-doBenchmark(ElGamalDecryptionBenchmark);
-doBenchmark(PublicKeyAggregation_2);
-doBenchmark(PublicKeyAggregation_5);
-doBenchmark(PublicKeyAggregation_10);
-doBenchmark(SignatureAggregation_2);
-doBenchmark(SignatureAggregation_5);
-doBenchmark(SignatureAggregation_10);
-doBenchmark(CoinSigning);
-doBenchmark(coinVerification);
-doBenchmark(ECDSA_Sign);
-doBenchmark(ECDSA_Verify);
-doBenchmark(SignatureRandomization);
+// doBenchmark(pairingBenchmark);
+// doBenchmark(randomBenchmark);
+// doBenchmark(ElGamalKeygenBenchmark);
+// doBenchmark(EntityKeygenBenchmark);
+// doBenchmark(CoinSigKeygenBenchmark);
+// doBenchmark(NZKPCreationBenchmark);
+// doBenchmark(NZKPVerificationBenchmark);
+// doBenchmark(ElGamalEncryptionBenchmark);
+// doBenchmark(ElGamalDecryptionBenchmark);
+// doBenchmark(PublicKeyAggregation_2);
+// doBenchmark(PublicKeyAggregation_5);
+// doBenchmark(PublicKeyAggregation_10);
+// doBenchmark(SignatureAggregation_2);
+// doBenchmark(SignatureAggregation_5);
+// doBenchmark(SignatureAggregation_10);
+// doBenchmark(CoinSigning);
+// doBenchmark(coinVerification);
+// doBenchmark(ECDSA_Sign);
+// doBenchmark(ECDSA_Verify);
+// doBenchmark(SignatureRandomization);
+doBenchmark(G1mul);
+doBenchmark(G2mul);

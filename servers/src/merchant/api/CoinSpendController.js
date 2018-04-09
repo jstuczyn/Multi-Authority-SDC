@@ -64,6 +64,7 @@ const depositCoin = async (coinAttributes, simplifiedProof, sigBytes, pkXBytes, 
 };
 
 router.post('/', async (req, res) => {
+  const t0 = new Date().getTime();
   const client_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
   if (DEBUG) {
@@ -144,6 +145,9 @@ router.post('/', async (req, res) => {
     console.warn(err);
     responseStatus = 400;
   }
+  const t1 = new Date().getTime();
+  console.log('Request took: ', t1 - t0);
+
   res.status(responseStatus)
     .json({ success: success });
 });
