@@ -8,7 +8,7 @@ Credential systems allow users to obtain certifications for some messages and la
 
 This project investigates the existing solutions and proposes an alternative signature scheme addressing their shortcomings. It allows for signing committed messages and uses signature randomization in order to introduce the required unlinkability. Furthermore, size of credentials is constant and relatively short regardless of the number of attributes embedded and the number of authorities that participated in its issuance.
 
-The implemented credential system is a sample application of the scheme in an e-cash setting in the web environment. It manages to operate with reasonably low latency and scales well with different number of signing authorities present. However, as the number of simultaneous clients increases, the bottleneck of the system is discovered that originates from the issuer.
+The Tangerine credential system is implemented as a sample application of the scheme in an e-cash setting in the web environment. It manages to operate with reasonably low latency and scales well with different number of signing authorities present. However, as the number of simultaneous clients increases, the bottleneck of the system is discovered that originates from the issuer.
 
 **Full thesis available upon request.**
 
